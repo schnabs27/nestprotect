@@ -126,65 +126,82 @@ serve(async (req) => {
             for (const query of searchQueries) {
               console.log(`Searching for: ${query} near ${zipCode}`);
               
-              // Use text search with location bias instead of strict radius
-              const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + ' near ' + zipCode)}&location=${location.lat},${location.lng}&radius=50000&key=${mapsApiKey}`;
-              console.log('Places search URL (key hidden):', placesUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
+              // Use NEW Places API (Text Search)
+              const placesUrl = `https://places.googleapis.com/v1/places:searchText`;
+              console.log('Places search URL:', placesUrl);
               
-              const placesResponse = await fetch(placesUrl);
+              const requestBody = {
+                textQuery: `${query} near ${zipCode}`,
+                locationBias: {
+                  circle: {
+                    center: {
+                      latitude: location.lat,
+                      longitude: location.lng
+                    },
+                    radius: 50000.0
+                  }
+                },
+                maxResultCount: 10,
+                includedType: getPlaceType(query)
+              };
+              
+              console.log('Places API request body:', JSON.stringify(requestBody, null, 2));
+              
+              const placesResponse = await fetch(placesUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Goog-Api-Key': mapsApiKey,
+                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus'
+                },
+                body: JSON.stringify(requestBody)
+              });
               console.log(`Places API response status for "${query}":`, placesResponse.status, placesResponse.statusText);
               
               if (placesResponse.ok) {
                 const placesData = await placesResponse.json();
                 console.log(`Places API response for "${query}":`, JSON.stringify({
-                  status: placesData.status,
-                  resultsCount: placesData?.results?.length || 0,
-                  error_message: placesData.error_message,
-                  next_page_token: placesData.next_page_token ? 'present' : 'none'
+                  placesCount: placesData?.places?.length || 0,
+                  hasPlaces: !!placesData.places
                 }, null, 2));
                 
-                if (placesData.status === 'OK' && placesData.results && placesData.results.length > 0) {
-                  console.log(`Processing ${placesData.results.length} results for "${query}"`);
+                if (placesData.places && placesData.places.length > 0) {
+                  console.log(`Processing ${placesData.places.length} results for "${query}"`);
                   
-                  for (const place of placesData.results.slice(0, 5)) { // Limit to first 5 results per query
+                  for (const place of placesData.places.slice(0, 5)) { // Limit to first 5 results per query
                     // Calculate distance from ZIP center
                     const distance = calculateDistance(
                       location.lat, location.lng,
-                      place.geometry.location.lat, place.geometry.location.lng
+                      place.location.latitude, place.location.longitude
                     );
                     
-                    console.log(`Found ${place.name} at distance: ${distance.toFixed(1)} miles`);
+                    console.log(`Found ${place.displayName?.text || 'Unknown'} at distance: ${distance.toFixed(1)} miles`);
                     
                     if (distance <= 30) { // Within 30 miles
                       results.push({
-                        name: place.name || 'Unknown Place',
+                        name: place.displayName?.text || 'Unknown Place',
                         category: categorizePlace(query, place.types || []),
-                        description: `${place.types?.slice(0, 2).join(', ') || query} - ${place.formatted_address || ''}`,
+                        description: `${place.types?.slice(0, 2).join(', ') || query} - ${place.formattedAddress || ''}`,
                         phone: '',
                         website: '',
-                        address: place.formatted_address || '',
-                        city: extractCity(place.formatted_address || ''),
-                        state: extractState(place.formatted_address || ''),
+                        address: place.formattedAddress || '',
+                        city: extractCity(place.formattedAddress || ''),
+                        state: extractState(place.formattedAddress || ''),
                         postal_code: zipCode,
-                        latitude: place.geometry.location.lat,
-                        longitude: place.geometry.location.lng,
+                        latitude: place.location.latitude,
+                        longitude: place.location.longitude,
                         distance_mi: Math.round(distance * 10) / 10,
                         source: 'Google Maps',
-                        source_id: place.place_id || '',
+                        source_id: place.id || '',
                         hours: ''
                       });
-                      console.log(`Added ${place.name} to results`);
+                      console.log(`Added ${place.displayName?.text || 'Unknown'} to results`);
                     } else {
-                      console.log(`${place.name} excluded - outside 30 mile radius (${distance.toFixed(1)} miles)`);
+                      console.log(`${place.displayName?.text || 'Unknown'} excluded - outside 30 mile radius (${distance.toFixed(1)} miles)`);
                     }
                   }
-                } else if (placesData.status === 'REQUEST_DENIED') {
-                  console.error(`Places API REQUEST DENIED for "${query}":`, placesData.error_message);
-                  errors.push(`Google Places API access denied: ${placesData.error_message}`);
-                } else if (placesData.status === 'INVALID_REQUEST') {
-                  console.error(`Places API INVALID REQUEST for "${query}":`, placesData.error_message);
-                  errors.push(`Google Places API invalid request: ${placesData.error_message}`);
                 } else {
-                  console.log(`No results for "${query}": status=${placesData.status}, error=${placesData.error_message || 'none'}`);
+                  console.log(`No results for "${query}": response contains no places`);
                 }
               } else {
                 console.error(`Places API HTTP error for "${query}":`, placesResponse.status, placesResponse.statusText);
@@ -266,6 +283,32 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+// Helper function to get place type for new Places API
+function getPlaceType(query: string): string {
+  query = query.toLowerCase();
+  
+  if (query.includes('food') || query.includes('bank') || query.includes('pantry')) {
+    return 'food';
+  }
+  if (query.includes('shelter') || query.includes('homeless')) {
+    return 'lodging';
+  }
+  if (query.includes('hospital')) {
+    return 'hospital';
+  }
+  if (query.includes('fire')) {
+    return 'fire_station';
+  }
+  if (query.includes('police')) {
+    return 'police';
+  }
+  if (query.includes('community')) {
+    return 'community_center';
+  }
+  
+  return 'establishment';
 }
 
 // Helper function to categorize places based on search query and types
