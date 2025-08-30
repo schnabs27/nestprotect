@@ -192,7 +192,7 @@ serve(async (req) => {
                         description: typeDescription,
                         phone: place.nationalPhoneNumber || '',
                         website: '',
-                        address: place.formattedAddress || '',
+                        address: extractStreetAddress(place.formattedAddress || ''),
                         city: extractCity(place.formattedAddress || ''),
                         state: extractState(place.formattedAddress || ''),
                         postal_code: zipCode,
@@ -343,6 +343,13 @@ function categorizePlace(query: string, types: string[]): string {
   }
   
   return 'general';
+}
+
+// Helper function to extract street address from formatted address
+function extractStreetAddress(address: string): string {
+  const parts = address.split(',');
+  // Return just the first part (street address) if available
+  return parts.length > 0 ? parts[0].trim() : '';
 }
 
 // Helper function to extract city from formatted address
