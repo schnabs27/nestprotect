@@ -1,41 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, MapPin, Star, Phone, Globe, Navigation, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ResourcesPage = () => {
   const [zipCode, setZipCode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-
-  const mockResources = [
-    {
-      id: "1",
-      name: "American Red Cross Shelter",
-      category: "shelter",
-      description: "Emergency shelter and relief services for disaster victims",
-      phone: "(555) 123-4567",
-      website: "redcross.org",
-      address: "123 Main St, Springfield, IL",
-      distance: 0.8,
-      sources: ["Red Cross", "FEMA"],
-      isFavorite: false
-    },
-    {
-      id: "2", 
-      name: "United Way Food Bank",
-      category: "food",
-      description: "Emergency food assistance and meal distribution center",
-      phone: "(555) 987-6543",
-      website: "unitedway.org",
-      address: "456 Oak Ave, Springfield, IL",
-      distance: 1.2,
-      sources: ["211", "Google"],
-      isFavorite: true
-    }
-  ];
+  const [resources, setResources] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [cachedResults, setCachedResults] = useState<any>(null);
+  const { toast } = useToast();
 
   const categories = [
     { id: "all", label: "All", color: "bg-secondary" },
@@ -46,14 +25,66 @@ const ResourcesPage = () => {
     { id: "legal", label: "Legal", color: "bg-muted" }
   ];
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!zipCode.trim()) return;
     
     setIsSearching(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('search-disaster-resources', {
+        body: { zipCode: zipCode.trim() }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.cached && data.cachedAt) {
+        setCachedResults({
+          cachedAt: new Date(data.cachedAt).toLocaleString(),
+          count: data.resources.length
+        });
+        toast({
+          title: "Cached Results",
+          description: `Showing ${data.resources.length} cached results from ${new Date(data.cachedAt).toLocaleString()}`,
+        });
+      } else {
+        setCachedResults(null);
+        toast({
+          title: "Search Complete",
+          description: `Found ${data.resources.length} disaster relief resources`,
+        });
+      }
+
+      if (data.errors && data.errors.length > 0) {
+        toast({
+          title: "Partial Results",
+          description: `Some data sources had errors: ${data.errors.join(', ')}`,
+          variant: "destructive",
+        });
+      }
+
+      setResources(data.resources || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Search Error",
+        description: "Failed to search for disaster relief resources. Please try again.",
+        variant: "destructive",
+      });
+      setResources([]);
+    } finally {
       setIsSearching(false);
-    }, 2000);
+    }
+  };
+
+  const filteredResources = resources.filter(resource => 
+    selectedCategory === "all" || resource.category?.toLowerCase().includes(selectedCategory)
+  );
+
+  const toggleFavorite = async (resourceId: string) => {
+    // This would integrate with user preferences when auth is implemented
+    console.log('Toggle favorite for resource:', resourceId);
   };
 
   return (
@@ -105,11 +136,31 @@ const ResourcesPage = () => {
               <Badge
                 key={category.id}
                 variant="secondary"
-                className={`${category.color} text-white cursor-pointer hover:opacity-80 transition-smooth`}
+                className={`${category.color} text-white cursor-pointer hover:opacity-80 transition-smooth ${
+                  selectedCategory === category.id ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setSelectedCategory(category.id)}
               >
                 {category.label}
               </Badge>
             ))}
+          </div>
+        )}
+
+        {/* Cached Results Notice */}
+        {cachedResults && (
+          <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4">
+            <p className="text-xs text-muted-foreground">
+              Showing cached results from {cachedResults.cachedAt}. 
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="h-auto p-0 ml-1 text-xs"
+                onClick={handleSearch}
+              >
+                Run fresh search ↻
+              </Button>
+            </p>
           </div>
         )}
 
@@ -134,7 +185,19 @@ const ResourcesPage = () => {
 
         {/* Resource Cards */}
         <div className="space-y-4">
-          {mockResources.map((resource) => (
+          {filteredResources.length === 0 && resources.length === 0 && !isSearching && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Enter a ZIP code to search for disaster relief resources</p>
+            </div>
+          )}
+          
+          {filteredResources.length === 0 && resources.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No resources found for the selected category</p>
+            </div>
+          )}
+
+          {filteredResources.map((resource) => (
             <Card key={resource.id} className="shadow-soft hover:shadow-medium transition-smooth">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -145,10 +208,11 @@ const ResourcesPage = () => {
                         variant="ghost"
                         size="sm"
                         className="h-6 w-6 p-0"
+                        onClick={() => toggleFavorite(resource.id)}
                       >
                         <Star 
                           size={16} 
-                          className={resource.isFavorite ? "fill-yellow text-yellow" : "text-muted-foreground"} 
+                          className="text-muted-foreground hover:text-yellow" 
                         />
                       </Button>
                     </div>
@@ -157,34 +221,61 @@ const ResourcesPage = () => {
                     </p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                       <MapPin size={12} />
-                      <span>{resource.address} • {resource.distance} mi</span>
+                      <span>
+                        {resource.address && `${resource.address} • `}
+                        {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Source badges */}
+                {/* Source badge */}
                 <div className="flex gap-1 mb-3">
-                  {resource.sources.map((source) => (
-                    <Badge key={source} variant="secondary" className="text-xs">
-                      {source}
+                  <Badge variant="secondary" className="text-xs">
+                    {resource.source}
+                  </Badge>
+                  {resource.category && (
+                    <Badge variant="outline" className="text-xs">
+                      {resource.category}
                     </Badge>
-                  ))}
+                  )}
                 </div>
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Phone size={16} className="mr-1" />
-                    Call
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Globe size={16} className="mr-1" />
-                    Website
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Navigation size={16} className="mr-1" />
-                    Directions
-                  </Button>
+                  {resource.phone && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => window.open(`tel:${resource.phone}`)}
+                    >
+                      <Phone size={16} className="mr-1" />
+                      Call
+                    </Button>
+                  )}
+                  {resource.website && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => window.open(resource.website.startsWith('http') ? resource.website : `https://${resource.website}`, '_blank')}
+                    >
+                      <Globe size={16} className="mr-1" />
+                      Website
+                    </Button>
+                  )}
+                  {resource.latitude && resource.longitude && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => window.open(`https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}`, '_blank')}
+                    >
+                      <Navigation size={16} className="mr-1" />
+                      Directions
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

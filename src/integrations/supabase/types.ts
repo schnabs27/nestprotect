@@ -14,7 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      disaster_resources: {
+        Row: {
+          address: string | null
+          category: string | null
+          city: string | null
+          created_at: string
+          description: string | null
+          distance_mi: number | null
+          email: string | null
+          hours: string | null
+          id: string
+          is_archived: boolean | null
+          last_seen_at: string | null
+          last_verified_at: string | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          postal_code: string | null
+          source: string | null
+          source_id: string | null
+          state: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          distance_mi?: number | null
+          email?: string | null
+          hours?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_seen_at?: string | null
+          last_verified_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          postal_code?: string | null
+          source?: string | null
+          source_id?: string | null
+          state?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          distance_mi?: number | null
+          email?: string | null
+          hours?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_seen_at?: string | null
+          last_verified_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          postal_code?: string | null
+          source?: string | null
+          source_id?: string | null
+          state?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      user_resource_prefs: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          id: string
+          is_favorite: boolean | null
+          is_hidden: boolean | null
+          resource_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_hidden?: boolean | null
+          resource_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_hidden?: boolean | null
+          resource_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_resource_prefs_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "disaster_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
