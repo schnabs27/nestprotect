@@ -45,8 +45,8 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
     const getMapsApiKey = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('get-maps-api-key');
-        if (data?.key) {
-          setMapsApiKey(data.key);
+        if (data?.apiKey) {
+          setMapsApiKey(data.apiKey);
         }
       } catch (error) {
         console.error('Error getting Maps API key:', error);
