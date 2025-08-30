@@ -225,10 +225,11 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 relative min-h-0 mb-2">
+        <div className="flex-1 relative min-h-[400px] mb-2">
           <div 
             ref={mapContainer} 
-            className="absolute inset-0 rounded-lg w-full h-full"
+            className="w-full h-full rounded-lg"
+            style={{ minHeight: '400px', height: '100%' }}
           />
           {(!googleMapsLoaded || !mapsApiKey) && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg">
