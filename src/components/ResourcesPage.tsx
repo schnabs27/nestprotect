@@ -27,15 +27,17 @@ const ResourcesPage = () => {
     );
   };
 
-  const categories = [
+  const mainCategories = [
     { id: "all", label: "All", color: "bg-[#06c29a]" },
-    { id: "favorites", label: "Favorites", color: "bg-yellow-500" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-orange-500" },
     { id: "medical", label: "Medical", color: "bg-accent" },
     { id: "cleanup", label: "Cleanup", color: "bg-primary" },
-    { id: "legal", label: "Legal", color: "bg-gray-700" }
+    { id: "legal", label: "Legal", color: "bg-gray-700" },
+    { id: "emergency", label: "Emergency Response", color: "bg-raspberry" }
   ];
+
+  const favoritesCategory = { id: "favorites", label: "Favorites", color: "bg-yellow" };
 
   const handleSearch = async () => {
     if (!zipCode.trim()) return;
@@ -126,11 +128,15 @@ const ResourcesPage = () => {
   const filteredResources = resources
     .filter(resource => {
       if (selectedCategory === "all") return true;
-      if (selectedCategory === "favorites") {
-        const resourceKey = `${resource.source_id}-${resource.source}`;
-        return favorites.has(resourceKey);
-      }
-      return resource.category?.toLowerCase().includes(selectedCategory);
+              if (selectedCategory === "favorites") {
+                const resourceKey = `${resource.source_id}-${resource.source}`;
+                return favorites.has(resourceKey);
+              }
+              if (selectedCategory === "emergency") {
+                return resource.category?.toLowerCase().includes("emergency") || 
+                       resource.category?.toLowerCase().includes("response");
+              }
+              return resource.category?.toLowerCase().includes(selectedCategory);
     })
     .sort((a, b) => (a.distance_mi || 999) - (b.distance_mi || 999));
 
@@ -191,7 +197,7 @@ const ResourcesPage = () => {
       <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
         <h1 className="text-2xl font-bold mb-2">Local Disaster Relief</h1>
         <p className="text-primary-foreground/90 text-sm">
-          Find nearby resources within 30 miles
+          Find nearby resources within 30 miles using ZIP code or location
         </p>
       </div>
 
@@ -200,7 +206,7 @@ const ResourcesPage = () => {
         <div className="flex gap-2 mb-4">
           <div className="flex-1">
             <Input
-              placeholder="Enter ZIP code..."
+              placeholder="Enter ZIP code or location (address)..."
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
               className="h-12"
@@ -216,21 +222,11 @@ const ResourcesPage = () => {
           </Button>
         </div>
 
-        {/* Filter Toggle */}
-        <Button
-          variant="outline" 
-          size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className="mb-4"
-        >
-          <Filter size={16} className="mr-2" />
-          Filters
-        </Button>
-
         {/* Category Filters */}
-        {showFilters && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {categories.map((category) => (
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {mainCategories.map((category) => (
               <Badge
                 key={category.id}
                 variant="secondary"
@@ -243,7 +239,20 @@ const ResourcesPage = () => {
               </Badge>
             ))}
           </div>
-        )}
+          
+          {/* Favorites - Separate section */}
+          <div className="flex flex-wrap gap-2">
+            <Badge
+              variant="secondary"
+              className={`${favoritesCategory.color} text-yellow-foreground cursor-pointer hover:opacity-80 transition-smooth ${
+                selectedCategory === favoritesCategory.id ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => setSelectedCategory(favoritesCategory.id)}
+            >
+              {favoritesCategory.label}
+            </Badge>
+          </div>
+        </div>
 
         {/* Cached Results Notice */}
         {cachedResults && (
@@ -279,7 +288,7 @@ const ResourcesPage = () => {
           <div className="mb-4">
             <Button 
               variant="outline" 
-              className="w-full"
+              className="w-full bg-gradient-primary text-primary-foreground border-0 hover:opacity-90"
               onClick={() => setShowMap(true)}
             >
               <MapPin size={16} className="mr-2" />
@@ -302,14 +311,6 @@ const ResourcesPage = () => {
             <p className="text-xs text-muted-foreground pr-8">
               These listings come from disaster relief databases. Please <strong>call to confirm</strong> they're open.
             </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-2 h-6 px-2 text-xs"
-              onClick={() => setShowDisclaimer(false)}
-            >
-              OK
-            </Button>
           </div>
         )}
 
@@ -317,7 +318,7 @@ const ResourcesPage = () => {
         <div className="space-y-4">
           {filteredResources.length === 0 && resources.length === 0 && !isSearching && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Enter a ZIP code to search for disaster relief resources</p>
+              <p className="text-muted-foreground">Enter a ZIP code or location to search for disaster relief resources</p>
             </div>
           )}
           

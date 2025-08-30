@@ -57,6 +57,10 @@ export default {
 					DEFAULT: 'hsl(var(--yellow))',
 					foreground: 'hsl(var(--yellow-foreground))'
 				},
+				raspberry: {
+					DEFAULT: 'hsl(var(--raspberry))',
+					foreground: 'hsl(var(--raspberry-foreground))'
+				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))'

@@ -42,6 +42,9 @@ All colors MUST be HSL.
     
     --yellow: 51 100% 50%; /* #FFD400 */
     --yellow-foreground: 0 0% 0%;
+    
+    --raspberry: 345 84% 56%; /* #e13363 */
+    --raspberry-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
