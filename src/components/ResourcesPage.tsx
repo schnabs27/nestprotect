@@ -31,7 +31,7 @@ const ResourcesPage = () => {
     { id: "all", label: "All", color: "bg-[#06c29a]" },
     { id: "favorites", label: "Favorites", color: "bg-yellow-500" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
-    { id: "food", label: "Food", color: "bg-yellow" },
+    { id: "food", label: "Food", color: "bg-orange-500" },
     { id: "medical", label: "Medical", color: "bg-accent" },
     { id: "cleanup", label: "Cleanup", color: "bg-primary" },
     { id: "legal", label: "Legal", color: "bg-gray-700" }
