@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, MapPin, Phone, Globe, Navigation } from "lucide-react";
+import { MapPin, Phone, Globe, Navigation } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Resource {
@@ -28,59 +26,89 @@ interface ResourceMapProps {
   zipCode: string;
 }
 
+// Declare global google types
+declare global {
+  interface Window {
+    google: any;
+    initMap: () => void;
+  }
+}
+
 const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange, zipCode }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
+  const [map, setMap] = useState<any>(null);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  const [mapsApiKey, setMapsApiKey] = useState<string>('');
 
-  // Get Mapbox token from Supabase function
+  // Get Google Maps API key from Supabase function
   useEffect(() => {
-    const getMapboxToken = async () => {
+    const getMapsApiKey = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (data?.token) {
-          setMapboxToken(data.token);
+        const { data, error } = await supabase.functions.invoke('get-maps-api-key');
+        if (data?.key) {
+          setMapsApiKey(data.key);
         }
       } catch (error) {
-        console.error('Error getting Mapbox token:', error);
+        console.error('Error getting Maps API key:', error);
       }
     };
 
     if (open) {
-      getMapboxToken();
+      getMapsApiKey();
     }
   }, [open]);
 
-  // Initialize map when dialog opens and token is available
+  // Load Google Maps script
   useEffect(() => {
-    if (!open || !mapContainer.current || !mapboxToken) return;
+    if (!mapsApiKey || googleMapsLoaded) return;
 
-    // Set Mapbox access token
-    mapboxgl.accessToken = mapboxToken;
+    const loadGoogleMaps = () => {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=marker`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        setGoogleMapsLoaded(true);
+      };
+      
+      document.head.appendChild(script);
+    };
 
-    // Clear existing markers
-    markers.current.forEach(marker => marker.remove());
-    markers.current = [];
+    loadGoogleMaps();
+  }, [mapsApiKey, googleMapsLoaded]);
 
+  // Initialize map when dialog opens and Google Maps is loaded
+  useEffect(() => {
+    if (!open || !googleMapsLoaded || !mapContainer.current || !window.google) return;
+
+    // Default center (Pasadena)
+    const defaultCenter = { lat: 34.1672, lng: -118.1535 };
+    
     // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+    const mapInstance = new window.google.maps.Map(mapContainer.current, {
+      center: defaultCenter,
       zoom: 11,
-      center: [-118.1535, 34.1672], // Default to Pasadena coordinates
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }]
+        }
+      ]
     });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    setMap(mapInstance);
 
     // Add markers for each resource
     if (resources.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
+      const bounds = new window.google.maps.LatLngBounds();
       
       resources.forEach((resource) => {
         if (resource.latitude && resource.longitude) {
-          // Create marker color based on category
+          const position = { lat: resource.latitude, lng: resource.longitude };
+          
+          // Get marker color based on category
           const getMarkerColor = (category?: string) => {
             switch (category?.toLowerCase()) {
               case 'food': return '#EAB308'; // yellow
@@ -91,75 +119,75 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             }
           };
 
-          // Create custom marker element
-          const markerEl = document.createElement('div');
-          markerEl.className = 'resource-marker';
-          markerEl.style.cssText = `
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: ${getMarkerColor(resource.category)};
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            cursor: pointer;
-          `;
+          // Create marker
+          const marker = new window.google.maps.Marker({
+            position,
+            map: mapInstance,
+            title: resource.name,
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: getMarkerColor(resource.category),
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 2,
+            }
+          });
 
-          // Create popup content
-          const popupContent = `
-            <div class="p-3 min-w-[250px]">
-              <h3 class="font-semibold text-sm mb-2">${resource.name}</h3>
-              <p class="text-xs text-gray-600 mb-2">${resource.description}</p>
-              ${resource.phone ? `<p class="text-xs mb-1"><span class="font-medium">Phone:</span> ${resource.phone}</p>` : ''}
-              ${resource.address ? `<p class="text-xs mb-2"><span class="font-medium">Address:</span> ${resource.address}${resource.city ? `, ${resource.city}` : ''}</p>` : ''}
-              <div class="flex gap-1 mt-2">
-                ${resource.phone ? `<button onclick="window.open('tel:${resource.phone}')" class="text-xs bg-green-500 text-white px-2 py-1 rounded">Call</button>` : ''}
-                ${resource.website ? `<button onclick="window.open('${resource.website.startsWith('http') ? resource.website : `https://${resource.website}`}', '_blank')" class="text-xs bg-blue-500 text-white px-2 py-1 rounded">Website</button>` : ''}
-                <button onclick="window.open('https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}', '_blank')" class="text-xs bg-red-500 text-white px-2 py-1 rounded">Directions</button>
+          // Create info window content
+          const infoContent = `
+            <div style="max-width: 250px; padding: 10px;">
+              <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">${resource.name}</h3>
+              <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">${resource.description}</p>
+              ${resource.phone ? `<p style="margin: 0 0 4px 0; font-size: 12px;"><strong>Phone:</strong> ${resource.phone}</p>` : ''}
+              ${resource.address ? `<p style="margin: 0 0 8px 0; font-size: 12px;"><strong>Address:</strong> ${resource.address}${resource.city ? `, ${resource.city}` : ''}</p>` : ''}
+              <div style="display: flex; gap: 4px; margin-top: 8px;">
+                ${resource.phone ? `<button onclick="window.open('tel:${resource.phone}')" style="font-size: 11px; background: #22c55e; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Call</button>` : ''}
+                ${resource.website ? `<button onclick="window.open('${resource.website.startsWith('http') ? resource.website : `https://${resource.website}`}', '_blank')" style="font-size: 11px; background: #3b82f6; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Website</button>` : ''}
+                <button onclick="window.open('https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}', '_blank')" style="font-size: 11px; background: #ef4444; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Directions</button>
               </div>
             </div>
           `;
 
-          // Create popup
-          const popup = new mapboxgl.Popup({
-            offset: 25,
-            closeButton: true,
-            closeOnClick: false
-          }).setHTML(popupContent);
+          const infoWindow = new window.google.maps.InfoWindow({
+            content: infoContent
+          });
 
-          // Create marker
-          const marker = new mapboxgl.Marker(markerEl)
-            .setLngLat([resource.longitude, resource.latitude])
-            .setPopup(popup)
-            .addTo(map.current!);
+          marker.addListener('click', () => {
+            infoWindow.open(mapInstance, marker);
+          });
 
-          markers.current.push(marker);
-          bounds.extend([resource.longitude, resource.latitude]);
+          bounds.extend(position);
         }
       });
 
       // Fit map to show all markers
       if (!bounds.isEmpty()) {
-        map.current.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 15
+        mapInstance.fitBounds(bounds);
+        
+        // Set max zoom level
+        const listener = window.google.maps.event.addListener(mapInstance, 'idle', () => {
+          if (mapInstance.getZoom() > 15) {
+            mapInstance.setZoom(15);
+          }
+          window.google.maps.event.removeListener(listener);
         });
       }
     }
 
     // Cleanup function
     return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
+      if (mapInstance) {
+        window.google.maps.event.clearInstanceListeners(mapInstance);
       }
     };
-  }, [open, mapboxToken, resources]);
+  }, [open, googleMapsLoaded, resources]);
 
-  if (!mapboxToken && open) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
-        <DialogHeader className="pb-2 md:pb-4">
+  if (!mapsApiKey && open) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
+          <DialogHeader>
             <DialogTitle>Resource Map</DialogTitle>
           </DialogHeader>
           <div className="flex items-center justify-center h-full">
@@ -183,10 +211,16 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
           </DialogTitle>
         </DialogHeader>
         <div className="flex-1 relative min-h-0">
-          <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
-          {resources.length === 0 && (
+          <div 
+            ref={mapContainer} 
+            className="absolute inset-0 rounded-lg w-full h-full"
+            style={{ minHeight: '300px' }}
+          />
+          {(!googleMapsLoaded || resources.length === 0) && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg">
-              <p className="text-muted-foreground">No resources to display on map</p>
+              <p className="text-muted-foreground">
+                {!googleMapsLoaded ? 'Loading map...' : 'No resources to display on map'}
+              </p>
             </div>
           )}
         </div>
