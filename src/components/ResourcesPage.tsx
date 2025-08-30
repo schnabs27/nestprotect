@@ -225,18 +225,27 @@ const ResourcesPage = () => {
         <div className="mb-4">
           <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
           <div className="flex flex-wrap gap-2">
-            {mainCategories.map((category) => (
-              <Badge
-                key={category.id}
-                variant="secondary"
-                className={`${category.color} ${category.id === "favorites" ? "text-yellow-foreground" : "text-white"} cursor-pointer hover:opacity-80 transition-smooth ${
-                  selectedCategory === category.id ? 'ring-2 ring-primary' : ''
-                }`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                {category.label}
-              </Badge>
-            ))}
+            {mainCategories.map((category) => {
+              const isSelected = selectedCategory === category.id;
+              const isFavorites = category.id === "favorites";
+              
+              return (
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} ${isFavorites ? "text-yellow-foreground" : "text-white"} ring-2 ring-primary`
+                      : isFavorites 
+                        ? `${category.color} text-yellow-foreground`
+                        : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
+                  }`}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
+              );
+            })}
           </div>
         </div>
 
