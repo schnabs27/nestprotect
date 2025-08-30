@@ -169,68 +169,66 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
   const addWeatherMarkers = () => {
     if (!mapInstance.current || !window.google) return;
 
-    // Mock weather data points
+    // Get map center for weather data
+    const center = mapInstance.current.getCenter();
+    if (!center) return;
+
+    // Mock weather data points around the center - NOTE: This is demo data
     const weatherPoints = [
-      { lat: 39.7817, lng: -89.6501, condition: 'Partly Cloudy', temp: 72 },
-      { lat: 39.8, lng: -89.7, condition: 'Sunny', temp: 75 },
-      { lat: 39.75, lng: -89.6, condition: 'Cloudy', temp: 70 },
+      { 
+        lat: center.lat(), 
+        lng: center.lng(), 
+        condition: 'Current Location', 
+        temp: 'N/A',
+        note: 'Real weather data integration needed'
+      },
+      { 
+        lat: center.lat() + 0.02, 
+        lng: center.lng() + 0.02, 
+        condition: 'Demo Data', 
+        temp: '72',
+        note: 'This is sample data'
+      },
+      { 
+        lat: center.lat() - 0.02, 
+        lng: center.lng() - 0.02, 
+        condition: 'Mock Data', 
+        temp: '68',
+        note: 'Connect to weather API for real data'
+      },
     ];
 
     weatherPoints.forEach((point) => {
-      // Use AdvancedMarkerElement if available, fallback to legacy Marker
-      if (window.google.maps.marker && window.google.maps.marker.AdvancedMarkerElement) {
-        const content = document.createElement('div');
-        content.innerHTML = `
-          <div style="
-            background: #3B82F6; 
-            color: white; 
-            padding: 4px 8px; 
-            border-radius: 16px; 
-            font-size: 12px; 
-            font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          ">
-            ${point.temp}°
+      // Always use legacy Marker to avoid Map ID requirement
+      const marker = new window.google.maps.Marker({
+        position: { lat: point.lat, lng: point.lng },
+        map: mapInstance.current,
+        title: `${point.temp}°F - ${point.condition}`,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+            <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="#e11d48" stroke="white" stroke-width="2"/>
+              <text x="20" y="15" text-anchor="middle" fill="white" font-size="10" font-weight="bold">DEMO</text>
+              <text x="20" y="27" text-anchor="middle" fill="white" font-size="8">${point.temp}°</text>
+            </svg>
+          `),
+          scaledSize: new window.google.maps.Size(40, 40)
+        }
+      });
+
+      const infoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px;">
+            <strong>⚠️ Demo Weather Data</strong><br/>
+            <em>Temperature: ${point.temp}°F</em><br/>
+            <small>${point.note}</small>
           </div>
-        `;
+        `
+      });
 
-        const marker = new window.google.maps.marker.AdvancedMarkerElement({
-          position: { lat: point.lat, lng: point.lng },
-          map: mapInstance.current,
-          title: `${point.temp}°F - ${point.condition}`,
-          content: content
-        });
-      } else {
-        // Fallback to legacy Marker (with deprecation warning)
-        const marker = new window.google.maps.Marker({
-          position: { lat: point.lat, lng: point.lng },
-          map: mapInstance.current,
-          title: `${point.temp}°F - ${point.condition}`,
-          icon: {
-            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-              <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="20" r="18" fill="#3B82F6" stroke="white" stroke-width="2"/>
-                <text x="20" y="25" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${point.temp}°</text>
-              </svg>
-            `),
-            scaledSize: new window.google.maps.Size(40, 40)
-          }
-        });
-
-        const infoWindow = new window.google.maps.InfoWindow({
-          content: `
-            <div style="padding: 8px;">
-              <strong>${point.temp}°F</strong><br/>
-              ${point.condition}
-            </div>
-          `
-        });
-
-        marker.addListener('click', () => {
-          infoWindow.open(mapInstance.current, marker);
-        });
-      }
+      marker.addListener('click', () => {
+        infoWindow.open(mapInstance.current, marker);
+      });
     });
   };
 
