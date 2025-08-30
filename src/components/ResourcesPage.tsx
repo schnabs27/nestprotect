@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MapPin, Star, Phone, Globe, Navigation, Filter } from "lucide-react";
+import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +14,7 @@ const ResourcesPage = () => {
   const [resources, setResources] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cachedResults, setCachedResults] = useState<any>(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
   const { toast } = useToast();
 
   const categories = [
@@ -176,12 +177,40 @@ const ResourcesPage = () => {
 
       {/* Results */}
       <div className="p-4">
-        {/* Disclaimer */}
-        <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4">
-          <p className="text-xs text-muted-foreground">
-            These listings come from disaster relief databases. Please <strong>call to confirm</strong> they're open.
-          </p>
-        </div>
+        {/* View Map Button */}
+        {resources.length > 0 && (
+          <div className="mb-4">
+            <Button variant="outline" className="w-full">
+              <MapPin size={16} className="mr-2" />
+              View Map
+            </Button>
+          </div>
+        )}
+
+        {/* Dismissible Disclaimer */}
+        {showDisclaimer && (
+          <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4 relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-1 right-1 h-6 w-6 p-0"
+              onClick={() => setShowDisclaimer(false)}
+            >
+              <X size={12} />
+            </Button>
+            <p className="text-xs text-muted-foreground pr-8">
+              These listings come from disaster relief databases. Please <strong>call to confirm</strong> they're open.
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-2 h-6 px-2 text-xs"
+              onClick={() => setShowDisclaimer(false)}
+            >
+              OK
+            </Button>
+          </div>
+        )}
 
         {/* Resource Cards */}
         <div className="space-y-4">
@@ -282,13 +311,6 @@ const ResourcesPage = () => {
           ))}
         </div>
 
-        {/* Map Toggle */}
-        <div className="mt-6 text-center">
-          <Button variant="outline" className="w-full">
-            <MapPin size={16} className="mr-2" />
-            View Map
-          </Button>
-        </div>
       </div>
     </div>
   );

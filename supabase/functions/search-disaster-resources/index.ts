@@ -151,7 +151,7 @@ serve(async (req) => {
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Goog-Api-Key': mapsApiKey,
-                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus'
+                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber'
                 },
                 body: JSON.stringify(requestBody)
               });
@@ -177,11 +177,20 @@ serve(async (req) => {
                     console.log(`Found ${place.displayName?.text || 'Unknown'} at distance: ${distance.toFixed(1)} miles`);
                     
                     if (distance <= 30) { // Within 30 miles
+                      // Filter out generic types and include phone if available
+                      const filteredTypes = place.types?.filter(type => 
+                        type !== 'point_of_interest' && 
+                        type !== 'establishment'
+                      ) || [];
+                      
+                      const typeDescription = filteredTypes.slice(0, 2).join(', ') || query;
+                      const phoneInfo = place.nationalPhoneNumber ? ` • ${place.nationalPhoneNumber}` : '';
+                      
                       results.push({
                         name: place.displayName?.text || 'Unknown Place',
                         category: categorizePlace(query, place.types || []),
-                        description: `${place.types?.slice(0, 2).join(', ') || query} - ${place.formattedAddress || ''}`,
-                        phone: '',
+                        description: typeDescription + phoneInfo,
+                        phone: place.nationalPhoneNumber || '',
                         website: '',
                         address: place.formattedAddress || '',
                         city: extractCity(place.formattedAddress || ''),
