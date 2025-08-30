@@ -295,8 +295,29 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
           const aiContent = openaiData.choices[0]?.message?.content;
           if (aiContent) {
             try {
+              console.log('Raw OpenAI content:', aiContent);
+              
+              // Clean the content - remove any markdown code blocks or extra text
+              let cleanContent = aiContent.trim();
+              
+              // Remove markdown code blocks if present
+              if (cleanContent.startsWith('```json')) {
+                cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+              } else if (cleanContent.startsWith('```')) {
+                cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
+              }
+              
+              // Find JSON array in the content
+              const jsonStart = cleanContent.indexOf('[');
+              const jsonEnd = cleanContent.lastIndexOf(']');
+              if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
+              }
+              
+              console.log('Cleaned OpenAI content:', cleanContent);
+              
               // Parse the JSON response from OpenAI
-              const aiResources = JSON.parse(aiContent);
+              const aiResources = JSON.parse(cleanContent);
               console.log(`OpenAI returned ${aiResources.length} resources`);
               
               // Transform AI results to match our schema
