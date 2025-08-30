@@ -77,14 +77,14 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=marker&callback=initGoogleMaps`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=marker&callback=initResourceMap`;
       script.async = true;
       script.defer = true;
       
-      // Use a unique callback name to avoid conflicts
-      (window as any).initGoogleMaps = () => {
+      // Use a unique callback name to avoid conflicts with WeatherMap
+      (window as any).initResourceMap = () => {
         setGoogleMapsLoaded(true);
-        delete (window as any).initGoogleMaps;
+        delete (window as any).initResourceMap;
       };
       
       document.head.appendChild(script);
