@@ -141,8 +141,7 @@ serve(async (req) => {
                     radius: 50000.0
                   }
                 },
-                maxResultCount: 10,
-                includedType: getPlaceType(query)
+                maxResultCount: 10
               };
               
               console.log('Places API request body:', JSON.stringify(requestBody, null, 2));
