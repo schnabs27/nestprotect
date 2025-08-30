@@ -25,7 +25,7 @@ const ResourcesPage = () => {
   };
 
   const categories = [
-    { id: "all", label: "All", color: "bg-green-600" },
+    { id: "all", label: "All", color: "bg-[#06c29a]" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-yellow" },
     { id: "medical", label: "Medical", color: "bg-accent" },
