@@ -39,10 +39,14 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
   const [map, setMap] = useState<any>(null);
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
   const [mapsApiKey, setMapsApiKey] = useState<string>('');
+  const [isLoadingApi, setIsLoadingApi] = useState(false);
 
   // Get Google Maps API key from Supabase function
   useEffect(() => {
     const getMapsApiKey = async () => {
+      if (mapsApiKey || isLoadingApi) return;
+      
+      setIsLoadingApi(true);
       try {
         const { data, error } = await supabase.functions.invoke('get-maps-api-key');
         if (data?.apiKey) {
@@ -50,26 +54,37 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
         }
       } catch (error) {
         console.error('Error getting Maps API key:', error);
+      } finally {
+        setIsLoadingApi(false);
       }
     };
 
-    if (open) {
-      getMapsApiKey();
-    }
-  }, [open]);
+    getMapsApiKey();
+  }, [mapsApiKey, isLoadingApi]);
 
-  // Load Google Maps script
+  // Load Google Maps script immediately when API key is available
   useEffect(() => {
-    if (!mapsApiKey || googleMapsLoaded) return;
+    if (!mapsApiKey || googleMapsLoaded || window.google?.maps) {
+      if (window.google?.maps) setGoogleMapsLoaded(true);
+      return;
+    }
 
     const loadGoogleMaps = () => {
+      const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
+      if (existingScript) {
+        setGoogleMapsLoaded(true);
+        return;
+      }
+
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=marker`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=marker&callback=initGoogleMaps`;
       script.async = true;
       script.defer = true;
       
-      script.onload = () => {
+      // Use a unique callback name to avoid conflicts
+      (window as any).initGoogleMaps = () => {
         setGoogleMapsLoaded(true);
+        delete (window as any).initGoogleMaps;
       };
       
       document.head.appendChild(script);
@@ -215,11 +230,14 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             ref={mapContainer} 
             className="absolute inset-0 rounded-lg w-full h-full"
           />
-          {(!googleMapsLoaded || resources.length === 0) && (
+          {(!googleMapsLoaded || !mapsApiKey) && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg">
-              <p className="text-muted-foreground">
-                {!googleMapsLoaded ? 'Loading map...' : 'No resources to display on map'}
-              </p>
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-muted-foreground">
+                  {!mapsApiKey ? 'Loading map configuration...' : 'Loading Google Maps...'}
+                </p>
+              </div>
             </div>
           )}
         </div>
