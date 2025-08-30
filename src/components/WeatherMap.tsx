@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface WeatherMapProps {
   location: string;
   className?: string;
+  mapType?: 'weather' | 'traffic';
 }
 
 declare global {
@@ -13,7 +14,7 @@ declare global {
   }
 }
 
-const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
+const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -83,17 +84,20 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
         zoom: 10,
         center: { lat: 39.7817, lng: -89.6501 }, // Springfield, IL default
         mapTypeId: 'roadmap',
-        styles: [
+        styles: mapType === 'weather' ? [
           {
             featureType: 'all',
             stylers: [{ saturation: -10 }, { lightness: 10 }]
           }
-        ]
+        ] : undefined
       });
 
-      // Add weather layer (this would typically require a weather API)
-      // For demonstration, we'll add some mock weather markers
-      addWeatherMarkers();
+      // Add layers based on map type
+      if (mapType === 'weather') {
+        addWeatherMarkers();
+      } else if (mapType === 'traffic') {
+        addTrafficLayer();
+      }
     };
 
     const addWeatherMarkers = () => {
@@ -137,8 +141,16 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
       });
     };
 
+    const addTrafficLayer = () => {
+      if (!mapInstance.current || !window.google) return;
+
+      // Add Google's traffic layer
+      const trafficLayer = new window.google.maps.TrafficLayer();
+      trafficLayer.setMap(mapInstance.current);
+    };
+
     loadGoogleMaps();
-  }, [apiKey]); // Depend on apiKey
+  }, [apiKey, mapType]); // Depend on apiKey and mapType
 
   // Geocode location when it changes
   useEffect(() => {
@@ -181,7 +193,7 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
             </div>
           )}
           <div className="absolute top-2 left-2 bg-background/90 px-2 py-1 rounded text-xs text-muted-foreground">
-            Weather conditions and radar
+            {mapType === 'weather' ? 'Weather conditions and radar' : 'Live traffic conditions'}
           </div>
         </>
       )}

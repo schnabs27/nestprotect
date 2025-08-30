@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { MapPin, AlertTriangle, Thermometer, Droplets, Wind, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, AlertTriangle, Thermometer, Droplets, Wind, Search, Navigation, Car } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +10,8 @@ import WeatherMap from "@/components/WeatherMap";
 const WeatherPage = () => {
   const [location, setLocation] = useState("Springfield, IL");
   const [locationInput, setLocationInput] = useState("");
+  const [isLocating, setIsLocating] = useState(false);
+  const [mapType, setMapType] = useState<'weather' | 'traffic'>('weather');
 
   const mockCurrentWeather = {
     temperature: 72,
@@ -49,6 +51,51 @@ const WeatherPage = () => {
     }
   };
 
+  const handleAutoLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        // Use reverse geocoding to get location name
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyBZhmhQrVv5-ODgo8ptKu8Cj-g_i0Bj2aI`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.results && data.results[0]) {
+              const addressComponents = data.results[0].address_components;
+              const city = addressComponents.find((component: any) => 
+                component.types.includes('locality'))?.long_name || '';
+              const state = addressComponents.find((component: any) => 
+                component.types.includes('administrative_area_level_1'))?.short_name || '';
+              const newLocation = city && state ? `${city}, ${state}` : data.results[0].formatted_address;
+              setLocation(newLocation);
+            }
+          })
+          .catch(error => {
+            console.error('Geocoding error:', error);
+            setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          })
+          .finally(() => {
+            setIsLocating(false);
+          });
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        alert('Unable to retrieve your location. Please enter it manually.');
+        setIsLocating(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 600000 // 10 minutes
+      }
+    );
+  };
+
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -68,7 +115,7 @@ const WeatherPage = () => {
             <CardTitle className="text-title">Change Location</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-3">
               <Input
                 placeholder="Enter city or ZIP code"
                 value={locationInput}
@@ -79,8 +126,20 @@ const WeatherPage = () => {
               <Button onClick={handleLocationChange} size="icon">
                 <Search size={16} />
               </Button>
+              <Button 
+                onClick={handleAutoLocation} 
+                size="icon" 
+                variant="outline"
+                disabled={isLocating}
+              >
+                {isLocating ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                ) : (
+                  <Navigation size={16} />
+                )}
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground">
               Current location: {location}
             </p>
           </CardContent>
@@ -114,15 +173,42 @@ const WeatherPage = () => {
           </div>
         )}
 
-        {/* Weather Map temporarily removed for debugging */}
-        {/* <Card className="mb-6 shadow-soft">
+        {/* Interactive Maps */}
+        <Card className="mb-6 shadow-soft">
           <CardHeader>
-            <CardTitle className="text-title">Weather Map</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-title">
+                {mapType === 'weather' ? 'Weather Map' : 'Traffic Map'}
+              </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={mapType === 'weather' ? 'default' : 'outline'}
+                  onClick={() => setMapType('weather')}
+                  className="text-xs"
+                >
+                  Weather
+                </Button>
+                <Button
+                  size="sm"
+                  variant={mapType === 'traffic' ? 'default' : 'outline'}
+                  onClick={() => setMapType('traffic')}
+                  className="text-xs"
+                >
+                  <Car size={14} className="mr-1" />
+                  Traffic
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
-            <WeatherMap location={location} className="h-80" />
+            <WeatherMap 
+              location={location} 
+              className="h-80" 
+              mapType={mapType}
+            />
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Current Stats */}
         <Card className="mb-6 shadow-soft">
