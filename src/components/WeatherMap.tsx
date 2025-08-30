@@ -50,53 +50,87 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
   // Load Google Maps when API key is available
   useEffect(() => {
     if (!apiKey) return;
+    
     const loadGoogleMaps = () => {
+      // Check if already loaded
       if (window.google && window.google.maps) {
-        initializeMap();
+        console.log('Google Maps already loaded, initializing...');
+        setTimeout(() => initializeMap(), 100);
         return;
       }
 
-      // Create the script element
+      // Check if script is already loading
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        console.log('Google Maps script already exists, waiting for load...');
+        existingScript.addEventListener('load', () => {
+          setTimeout(() => initializeMap(), 100);
+        });
+        return;
+      }
+
+      // Create new script
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
       script.async = true;
       script.defer = true;
 
-      // Set up the callback
-      window.initMap = () => {
-        setMapLoaded(true);
-        initializeMap();
+      script.onload = () => {
+        console.log('Google Maps script loaded');
+        setTimeout(() => initializeMap(), 100);
+      };
+
+      script.onerror = (error) => {
+        console.error('Error loading Google Maps script:', error);
+        setError('Failed to load Google Maps');
       };
 
       document.head.appendChild(script);
-
-      return () => {
-        document.head.removeChild(script);
-        delete window.initMap;
-      };
     };
 
     const initializeMap = () => {
-      if (!mapRef.current || !window.google) return;
-
-      // Initialize the map
-      mapInstance.current = new window.google.maps.Map(mapRef.current, {
-        zoom: 10,
-        center: { lat: 39.7817, lng: -89.6501 }, // Springfield, IL default
-        mapTypeId: 'roadmap',
-        styles: mapType === 'weather' ? [
-          {
-            featureType: 'all',
-            stylers: [{ saturation: -10 }, { lightness: 10 }]
-          }
-        ] : undefined
+      console.log('Initializing map...', { 
+        mapRef: !!mapRef.current, 
+        google: !!window.google,
+        mapType 
       });
+      
+      if (!mapRef.current) {
+        console.error('Map container not found');
+        return;
+      }
+      
+      if (!window.google) {
+        console.error('Google Maps not loaded');
+        return;
+      }
 
-      // Add layers based on map type
-      if (mapType === 'weather') {
-        addWeatherMarkers();
-      } else if (mapType === 'traffic') {
-        addTrafficLayer();
+      try {
+        // Initialize the map
+        mapInstance.current = new window.google.maps.Map(mapRef.current, {
+          zoom: 10,
+          center: { lat: 39.7817, lng: -89.6501 }, // Springfield, IL default
+          mapTypeId: 'roadmap',
+          styles: mapType === 'weather' ? [
+            {
+              featureType: 'all',
+              stylers: [{ saturation: -10 }, { lightness: 10 }]
+            }
+          ] : undefined
+        });
+
+        console.log('Map initialized successfully');
+        setMapLoaded(true);
+
+        // Add layers based on map type
+        if (mapType === 'weather') {
+          addWeatherMarkers();
+        } else if (mapType === 'traffic') {
+          addTrafficLayer();
+        }
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        setError('Failed to initialize map');
       }
     };
 
@@ -111,33 +145,60 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
       ];
 
       weatherPoints.forEach((point) => {
-        const marker = new window.google.maps.Marker({
-          position: { lat: point.lat, lng: point.lng },
-          map: mapInstance.current,
-          title: `${point.temp}°F - ${point.condition}`,
-          icon: {
-            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-              <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="20" r="18" fill="#3B82F6" stroke="white" stroke-width="2"/>
-                <text x="20" y="25" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${point.temp}°</text>
-              </svg>
-            `),
-            scaledSize: new window.google.maps.Size(40, 40)
-          }
-        });
-
-        const infoWindow = new window.google.maps.InfoWindow({
-          content: `
-            <div style="padding: 8px;">
-              <strong>${point.temp}°F</strong><br/>
-              ${point.condition}
+        // Use AdvancedMarkerElement if available, fallback to legacy Marker
+        if (window.google.maps.marker && window.google.maps.marker.AdvancedMarkerElement) {
+          const content = document.createElement('div');
+          content.innerHTML = `
+            <div style="
+              background: #3B82F6; 
+              color: white; 
+              padding: 4px 8px; 
+              border-radius: 16px; 
+              font-size: 12px; 
+              font-weight: bold;
+              border: 2px solid white;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            ">
+              ${point.temp}°
             </div>
-          `
-        });
+          `;
 
-        marker.addListener('click', () => {
-          infoWindow.open(mapInstance.current, marker);
-        });
+          const marker = new window.google.maps.marker.AdvancedMarkerElement({
+            position: { lat: point.lat, lng: point.lng },
+            map: mapInstance.current,
+            title: `${point.temp}°F - ${point.condition}`,
+            content: content
+          });
+        } else {
+          // Fallback to legacy Marker (with deprecation warning)
+          const marker = new window.google.maps.Marker({
+            position: { lat: point.lat, lng: point.lng },
+            map: mapInstance.current,
+            title: `${point.temp}°F - ${point.condition}`,
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="20" r="18" fill="#3B82F6" stroke="white" stroke-width="2"/>
+                  <text x="20" y="25" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${point.temp}°</text>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(40, 40)
+            }
+          });
+
+          const infoWindow = new window.google.maps.InfoWindow({
+            content: `
+              <div style="padding: 8px;">
+                <strong>${point.temp}°F</strong><br/>
+                ${point.condition}
+              </div>
+            `
+          });
+
+          marker.addListener('click', () => {
+            infoWindow.open(mapInstance.current, marker);
+          });
+        }
       });
     };
 
@@ -154,14 +215,18 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
 
   // Geocode location when it changes
   useEffect(() => {
-    if (!mapInstance.current || !window.google || !location) return;
+    if (!mapInstance.current || !window.google || !location || !mapLoaded) return;
 
+    console.log('Geocoding location:', location);
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ address: location }, (results: any, status: any) => {
       if (status === 'OK' && results[0]) {
         const newCenter = results[0].geometry.location;
         mapInstance.current.setCenter(newCenter);
         mapInstance.current.setZoom(10);
+        console.log('Map centered on:', location);
+      } else {
+        console.error('Geocoding failed:', status);
       }
     });
   }, [location, mapLoaded]);
@@ -179,7 +244,7 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
         <>
           <div 
             ref={mapRef} 
-            className="w-full h-full min-h-[300px] rounded-lg"
+            className="w-full h-full min-h-[300px] rounded-lg bg-muted"
             style={{ minHeight: '300px' }}
           />
           {(!mapLoaded || !apiKey) && (
