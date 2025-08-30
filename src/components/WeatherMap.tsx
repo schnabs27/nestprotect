@@ -17,6 +17,7 @@ declare global {
 const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
+  const trafficLayerRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -210,16 +211,24 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
   const addTrafficLayer = () => {
     if (!mapInstance.current || !window.google) return;
 
+    console.log('Adding traffic layer...');
+    
+    // Remove existing traffic layer if it exists
+    if (trafficLayerRef.current) {
+      trafficLayerRef.current.setMap(null);
+    }
+
     // Add Google's traffic layer
-    const trafficLayer = new window.google.maps.TrafficLayer();
-    trafficLayer.setMap(mapInstance.current);
+    trafficLayerRef.current = new window.google.maps.TrafficLayer();
+    trafficLayerRef.current.setMap(mapInstance.current);
+    console.log('Traffic layer added successfully');
   };
 
   // Geocode location when it changes
   useEffect(() => {
     if (!mapInstance.current || !window.google || !location || !mapLoaded) return;
 
-    console.log('Geocoding location:', location);
+    console.log('Geocoding location:', location, 'mapType:', mapType);
     
     // Check if location is already coordinates (lat,lng format)
     const coordsMatch = location.match(/^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/);
@@ -229,6 +238,16 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
       console.log('Using coordinates directly:', { lat, lng });
       mapInstance.current.setCenter({ lat, lng });
       mapInstance.current.setZoom(12);
+      
+      // Refresh layers for the new location
+      setTimeout(() => {
+        if (mapType === 'weather') {
+          addWeatherMarkers();
+        } else if (mapType === 'traffic') {
+          addTrafficLayer(); // Refresh traffic layer for new location
+        }
+      }, 500);
+      
       return;
     }
 
@@ -241,12 +260,15 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
         mapInstance.current.setCenter(newCenter);
         mapInstance.current.setZoom(12);
         
-        // Update weather markers for the new location if in weather mode
-        if (mapType === 'weather') {
-          // Clear existing markers first
-          // Note: In a real app, you'd fetch new weather data for this location
-          addWeatherMarkers();
-        }
+        // Refresh layers for the new location
+        setTimeout(() => {
+          if (mapType === 'weather') {
+            addWeatherMarkers();
+          } else if (mapType === 'traffic') {
+            console.log('Refreshing traffic layer for new location');
+            addTrafficLayer(); // Refresh traffic layer for new location
+          }
+        }, 500);
       } else {
         console.error('Geocoding failed:', status, 'for location:', location);
       }
