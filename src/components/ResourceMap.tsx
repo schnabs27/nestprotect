@@ -95,6 +95,7 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
 
   // Initialize map when dialog opens and Google Maps is loaded
   useEffect(() => {
+    console.log('Map initialization check:', { open, googleMapsLoaded, mapContainer: !!mapContainer.current, windowGoogle: !!window.google });
     if (!open || !googleMapsLoaded || !mapContainer.current || !window.google) return;
 
     // Default center (Pasadena)
