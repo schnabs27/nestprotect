@@ -479,6 +479,7 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
       errors.push('OpenAI API error');
       console.error('OpenAI API error:', error);
     }
+
     // Remove duplicates based on name and location proximity
     const uniqueResults = removeDuplicates(results);
     console.log(`Filtered ${results.length} results down to ${uniqueResults.length} unique results`);
