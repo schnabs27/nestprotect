@@ -83,25 +83,16 @@ serve(async (req) => {
       if (!mapsApiKey) {
         errors.push('Google Maps API key not configured');
         console.error('Google Maps API key missing from environment variables');
-        return new Response(
-          JSON.stringify({ 
-            resources: [],
-            cached: false,
-            errors: ['Google Maps API key not configured. Please add MAPS_API_KEY to Supabase secrets.']
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      console.log('Google Maps API key found, length:', mapsApiKey.length);
-      
-      // First, geocode the ZIP code to get coordinates
-      console.log(`Geocoding ZIP code: ${zipCode}`);
-      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`;
-      console.log('Geocoding URL (key hidden):', geocodeUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
-      
-      const geocodeResponse = await fetch(geocodeUrl);
-      console.log('Geocode response status:', geocodeResponse.status, geocodeResponse.statusText);
+      } else {
+        console.log('Google Maps API key found, length:', mapsApiKey.length);
+        
+        // First, geocode the ZIP code to get coordinates
+        console.log(`Geocoding ZIP code: ${zipCode}`);
+        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`;
+        console.log('Geocoding URL (key hidden):', geocodeUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
+        
+        const geocodeResponse = await fetch(geocodeUrl);
+        console.log('Geocode response status:', geocodeResponse.status, geocodeResponse.statusText);
         
         if (geocodeResponse.ok) {
           const geocodeData = await geocodeResponse.json();
@@ -247,12 +238,14 @@ serve(async (req) => {
     try {
       console.log('Calling OpenAI API for disaster relief resources...');
       const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+      const mapsApiKey = Deno.env.get('MAPS_API_KEY'); // Make sure we have this for geocoding
       
       if (!openaiApiKey) {
         errors.push('OpenAI API key not configured');
         console.error('OpenAI API key missing from environment variables');
       } else {
         console.log('OpenAI API key found, making request...');
+        console.log('Maps API key available for geocoding:', !!mapsApiKey);
         
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
