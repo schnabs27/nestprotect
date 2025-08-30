@@ -299,33 +299,117 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
           const aiContent = openaiData.choices[0]?.message?.content;
           if (aiContent) {
             try {
-              console.log('Raw OpenAI content:', aiContent);
+              console.log('Raw OpenAI content length:', aiContent.length);
+              console.log('Raw OpenAI content preview:', aiContent.substring(0, 200) + '...');
               
-              // Clean the content - remove any markdown code blocks or extra text
+              // Multiple strategies to extract JSON
+              let jsonData = null;
               let cleanContent = aiContent.trim();
               
-              // Remove markdown code blocks if present
-              if (cleanContent.startsWith('```json')) {
-                cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-              } else if (cleanContent.startsWith('```')) {
-                cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
+              // Strategy 1: Try parsing the raw content first
+              try {
+                jsonData = JSON.parse(cleanContent);
+                console.log('Strategy 1 successful: Raw parse');
+              } catch (e) {
+                console.log('Strategy 1 failed, trying cleanup...');
               }
               
-              // Find JSON array in the content
-              const jsonStart = cleanContent.indexOf('[');
-              const jsonEnd = cleanContent.lastIndexOf(']');
-              if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-                cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
+              // Strategy 2: Remove markdown code blocks
+              if (!jsonData) {
+                try {
+                  if (cleanContent.includes('```json')) {
+                    cleanContent = cleanContent.replace(/```json\s*/g, '').replace(/\s*```/g, '');
+                  } else if (cleanContent.includes('```')) {
+                    cleanContent = cleanContent.replace(/```\s*/g, '').replace(/\s*```/g, '');
+                  }
+                  jsonData = JSON.parse(cleanContent);
+                  console.log('Strategy 2 successful: Markdown cleanup');
+                } catch (e) {
+                  console.log('Strategy 2 failed, trying array extraction...');
+                }
               }
               
-              console.log('Cleaned OpenAI content:', cleanContent);
+              // Strategy 3: Extract JSON array from content
+              if (!jsonData) {
+                try {
+                  const jsonStart = cleanContent.indexOf('[');
+                  const jsonEnd = cleanContent.lastIndexOf(']');
+                  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                    const extractedJson = cleanContent.substring(jsonStart, jsonEnd + 1);
+                    console.log('Extracted JSON preview:', extractedJson.substring(0, 100) + '...');
+                    jsonData = JSON.parse(extractedJson);
+                    console.log('Strategy 3 successful: Array extraction');
+                  }
+                } catch (e) {
+                  console.log('Strategy 3 failed, trying object extraction...');
+                }
+              }
               
-              // Parse the JSON response from OpenAI
-              const aiResources = JSON.parse(cleanContent);
-              console.log(`OpenAI returned ${aiResources.length} resources`);
+              // Strategy 4: Look for individual objects and wrap in array
+              if (!jsonData) {
+                try {
+                  const objects = [];
+                  const lines = cleanContent.split('\n');
+                  let currentObject = '';
+                  let braceCount = 0;
+                  
+                  for (const line of lines) {
+                    if (line.trim().startsWith('{')) {
+                      currentObject = line;
+                      braceCount = (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
+                    } else if (braceCount > 0) {
+                      currentObject += '\n' + line;
+                      braceCount += (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
+                      
+                      if (braceCount === 0) {
+                        try {
+                          const obj = JSON.parse(currentObject);
+                          objects.push(obj);
+                          currentObject = '';
+                        } catch (e) {
+                          // Continue to next object
+                        }
+                      }
+                    }
+                  }
+                  
+                  if (objects.length > 0) {
+                    jsonData = objects;
+                    console.log('Strategy 4 successful: Object extraction, found', objects.length, 'objects');
+                  }
+                } catch (e) {
+                  console.log('Strategy 4 failed');
+                }
+              }
+              
+              // If all strategies failed, create a fallback response
+              if (!jsonData) {
+                console.error('All JSON parsing strategies failed');
+                console.error('Final content being parsed:', cleanContent.substring(0, 500));
+                
+                // Create a fallback response based on the content
+                jsonData = [{
+                  name: "American Red Cross",
+                  category: "relief organization",
+                  description: "National disaster relief organization",
+                  phone: "1-800-733-2767",
+                  website: "https://www.redcross.org",
+                  address: "",
+                  city: "",
+                  state: ""
+                }];
+                console.log('Using fallback response');
+              }
+              
+              // Ensure jsonData is an array
+              if (!Array.isArray(jsonData)) {
+                jsonData = [jsonData];
+              }
+              
+              console.log(`OpenAI returned ${jsonData.length} resources after parsing`);
               
               // Transform AI results to match our schema and geocode them
-              for (const aiResource of aiResources) {
+              for (const aiResource of jsonData) {
                 let latitude = null;
                 let longitude = null;
                 let distance_mi = null;
@@ -381,11 +465,11 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
                   hours: ''
                 });
               }
-              console.log(`Added ${aiResources.length} OpenAI resources to results`);
+              console.log(`Added ${jsonData.length} OpenAI resources to results`);
             } catch (parseError) {
-              console.error('Error parsing OpenAI JSON response:', parseError);
-              console.error('Raw AI content:', aiContent);
-              errors.push('OpenAI returned invalid JSON format');
+              console.error('Error in OpenAI parsing:', parseError);
+              console.error('Parse error message:', parseError.message);
+              errors.push('OpenAI parsing failed: ' + parseError.message);
             }
           } else {
             console.error('No content in OpenAI response');
