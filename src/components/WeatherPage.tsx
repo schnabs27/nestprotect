@@ -114,15 +114,15 @@ const WeatherPage = () => {
           </div>
         )}
 
-        {/* Weather Map */}
-        <Card className="mb-6 shadow-soft">
+        {/* Weather Map temporarily removed for debugging */}
+        {/* <Card className="mb-6 shadow-soft">
           <CardHeader>
             <CardTitle className="text-title">Weather Map</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <WeatherMap location={location} className="h-80" />
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Current Stats */}
         <Card className="mb-6 shadow-soft">
