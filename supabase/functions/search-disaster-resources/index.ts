@@ -95,78 +95,75 @@ serve(async (req) => {
             const location = geocodeData.results[0].geometry.location;
             console.log(`Location found: ${location.lat}, ${location.lng}`);
             
-            // Search for relevant places with broader keywords
+            // Search for relevant places with broader search approach
             const searchQueries = [
               'food bank',
-              'shelter',
-              'emergency services',
+              'emergency shelter',
               'hospital',
-              'fire station',
+              'fire station', 
               'police station',
               'community center',
               'red cross',
               'salvation army',
-              'united way'
+              'food pantry',
+              'homeless shelter'
             ];
             
             for (const query of searchQueries) {
-              console.log(`Searching for: ${query}`);
+              console.log(`Searching for: ${query} near ${zipCode}`);
+              
+              // Use text search with location bias instead of strict radius
               const placesResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${location.lat},${location.lng}&radius=48280&key=${mapsApiKey}`
+                `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + ' near ' + zipCode)}&location=${location.lat},${location.lng}&radius=50000&key=${mapsApiKey}`
               );
               
               if (placesResponse.ok) {
                 const placesData = await placesResponse.json();
-                console.log(`Text search for "${query}" returned ${placesData?.results?.length || 0} results`);
+                console.log(`Text search for "${query}" returned status: ${placesData.status}, ${placesData?.results?.length || 0} results`);
                 
-                if (placesData.results && placesData.results.length > 0) {
-                  for (const place of placesData.results.slice(0, 10)) { // Limit to first 10 results per query
+                if (placesData.status === 'OK' && placesData.results && placesData.results.length > 0) {
+                  for (const place of placesData.results.slice(0, 5)) { // Limit to first 5 results per query
                     // Calculate distance from ZIP center
                     const distance = calculateDistance(
                       location.lat, location.lng,
                       place.geometry.location.lat, place.geometry.location.lng
                     );
                     
+                    console.log(`Found ${place.name} at distance: ${distance.toFixed(1)} miles`);
+                    
                     if (distance <= 30) { // Within 30 miles
-                      // Get more details for this place
-                      const detailsResponse = await fetch(
-                        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,types&key=${mapsApiKey}`
-                      );
-                      
-                      let placeDetails = place;
-                      if (detailsResponse.ok) {
-                        const detailsData = await detailsResponse.json();
-                        if (detailsData.result) {
-                          placeDetails = { ...place, ...detailsData.result };
-                        }
-                      }
-                      
                       results.push({
-                        name: placeDetails.name || 'Unknown Place',
-                        category: categorizePlace(query, placeDetails.types || []),
-                        description: `${query} facility. ${placeDetails.types?.slice(0, 3).join(', ') || ''}`,
-                        phone: placeDetails.formatted_phone_number || '',
-                        website: placeDetails.website || '',
-                        address: placeDetails.formatted_address || placeDetails.vicinity || '',
-                        city: extractCity(placeDetails.formatted_address || ''),
-                        state: extractState(placeDetails.formatted_address || ''),
+                        name: place.name || 'Unknown Place',
+                        category: categorizePlace(query, place.types || []),
+                        description: `${place.types?.slice(0, 2).join(', ') || query} - ${place.formatted_address || ''}`,
+                        phone: '',
+                        website: '',
+                        address: place.formatted_address || '',
+                        city: extractCity(place.formatted_address || ''),
+                        state: extractState(place.formatted_address || ''),
                         postal_code: zipCode,
                         latitude: place.geometry.location.lat,
                         longitude: place.geometry.location.lng,
                         distance_mi: Math.round(distance * 10) / 10,
                         source: 'Google Maps',
                         source_id: place.place_id || '',
-                        hours: placeDetails.opening_hours?.weekday_text?.join('; ') || ''
+                        hours: ''
                       });
+                    } else {
+                      console.log(`${place.name} excluded - outside 30 mile radius (${distance.toFixed(1)} miles)`);
                     }
                   }
+                } else {
+                  console.log(`No results for "${query}": status=${placesData.status}, error=${placesData.error_message || 'none'}`);
                 }
               } else {
                 console.error(`Places API error for "${query}":`, placesResponse.status);
+                const errorText = await placesResponse.text();
+                console.error('Error response:', errorText);
               }
               
               // Small delay to avoid rate limits
-              await new Promise(resolve => setTimeout(resolve, 100));
+              await new Promise(resolve => setTimeout(resolve, 200));
             }
           } else {
             errors.push(`Could not geocode ZIP code: ${zipCode}`);
