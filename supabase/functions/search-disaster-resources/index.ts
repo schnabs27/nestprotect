@@ -72,6 +72,8 @@ serve(async (req) => {
     // Aggregate data from Google Maps Places API and OpenAI
     const results: DisasterResource[] = [];
     const errors: string[] = [];
+    let zipCenterLat = 34.1672; // Default to Pasadena
+    let zipCenterLng = -118.1535;
 
     // Call Google Maps Places API
     try {
@@ -107,6 +109,8 @@ serve(async (req) => {
           
           if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results.length > 0) {
             const location = geocodeData.results[0].geometry.location;
+            zipCenterLat = location.lat; // Store for OpenAI geocoding
+            zipCenterLng = location.lng;
             console.log(`Location found: ${location.lat}, ${location.lng}`);
             
             // Search for relevant places with broader search approach
@@ -320,8 +324,45 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
               const aiResources = JSON.parse(cleanContent);
               console.log(`OpenAI returned ${aiResources.length} resources`);
               
-              // Transform AI results to match our schema
+              // Transform AI results to match our schema and geocode them
               for (const aiResource of aiResources) {
+                let latitude = null;
+                let longitude = null;
+                let distance_mi = null;
+
+                // Try to geocode the address for distance calculation
+                if (aiResource.address && aiResource.city && mapsApiKey) {
+                  try {
+                    const geocodeAddress = `${aiResource.address}, ${aiResource.city}, ${aiResource.state || ''}`.trim();
+                    console.log(`Geocoding OpenAI resource: ${aiResource.name} at ${geocodeAddress}`);
+                    
+                    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(geocodeAddress)}&key=${mapsApiKey}`;
+                    const geocodeResponse = await fetch(geocodeUrl);
+                    
+                    if (geocodeResponse.ok) {
+                      const geocodeData = await geocodeResponse.json();
+                      if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results.length > 0) {
+                        const location = geocodeData.results[0].geometry.location;
+                        latitude = location.lat;
+                        longitude = location.lng;
+                        
+                        // Calculate distance from ZIP center using the actual coordinates
+                        if (location.lat && location.lng && typeof location.lat === 'number' && typeof location.lng === 'number') {
+                          distance_mi = calculateDistance(zipCenterLat, zipCenterLng, location.lat, location.lng);
+                          console.log(`Calculated distance for ${aiResource.name}: ${distance_mi.toFixed(1)} miles`);
+                        }
+                      } else {
+                        console.log(`Geocoding failed for ${aiResource.name}: ${geocodeData.status}`);
+                      }
+                    }
+                    
+                    // Small delay to avoid rate limits
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                  } catch (geocodeError) {
+                    console.error(`Geocoding error for ${aiResource.name}:`, geocodeError);
+                  }
+                }
+
                 results.push({
                   name: aiResource.name || 'Unknown Resource',
                   category: aiResource.category || 'general',
@@ -332,9 +373,9 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
                   city: aiResource.city || '',
                   state: aiResource.state || '',
                   postal_code: zipCode,
-                  latitude: null, // OpenAI doesn't provide coordinates
-                  longitude: null,
-                  distance_mi: null,
+                  latitude: latitude,
+                  longitude: longitude,
+                  distance_mi: distance_mi,
                   source: 'OpenAI Knowledge',
                   source_id: `openai_${aiResource.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
                   hours: ''
