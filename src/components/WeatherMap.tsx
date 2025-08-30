@@ -26,6 +26,10 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
+        console.log('Fetching Maps API key...');
+        console.log('Current domain:', window.location.hostname);
+        console.log('Current URL:', window.location.href);
+        
         const { data, error } = await supabase.functions.invoke('get-maps-api-key');
         
         if (error) {
@@ -35,8 +39,10 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
         }
         
         if (data?.apiKey) {
+          console.log('Maps API key received successfully');
           setApiKey(data.apiKey);
         } else {
+          console.error('Maps API key not available in response');
           setError('Maps API key not available');
         }
       } catch (err) {
@@ -72,18 +78,23 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
 
       // Create new script
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&callback=initMap&v=weekly`;
       script.async = true;
       script.defer = true;
 
-      script.onload = () => {
-        console.log('Google Maps script loaded');
+      // Set up global callback
+      window.initMap = () => {
+        console.log('Google Maps callback triggered');
         setTimeout(() => initializeMap(), 100);
+      };
+
+      script.onload = () => {
+        console.log('Google Maps script loaded successfully');
       };
 
       script.onerror = (error) => {
         console.error('Error loading Google Maps script:', error);
-        setError('Failed to load Google Maps');
+        setError('Failed to load Google Maps script');
       };
 
       document.head.appendChild(script);
@@ -93,25 +104,36 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
       console.log('Initializing map...', { 
         mapRef: !!mapRef.current, 
         google: !!window.google,
-        mapType 
+        mapType,
+        domain: window.location.hostname
       });
       
       if (!mapRef.current) {
         console.error('Map container not found');
+        setError('Map container not found');
         return;
       }
       
       if (!window.google) {
         console.error('Google Maps not loaded');
+        setError('Google Maps API not loaded');
         return;
       }
 
       try {
-        // Initialize the map
+        // Initialize the map with additional options for better error handling
         mapInstance.current = new window.google.maps.Map(mapRef.current, {
           zoom: 10,
           center: { lat: 39.7817, lng: -89.6501 }, // Springfield, IL default
           mapTypeId: 'roadmap',
+          gestureHandling: 'cooperative',
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: true,
           styles: mapType === 'weather' ? [
             {
               featureType: 'all',
@@ -123,6 +145,11 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
         console.log('Map initialized successfully');
         setMapLoaded(true);
 
+        // Add event listeners for map errors
+        mapInstance.current.addListener('idle', () => {
+          console.log('Map is idle (finished loading)');
+        });
+
         // Add layers based on map type
         if (mapType === 'weather') {
           addWeatherMarkers();
@@ -131,7 +158,7 @@ const WeatherMap = ({ location, className = "", mapType = 'weather' }: WeatherMa
         }
       } catch (error) {
         console.error('Error initializing map:', error);
-        setError('Failed to initialize map');
+        setError(`Failed to initialize map: ${error.message}`);
       }
     };
 
