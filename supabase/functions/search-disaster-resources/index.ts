@@ -77,21 +77,35 @@ serve(async (req) => {
     try {
       console.log('Calling Google Maps Places API...');
       const mapsApiKey = Deno.env.get('MAPS_API_KEY');
+      
       if (!mapsApiKey) {
         errors.push('Google Maps API key not configured');
-        console.error('Google Maps API key missing');
-      } else {
-        // First, geocode the ZIP code to get coordinates
-        console.log(`Geocoding ZIP code: ${zipCode}`);
-        const geocodeResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`
+        console.error('Google Maps API key missing from environment variables');
+        return new Response(
+          JSON.stringify({ 
+            resources: [],
+            cached: false,
+            errors: ['Google Maps API key not configured. Please add MAPS_API_KEY to Supabase secrets.']
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
+      }
+      
+      console.log('Google Maps API key found, length:', mapsApiKey.length);
+      
+      // First, geocode the ZIP code to get coordinates
+      console.log(`Geocoding ZIP code: ${zipCode}`);
+      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`;
+      console.log('Geocoding URL (key hidden):', geocodeUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
+      
+      const geocodeResponse = await fetch(geocodeUrl);
+      console.log('Geocode response status:', geocodeResponse.status, geocodeResponse.statusText);
         
         if (geocodeResponse.ok) {
           const geocodeData = await geocodeResponse.json();
-          console.log(`Geocode response status: ${geocodeData.status}`);
+          console.log(`Geocode response:`, JSON.stringify(geocodeData, null, 2));
           
-          if (geocodeData.results && geocodeData.results.length > 0) {
+          if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results.length > 0) {
             const location = geocodeData.results[0].geometry.location;
             console.log(`Location found: ${location.lat}, ${location.lng}`);
             
@@ -113,15 +127,24 @@ serve(async (req) => {
               console.log(`Searching for: ${query} near ${zipCode}`);
               
               // Use text search with location bias instead of strict radius
-              const placesResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + ' near ' + zipCode)}&location=${location.lat},${location.lng}&radius=50000&key=${mapsApiKey}`
-              );
+              const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + ' near ' + zipCode)}&location=${location.lat},${location.lng}&radius=50000&key=${mapsApiKey}`;
+              console.log('Places search URL (key hidden):', placesUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
+              
+              const placesResponse = await fetch(placesUrl);
+              console.log(`Places API response status for "${query}":`, placesResponse.status, placesResponse.statusText);
               
               if (placesResponse.ok) {
                 const placesData = await placesResponse.json();
-                console.log(`Text search for "${query}" returned status: ${placesData.status}, ${placesData?.results?.length || 0} results`);
+                console.log(`Places API response for "${query}":`, JSON.stringify({
+                  status: placesData.status,
+                  resultsCount: placesData?.results?.length || 0,
+                  error_message: placesData.error_message,
+                  next_page_token: placesData.next_page_token ? 'present' : 'none'
+                }, null, 2));
                 
                 if (placesData.status === 'OK' && placesData.results && placesData.results.length > 0) {
+                  console.log(`Processing ${placesData.results.length} results for "${query}"`);
+                  
                   for (const place of placesData.results.slice(0, 5)) { // Limit to first 5 results per query
                     // Calculate distance from ZIP center
                     const distance = calculateDistance(
@@ -149,29 +172,42 @@ serve(async (req) => {
                         source_id: place.place_id || '',
                         hours: ''
                       });
+                      console.log(`Added ${place.name} to results`);
                     } else {
                       console.log(`${place.name} excluded - outside 30 mile radius (${distance.toFixed(1)} miles)`);
                     }
                   }
+                } else if (placesData.status === 'REQUEST_DENIED') {
+                  console.error(`Places API REQUEST DENIED for "${query}":`, placesData.error_message);
+                  errors.push(`Google Places API access denied: ${placesData.error_message}`);
+                } else if (placesData.status === 'INVALID_REQUEST') {
+                  console.error(`Places API INVALID REQUEST for "${query}":`, placesData.error_message);
+                  errors.push(`Google Places API invalid request: ${placesData.error_message}`);
                 } else {
                   console.log(`No results for "${query}": status=${placesData.status}, error=${placesData.error_message || 'none'}`);
                 }
               } else {
-                console.error(`Places API error for "${query}":`, placesResponse.status);
+                console.error(`Places API HTTP error for "${query}":`, placesResponse.status, placesResponse.statusText);
                 const errorText = await placesResponse.text();
-                console.error('Error response:', errorText);
+                console.error('Error response body:', errorText);
+                errors.push(`Places API HTTP error: ${placesResponse.status}`);
               }
               
               // Small delay to avoid rate limits
               await new Promise(resolve => setTimeout(resolve, 200));
             }
+          } else if (geocodeData.status === 'REQUEST_DENIED') {
+            errors.push(`Google Geocoding API access denied: ${geocodeData.error_message}`);
+            console.error('Geocoding REQUEST DENIED:', geocodeData.error_message);
           } else {
-            errors.push(`Could not geocode ZIP code: ${zipCode}`);
+            errors.push(`Could not geocode ZIP code: ${zipCode} (Status: ${geocodeData.status})`);
             console.error('Geocoding failed:', geocodeData.status, geocodeData.error_message);
           }
         } else {
           errors.push('Google Geocoding API request failed');
-          console.error('Geocoding API error:', geocodeResponse.status);
+          console.error('Geocoding API HTTP error:', geocodeResponse.status, geocodeResponse.statusText);
+          const errorText = await geocodeResponse.text();
+          console.error('Geocoding error response:', errorText);
         }
       }
     } catch (error) {
