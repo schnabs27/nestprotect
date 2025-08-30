@@ -34,10 +34,9 @@ const ResourcesPage = () => {
     { id: "medical", label: "Medical", color: "bg-accent" },
     { id: "cleanup", label: "Cleanup", color: "bg-primary" },
     { id: "legal", label: "Legal", color: "bg-gray-700" },
-    { id: "emergency", label: "Emergency Response", color: "bg-raspberry" }
+    { id: "emergency", label: "Emergency Response", color: "bg-raspberry" },
+    { id: "favorites", label: "Favorites", color: "bg-yellow" }
   ];
-
-  const favoritesCategory = { id: "favorites", label: "Favorites", color: "bg-yellow" };
 
   const handleSearch = async () => {
     if (!zipCode.trim()) return;
@@ -206,7 +205,7 @@ const ResourcesPage = () => {
         <div className="flex gap-2 mb-4">
           <div className="flex-1">
             <Input
-              placeholder="Enter ZIP code or location (address)..."
+              placeholder="Enter ZIP code or address"
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
               className="h-12"
@@ -225,12 +224,12 @@ const ResourcesPage = () => {
         {/* Category Filters */}
         <div className="mb-4">
           <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2">
             {mainCategories.map((category) => (
               <Badge
                 key={category.id}
                 variant="secondary"
-                className={`${category.color} text-white cursor-pointer hover:opacity-80 transition-smooth ${
+                className={`${category.color} ${category.id === "favorites" ? "text-yellow-foreground" : "text-white"} cursor-pointer hover:opacity-80 transition-smooth ${
                   selectedCategory === category.id ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => setSelectedCategory(category.id)}
@@ -238,19 +237,6 @@ const ResourcesPage = () => {
                 {category.label}
               </Badge>
             ))}
-          </div>
-          
-          {/* Favorites - Separate section */}
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant="secondary"
-              className={`${favoritesCategory.color} text-yellow-foreground cursor-pointer hover:opacity-80 transition-smooth ${
-                selectedCategory === favoritesCategory.id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => setSelectedCategory(favoritesCategory.id)}
-            >
-              {favoritesCategory.label}
-            </Badge>
           </div>
         </div>
 
