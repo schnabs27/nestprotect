@@ -330,53 +330,51 @@ const ResourcesPage = () => {
           {filteredResources.map((resource) => (
             <Card key={resource.id} className="shadow-soft hover:shadow-medium transition-smooth">
               <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-title">{resource.name}</h3>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => toggleFavorite(resource)}
-                          >
-                            <Star 
-                              size={16} 
-                              className={
-                                favorites.has(`${resource.source_id}-${resource.source}`)
-                                  ? "text-yellow-500 fill-yellow-500" 
-                                  : "text-muted-foreground hover:text-yellow-500"
-                              } 
-                            />
-                          </Button>
-                        </div>
-                    
-                    {/* Description */}
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
-                      <Info size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span>{toTitleCase(resource.description)}</span>
-                    </div>
-
-                    {/* Phone */}
-                    {resource.phone && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                        <Phone size={14} className="text-green-500 flex-shrink-0" />
-                        <span>{resource.phone}</span>
-                      </div>
-                    )}
-
-                    {/* Address with distance */}
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <MapPin size={14} className="text-red-500 flex-shrink-0" />
-                      <span>
-                        {resource.address && resource.city && `${resource.address}, ${resource.city}`}
-                        {resource.address && !resource.city && resource.address}
-                        {!resource.address && resource.city && resource.city}
-                        {(resource.address || resource.city) && ' • '}
-                        {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
-                      </span>
-                    </div>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 pr-2">
+                    <h3 className="font-semibold text-title">{resource.name}</h3>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 flex-shrink-0"
+                    onClick={() => toggleFavorite(resource)}
+                  >
+                    <Star 
+                      size={16} 
+                      className={
+                        favorites.has(`${resource.source_id}-${resource.source}`)
+                          ? "text-yellow-500 fill-yellow-500" 
+                          : "text-muted-foreground hover:text-yellow-500"
+                      } 
+                    />
+                  </Button>
+                </div>
+                
+                {/* Description */}
+                <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
+                  <Info size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                  <span>{toTitleCase(resource.description)}</span>
+                </div>
+
+                {/* Phone */}
+                {resource.phone && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <Phone size={14} className="text-green-500 flex-shrink-0" />
+                    <span>{resource.phone}</span>
+                  </div>
+                )}
+
+                {/* Address with distance */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <MapPin size={14} className="text-red-500 flex-shrink-0" />
+                  <span>
+                    {resource.address && resource.city && `${resource.address}, ${resource.city}`}
+                    {resource.address && !resource.city && resource.address}
+                    {!resource.address && resource.city && resource.city}
+                    {(resource.address || resource.city) && ' • '}
+                    {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
+                  </span>
                 </div>
 
                 {/* Source badge */}
