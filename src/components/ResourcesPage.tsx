@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X } from "lucide-react";
+import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,13 @@ const ResourcesPage = () => {
   const [cachedResults, setCachedResults] = useState<any>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const { toast } = useToast();
+
+  // Helper function to convert text to title case
+  const toTitleCase = (str: string) => {
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
 
   const categories = [
     { id: "all", label: "All", color: "bg-secondary" },
@@ -247,18 +254,29 @@ const ResourcesPage = () => {
                         />
                       </Button>
                     </div>
+                    
+                    {/* Description */}
+                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
+                      <Info size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                      <span>{toTitleCase(resource.description)}</span>
+                    </div>
+
+                    {/* Phone */}
                     {resource.phone && (
-                      <p className="text-sm text-muted-foreground mb-2 font-medium">
-                        📞 {resource.phone}
-                      </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                        <Phone size={14} className="text-green-500 flex-shrink-0" />
+                        <span className="font-medium">{resource.phone}</span>
+                      </div>
                     )}
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {resource.description}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-                      <MapPin size={12} />
+
+                    {/* Address with distance */}
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                      <MapPin size={14} className="text-red-500 flex-shrink-0" />
                       <span>
-                        {resource.city && `${resource.city} • `}
+                        {resource.address && resource.city && `${resource.address}, ${resource.city}`}
+                        {resource.address && !resource.city && resource.address}
+                        {!resource.address && resource.city && resource.city}
+                        {(resource.address || resource.city) && ' • '}
                         {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
                       </span>
                     </div>
