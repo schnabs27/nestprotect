@@ -95,8 +95,20 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
 
   // Initialize map when dialog opens and Google Maps is loaded
   useEffect(() => {
-    console.log('Map initialization check:', { open, googleMapsLoaded, mapContainer: !!mapContainer.current, windowGoogle: !!window.google });
-    if (!open || !googleMapsLoaded || !mapContainer.current || !window.google) return;
+    // Add a small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      console.log('Map initialization check:', { 
+        open, 
+        googleMapsLoaded, 
+        mapContainer: !!mapContainer.current, 
+        windowGoogle: !!window.google,
+        mapContainerElement: mapContainer.current 
+      });
+      
+      if (!open || !googleMapsLoaded || !mapContainer.current || !window.google) {
+        console.log('Map initialization skipped:', { open, googleMapsLoaded, hasContainer: !!mapContainer.current, hasGoogle: !!window.google });
+        return;
+      }
 
     // Default center (Pasadena)
     const defaultCenter = { lat: 34.1672, lng: -118.1535 };
@@ -191,12 +203,15 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
       }
     }
 
-    // Cleanup function
-    return () => {
-      if (mapInstance) {
-        window.google.maps.event.clearInstanceListeners(mapInstance);
-      }
-    };
+      // Cleanup function
+      return () => {
+        if (mapInstance) {
+          window.google.maps.event.clearInstanceListeners(mapInstance);
+        }
+      };
+    }, 100); // 100ms delay to ensure DOM is ready
+
+    return () => clearTimeout(timer);
   }, [open, googleMapsLoaded, resources]);
 
   if (!mapsApiKey && open) {
