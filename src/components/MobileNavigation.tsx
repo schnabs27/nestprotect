@@ -1,4 +1,4 @@
-import { Shield, Cloud, CheckSquare, FileText, Package, User } from "lucide-react";
+import { Shield, Cloud, CheckSquare, FileText, Package, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MobileNavigationProps {
@@ -12,7 +12,7 @@ const tabs = [
   { id: "preparedness", label: "Ready", icon: CheckSquare },
   { id: "documents", label: "Docs", icon: FileText },
   { id: "inventory", label: "Items", icon: Package },
-  { id: "profile", label: "Profile", icon: User },
+  { id: "profile", label: "Settings", icon: Settings },
 ];
 
 const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => {
