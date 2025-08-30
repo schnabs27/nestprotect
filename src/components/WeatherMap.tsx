@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WeatherMapProps {
   location: string;
@@ -16,8 +17,38 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch the Maps API key from Supabase edge function
   useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-maps-api-key');
+        
+        if (error) {
+          console.error('Error fetching Maps API key:', error);
+          setError('Failed to load map configuration');
+          return;
+        }
+        
+        if (data?.apiKey) {
+          setApiKey(data.apiKey);
+        } else {
+          setError('Maps API key not available');
+        }
+      } catch (err) {
+        console.error('Error calling get-maps-api-key function:', err);
+        setError('Failed to load map configuration');
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
+  // Load Google Maps when API key is available
+  useEffect(() => {
+    if (!apiKey) return;
     const loadGoogleMaps = () => {
       if (window.google && window.google.maps) {
         initializeMap();
@@ -26,7 +57,7 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
 
       // Create the script element
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
       script.async = true;
       script.defer = true;
 
@@ -107,7 +138,7 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
     };
 
     loadGoogleMaps();
-  }, []);
+  }, [apiKey]); // Depend on apiKey
 
   // Geocode location when it changes
   useEffect(() => {
@@ -125,22 +156,35 @@ const WeatherMap = ({ location, className = "" }: WeatherMapProps) => {
 
   return (
     <div className={`relative ${className}`}>
-      <div 
-        ref={mapRef} 
-        className="w-full h-full min-h-[300px] rounded-lg"
-        style={{ minHeight: '300px' }}
-      />
-      {!mapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
+      {error ? (
+        <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-muted rounded-lg">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-sm text-muted-foreground">Loading weather map...</p>
+            <p className="text-sm text-destructive mb-2">⚠️ Map Error</p>
+            <p className="text-xs text-muted-foreground">{error}</p>
           </div>
         </div>
+      ) : (
+        <>
+          <div 
+            ref={mapRef} 
+            className="w-full h-full min-h-[300px] rounded-lg"
+            style={{ minHeight: '300px' }}
+          />
+          {(!mapLoaded || !apiKey) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-sm text-muted-foreground">
+                  {!apiKey ? 'Loading map configuration...' : 'Loading weather map...'}
+                </p>
+              </div>
+            </div>
+          )}
+          <div className="absolute top-2 left-2 bg-background/90 px-2 py-1 rounded text-xs text-muted-foreground">
+            Weather conditions and radar
+          </div>
+        </>
       )}
-      <div className="absolute top-2 left-2 bg-background/90 px-2 py-1 rounded text-xs text-muted-foreground">
-        Weather conditions and radar
-      </div>
     </div>
   );
 };

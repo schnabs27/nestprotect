@@ -6,6 +6,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -14,8 +15,9 @@ serve(async (req) => {
     const mapsApiKey = Deno.env.get('MAPS_API_KEY');
     
     if (!mapsApiKey) {
+      console.error('MAPS_API_KEY not found in environment variables');
       return new Response(
-        JSON.stringify({ error: 'Google Maps API key not configured' }),
+        JSON.stringify({ error: 'Maps API key not configured' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -24,7 +26,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ key: mapsApiKey }),
+      JSON.stringify({ apiKey: mapsApiKey }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
