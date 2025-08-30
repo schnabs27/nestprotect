@@ -156,10 +156,10 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
   }, [open, mapboxToken, resources]);
 
   if (!mapboxToken && open) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl w-full h-[80vh]">
-          <DialogHeader>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
+        <DialogHeader className="pb-2 md:pb-4">
             <DialogTitle>Resource Map</DialogTitle>
           </DialogHeader>
           <div className="flex items-center justify-center h-full">
@@ -172,14 +172,17 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-full h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MapPin size={20} />
-            Disaster Relief Resources {zipCode && `in ${zipCode}`}
+      <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
+        <DialogHeader className="pb-2 md:pb-4">
+          <DialogTitle className="flex items-center gap-2 text-base md:text-lg">
+            <MapPin size={18} className="md:hidden" />
+            <MapPin size={20} className="hidden md:block" />
+            <span className="truncate">
+              Disaster Relief Resources {zipCode && `in ${zipCode}`}
+            </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-h-0">
           <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
           {resources.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg">
@@ -187,8 +190,8 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             </div>
           )}
         </div>
-        <div className="text-xs text-muted-foreground">
-          Showing {resources.length} resource{resources.length !== 1 ? 's' : ''} • Click markers for details
+        <div className="text-xs text-muted-foreground pt-2 md:pt-0">
+          Showing {resources.length} resource{resources.length !== 1 ? 's' : ''} • Tap markers for details
         </div>
       </DialogContent>
     </Dialog>
