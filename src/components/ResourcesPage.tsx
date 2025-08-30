@@ -17,6 +17,7 @@ const ResourcesPage = () => {
   const [cachedResults, setCachedResults] = useState<any>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   // Helper function to convert text to title case
@@ -28,6 +29,7 @@ const ResourcesPage = () => {
 
   const categories = [
     { id: "all", label: "All", color: "bg-[#06c29a]" },
+    { id: "favorites", label: "Favorites", color: "bg-yellow-500" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-yellow" },
     { id: "medical", label: "Medical", color: "bg-accent" },
@@ -75,6 +77,11 @@ const ResourcesPage = () => {
       }
 
       setResources(data.resources || []);
+      
+      // Load favorites for the new resources
+      if (data.resources && data.resources.length > 0) {
+        loadFavorites(data.resources);
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast({
@@ -88,15 +95,94 @@ const ResourcesPage = () => {
     }
   };
 
+  const loadFavorites = async (resourceList: any[]) => {
+    try {
+      // For now, use device-based storage for unauthenticated users
+      const deviceId = localStorage.getItem('device-id') || generateDeviceId();
+      
+      const resourceIds = resourceList.map(r => `${r.source_id}-${r.source}`);
+      
+      const { data: favoriteData } = await supabase
+        .from('user_resource_prefs')
+        .select('resource_id')
+        .in('resource_id', resourceIds)
+        .eq('device_id', deviceId)
+        .eq('is_favorite', true);
+
+      if (favoriteData) {
+        setFavorites(new Set(favoriteData.map(f => f.resource_id)));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  };
+
+  const generateDeviceId = () => {
+    const deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('device-id', deviceId);
+    return deviceId;
+  };
+
   const filteredResources = resources
-    .filter(resource => 
-      selectedCategory === "all" || resource.category?.toLowerCase().includes(selectedCategory)
-    )
+    .filter(resource => {
+      if (selectedCategory === "all") return true;
+      if (selectedCategory === "favorites") {
+        const resourceKey = `${resource.source_id}-${resource.source}`;
+        return favorites.has(resourceKey);
+      }
+      return resource.category?.toLowerCase().includes(selectedCategory);
+    })
     .sort((a, b) => (a.distance_mi || 999) - (b.distance_mi || 999));
 
-  const toggleFavorite = async (resourceId: string) => {
-    // This would integrate with user preferences when auth is implemented
-    console.log('Toggle favorite for resource:', resourceId);
+  const toggleFavorite = async (resource: any) => {
+    try {
+      const deviceId = localStorage.getItem('device-id') || generateDeviceId();
+      const resourceKey = `${resource.source_id}-${resource.source}`;
+      const isFavorited = favorites.has(resourceKey);
+
+      if (isFavorited) {
+        // Remove from favorites
+        await supabase
+          .from('user_resource_prefs')
+          .delete()
+          .eq('resource_id', resourceKey)
+          .eq('device_id', deviceId);
+        
+        const newFavorites = new Set(favorites);
+        newFavorites.delete(resourceKey);
+        setFavorites(newFavorites);
+        
+        toast({
+          title: "Removed from Favorites",
+          description: `${resource.name} has been removed from your favorites`,
+        });
+      } else {
+        // Add to favorites
+        await supabase
+          .from('user_resource_prefs')
+          .upsert({
+            resource_id: resourceKey,
+            device_id: deviceId,
+            is_favorite: true
+          });
+        
+        const newFavorites = new Set(favorites);
+        newFavorites.add(resourceKey);
+        setFavorites(newFavorites);
+        
+        toast({
+          title: "Added to Favorites",
+          description: `${resource.name} has been added to your favorites`,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -244,22 +330,26 @@ const ResourcesPage = () => {
           {filteredResources.map((resource) => (
             <Card key={resource.id} className="shadow-soft hover:shadow-medium transition-smooth">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-title">{resource.name}</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => toggleFavorite(resource.id)}
-                      >
-                        <Star 
-                          size={16} 
-                          className="text-muted-foreground hover:text-yellow" 
-                        />
-                      </Button>
-                    </div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-title">{resource.name}</h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => toggleFavorite(resource)}
+                          >
+                            <Star 
+                              size={16} 
+                              className={
+                                favorites.has(`${resource.source_id}-${resource.source}`)
+                                  ? "text-yellow-500 fill-yellow-500" 
+                                  : "text-muted-foreground hover:text-yellow-500"
+                              } 
+                            />
+                          </Button>
+                        </div>
                     
                     {/* Description */}
                     <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
