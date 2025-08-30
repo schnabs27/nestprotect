@@ -89,39 +89,39 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         </div>
 
         {/* Value Proposition */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="space-y-4 pt-6">
-            <p className="text-gray-700 text-center">
-              Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
-            </p>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">Before:</span>
-                  <span className="text-gray-600 ml-1">Interactive checklists and tools to be prepared</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">During:</span>
-                  <span className="text-gray-600 ml-1">Real-time fire, storm, and traffic data</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">After:</span>
-                  <span className="text-gray-600 ml-1">AI-driven search of disaster relief resources and tips for easier recovery</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-600 text-center text-sm pt-2">
-              NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a non-profit helping people affected by natural disasters.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <p className="text-gray-700 text-center">
+            Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
+          </p>
+          
+          {/* Before, During, After Cards */}
+          <div className="grid grid-cols-1 gap-4">
+            <Card className="border border-gray-200">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-gray-900 mb-2">Before</h3>
+                <p className="text-gray-600 text-sm">Interactive checklists and tools to be prepared</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-gray-200">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-gray-900 mb-2">During</h3>
+                <p className="text-gray-600 text-sm">Real-time fire, storm, and traffic data</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-gray-200">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-gray-900 mb-2">After</h3>
+                <p className="text-gray-600 text-sm">AI-driven search of disaster relief resources and tips for easier recovery</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <p className="text-gray-600 text-center text-sm pt-2">
+            NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a non-profit helping people affected by natural disasters.
+          </p>
+        </div>
 
         {/* Authentication Tabs */}
         <Card className="border-0 shadow-lg">
