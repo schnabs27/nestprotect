@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import WeatherMap from "@/components/WeatherMap";
+import { supabase } from "@/integrations/supabase/client";
 
 const WeatherPage = () => {
   const [location, setLocation] = useState("Springfield, IL");
@@ -59,29 +60,45 @@ const WeatherPage = () => {
 
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        // Use reverse geocoding to get location name
-        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyBZhmhQrVv5-ODgo8ptKu8Cj-g_i0Bj2aI`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.results && data.results[0]) {
-              const addressComponents = data.results[0].address_components;
+        console.log('Got coordinates:', { latitude, longitude });
+        
+        try {
+          // Use the existing Google Maps API key from Supabase
+          const { data } = await supabase.functions.invoke('get-maps-api-key');
+          const apiKey = data?.apiKey;
+          
+          if (apiKey) {
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+            );
+            const geocodeData = await response.json();
+            
+            if (geocodeData.results && geocodeData.results[0]) {
+              const addressComponents = geocodeData.results[0].address_components;
               const city = addressComponents.find((component: any) => 
                 component.types.includes('locality'))?.long_name || '';
               const state = addressComponents.find((component: any) => 
                 component.types.includes('administrative_area_level_1'))?.short_name || '';
-              const newLocation = city && state ? `${city}, ${state}` : data.results[0].formatted_address;
+              
+              const newLocation = city && state ? `${city}, ${state}` : geocodeData.results[0].formatted_address;
+              console.log('Setting location to:', newLocation);
               setLocation(newLocation);
+            } else {
+              console.log('Geocoding failed, using coordinates');
+              setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
             }
-          })
-          .catch(error => {
-            console.error('Geocoding error:', error);
+          } else {
+            console.log('No API key, using coordinates');
             setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-          })
-          .finally(() => {
-            setIsLocating(false);
-          });
+          }
+        } catch (error) {
+          console.error('Geocoding error:', error);
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        } finally {
+          setIsLocating(false);
+        }
       },
       (error) => {
         console.error('Geolocation error:', error);
@@ -91,7 +108,7 @@ const WeatherPage = () => {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 600000 // 10 minutes
+        maximumAge: 300000 // 5 minutes
       }
     );
   };
