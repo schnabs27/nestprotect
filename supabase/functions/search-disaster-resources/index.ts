@@ -69,83 +69,58 @@ serve(async (req) => {
       );
     }
 
-    // Aggregate data from multiple sources
+    // Aggregate data from Google Maps Places API only (for now)
     const results: DisasterResource[] = [];
     const errors: string[] = [];
 
-    // 1. Call 211 API
-    try {
-      console.log('Calling 211 API...');
-      const response211 = await fetch(
-        `https://api.211.org/search/v1/api/Search/Guided?TaxonomyCode=BD-1800&Location=${zipCode}&Distance=30&Top=50&OrderBy=Distance`
-      );
-      
-      if (response211.ok) {
-        const data211 = await response211.json();
-        console.log(`211 API returned ${data211?.Organizations?.length || 0} results`);
-        
-        if (data211.Organizations) {
-          for (const org of data211.Organizations) {
-            results.push({
-              name: org.Name || 'Unknown Organization',
-              category: org.Services?.[0]?.ServiceName || 'General',
-              description: org.Description || '',
-              phone: org.Phone || '',
-              website: org.Website || '',
-              email: org.Email || '',
-              address: org.Address || '',
-              city: org.City || '',
-              state: org.State || '',
-              postal_code: zipCode,
-              latitude: parseFloat(org.Latitude) || null,
-              longitude: parseFloat(org.Longitude) || null,
-              distance_mi: parseFloat(org.Distance) || null,
-              source: '211',
-              source_id: org.Id?.toString() || '',
-              hours: org.Hours || ''
-            });
-          }
-        }
-      } else {
-        errors.push('211 API request failed');
-        console.error('211 API error:', response211.status);
-      }
-    } catch (error) {
-      errors.push('211 API timeout or error');
-      console.error('211 API error:', error);
-    }
-
-    // 2. Call Google Maps Places API
+    // Call Google Maps Places API
     try {
       console.log('Calling Google Maps Places API...');
       const mapsApiKey = Deno.env.get('MAPS_API_KEY');
       if (!mapsApiKey) {
         errors.push('Google Maps API key not configured');
+        console.error('Google Maps API key missing');
       } else {
         // First, geocode the ZIP code to get coordinates
+        console.log(`Geocoding ZIP code: ${zipCode}`);
         const geocodeResponse = await fetch(
           `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`
         );
         
         if (geocodeResponse.ok) {
           const geocodeData = await geocodeResponse.json();
+          console.log(`Geocode response status: ${geocodeData.status}`);
+          
           if (geocodeData.results && geocodeData.results.length > 0) {
             const location = geocodeData.results[0].geometry.location;
+            console.log(`Location found: ${location.lat}, ${location.lng}`);
             
-            // Search for relevant places
-            const searchTypes = ['hospital', 'fire_station', 'police', 'local_government_office'];
+            // Search for relevant places with broader keywords
+            const searchQueries = [
+              'food bank',
+              'shelter',
+              'emergency services',
+              'hospital',
+              'fire station',
+              'police station',
+              'community center',
+              'red cross',
+              'salvation army',
+              'united way'
+            ];
             
-            for (const type of searchTypes) {
+            for (const query of searchQueries) {
+              console.log(`Searching for: ${query}`);
               const placesResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.lat},${location.lng}&radius=48280&type=${type}&key=${mapsApiKey}`
+                `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${location.lat},${location.lng}&radius=48280&key=${mapsApiKey}`
               );
               
               if (placesResponse.ok) {
                 const placesData = await placesResponse.json();
-                console.log(`Google Places API returned ${placesData?.results?.length || 0} results for ${type}`);
+                console.log(`Text search for "${query}" returned ${placesData?.results?.length || 0} results`);
                 
-                if (placesData.results) {
-                  for (const place of placesData.results) {
+                if (placesData.results && placesData.results.length > 0) {
+                  for (const place of placesData.results.slice(0, 10)) { // Limit to first 10 results per query
                     // Calculate distance from ZIP center
                     const distance = calculateDistance(
                       location.lat, location.lng,
@@ -153,92 +128,69 @@ serve(async (req) => {
                     );
                     
                     if (distance <= 30) { // Within 30 miles
+                      // Get more details for this place
+                      const detailsResponse = await fetch(
+                        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,types&key=${mapsApiKey}`
+                      );
+                      
+                      let placeDetails = place;
+                      if (detailsResponse.ok) {
+                        const detailsData = await detailsResponse.json();
+                        if (detailsData.result) {
+                          placeDetails = { ...place, ...detailsData.result };
+                        }
+                      }
+                      
                       results.push({
-                        name: place.name || 'Unknown Place',
-                        category: type.replace('_', ' '),
-                        description: place.types?.join(', ') || '',
-                        phone: place.formatted_phone_number || '',
-                        website: place.website || '',
-                        address: place.vicinity || '',
-                        city: '',
-                        state: '',
+                        name: placeDetails.name || 'Unknown Place',
+                        category: categorizePlace(query, placeDetails.types || []),
+                        description: `${query} facility. ${placeDetails.types?.slice(0, 3).join(', ') || ''}`,
+                        phone: placeDetails.formatted_phone_number || '',
+                        website: placeDetails.website || '',
+                        address: placeDetails.formatted_address || placeDetails.vicinity || '',
+                        city: extractCity(placeDetails.formatted_address || ''),
+                        state: extractState(placeDetails.formatted_address || ''),
                         postal_code: zipCode,
                         latitude: place.geometry.location.lat,
                         longitude: place.geometry.location.lng,
-                        distance_mi: distance,
+                        distance_mi: Math.round(distance * 10) / 10,
                         source: 'Google Maps',
                         source_id: place.place_id || '',
-                        hours: place.opening_hours?.weekday_text?.join('; ') || ''
+                        hours: placeDetails.opening_hours?.weekday_text?.join('; ') || ''
                       });
                     }
                   }
                 }
+              } else {
+                console.error(`Places API error for "${query}":`, placesResponse.status);
               }
+              
+              // Small delay to avoid rate limits
+              await new Promise(resolve => setTimeout(resolve, 100));
             }
+          } else {
+            errors.push(`Could not geocode ZIP code: ${zipCode}`);
+            console.error('Geocoding failed:', geocodeData.status, geocodeData.error_message);
           }
+        } else {
+          errors.push('Google Geocoding API request failed');
+          console.error('Geocoding API error:', geocodeResponse.status);
         }
       }
     } catch (error) {
       errors.push('Google Maps API error');
       console.error('Google Maps API error:', error);
     }
-
-    // 3. Use OpenAI for data cleanup and deduplication
-    try {
-      console.log('Processing with OpenAI for cleanup and deduplication...');
-      const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-      if (!openaiApiKey) {
-        errors.push('OpenAI API key not configured');
-      } else if (results.length > 0) {
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openaiApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a data cleanup assistant. Remove duplicate disaster relief resources, normalize descriptions to ~160 chars, and categorize properly. Return clean JSON array.'
-              },
-              {
-                role: 'user',
-                content: `Clean and deduplicate these disaster relief resources:\n${JSON.stringify(results.slice(0, 20))}`
-              }
-            ],
-            max_tokens: 2000,
-            temperature: 0.1
-          }),
-        });
-
-        if (openaiResponse.ok) {
-          const openaiData = await openaiResponse.json();
-          const cleanedData = openaiData.choices[0].message.content;
-          console.log('OpenAI cleanup completed');
-          
-          try {
-            const cleanedResults = JSON.parse(cleanedData);
-            if (Array.isArray(cleanedResults)) {
-              results.splice(0, results.length, ...cleanedResults);
-            }
-          } catch (parseError) {
-            console.error('Failed to parse OpenAI response:', parseError);
-          }
-        }
-      }
-    } catch (error) {
-      errors.push('OpenAI processing error');
-      console.error('OpenAI error:', error);
-    }
+    // Remove duplicates based on name and location proximity
+    const uniqueResults = removeDuplicates(results);
+    console.log(`Filtered ${results.length} results down to ${uniqueResults.length} unique results`);
 
     // Store results in database
-    if (results.length > 0) {
-      console.log(`Storing ${results.length} results in database...`);
+    if (uniqueResults.length > 0) {
+      console.log(`Storing ${uniqueResults.length} results in database...`);
       
       // Upsert results
-      for (const resource of results) {
+      for (const resource of uniqueResults) {
         await supabase
           .from('disaster_resources')
           .upsert({
@@ -250,11 +202,11 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Search completed. Found ${results.length} resources, ${errors.length} errors`);
+    console.log(`Search completed. Found ${uniqueResults.length} resources, ${errors.length} errors`);
 
     return new Response(
       JSON.stringify({ 
-        resources: results,
+        resources: uniqueResults,
         cached: false,
         errors: errors.length > 0 ? errors : undefined
       }),
@@ -281,4 +233,62 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+// Helper function to categorize places based on search query and types
+function categorizePlace(query: string, types: string[]): string {
+  query = query.toLowerCase();
+  const typeString = types.join(' ').toLowerCase();
+  
+  if (query.includes('food') || query.includes('bank') || typeString.includes('food')) {
+    return 'food';
+  }
+  if (query.includes('shelter') || typeString.includes('lodging')) {
+    return 'shelter';
+  }
+  if (query.includes('hospital') || query.includes('medical') || typeString.includes('hospital')) {
+    return 'medical';
+  }
+  if (query.includes('fire') || typeString.includes('fire')) {
+    return 'emergency services';
+  }
+  if (query.includes('police') || typeString.includes('police')) {
+    return 'emergency services';
+  }
+  if (query.includes('red cross') || query.includes('salvation army') || query.includes('united way')) {
+    return 'relief organization';
+  }
+  
+  return 'general';
+}
+
+// Helper function to extract city from formatted address
+function extractCity(address: string): string {
+  const parts = address.split(',');
+  return parts.length >= 2 ? parts[parts.length - 3]?.trim() || '' : '';
+}
+
+// Helper function to extract state from formatted address
+function extractState(address: string): string {
+  const parts = address.split(',');
+  const lastPart = parts[parts.length - 2]?.trim() || '';
+  return lastPart.split(' ')[0] || '';
+}
+
+// Helper function to remove duplicate resources
+function removeDuplicates(resources: DisasterResource[]): DisasterResource[] {
+  const unique: DisasterResource[] = [];
+  const seen = new Set<string>();
+  
+  for (const resource of resources) {
+    // Create a key based on name and approximate location
+    const key = `${resource.name.toLowerCase()}_${Math.round(resource.latitude || 0)}_${Math.round(resource.longitude || 0)}`;
+    
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(resource);
+    }
+  }
+  
+  return unique;
 }
