@@ -225,7 +225,6 @@ serve(async (req) => {
           const errorText = await geocodeResponse.text();
           console.error('Geocoding error response:', errorText);
         }
-      }
     } catch (error) {
       errors.push('Google Maps API error');
       console.error('Google Maps API error:', error);
