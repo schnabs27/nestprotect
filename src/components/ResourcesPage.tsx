@@ -323,8 +323,8 @@ const ResourcesPage = () => {
             </div>
           )}
 
-          {filteredResources.map((resource) => (
-            <Card key={resource.id} className="shadow-soft hover:shadow-medium transition-smooth">
+          {filteredResources.map((resource, index) => (
+            <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 pr-2">
