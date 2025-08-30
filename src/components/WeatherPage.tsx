@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { MapPin, AlertTriangle, Thermometer, Droplets, Wind } from "lucide-react";
+import { MapPin, AlertTriangle, Thermometer, Droplets, Wind, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import WeatherMap from "@/components/WeatherMap";
 
 const WeatherPage = () => {
-  const [location] = useState("Springfield, IL");
+  const [location, setLocation] = useState("Springfield, IL");
+  const [locationInput, setLocationInput] = useState("");
 
   const mockCurrentWeather = {
     temperature: 72,
@@ -32,6 +36,19 @@ const WeatherPage = () => {
     }
   ];
 
+  const handleLocationChange = () => {
+    if (locationInput.trim()) {
+      setLocation(locationInput.trim());
+      setLocationInput("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleLocationChange();
+    }
+  };
+
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -45,6 +62,30 @@ const WeatherPage = () => {
       </div>
 
       <div className="p-4">
+        {/* Location Change */}
+        <Card className="mb-6 shadow-soft">
+          <CardHeader>
+            <CardTitle className="text-title">Change Location</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter city or ZIP code"
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1"
+              />
+              <Button onClick={handleLocationChange} size="icon">
+                <Search size={16} />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Current location: {location}
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Weather Alerts */}
         {mockAlerts.length > 0 && (
           <div className="mb-6">
@@ -73,10 +114,20 @@ const WeatherPage = () => {
           </div>
         )}
 
-        {/* Current Conditions */}
+        {/* Weather Map */}
         <Card className="mb-6 shadow-soft">
           <CardHeader>
-            <CardTitle className="text-title">Current Conditions</CardTitle>
+            <CardTitle className="text-title">Weather Map</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <WeatherMap location={location} className="h-80" />
+          </CardContent>
+        </Card>
+
+        {/* Current Stats */}
+        <Card className="mb-6 shadow-soft">
+          <CardHeader>
+            <CardTitle className="text-title">Current Stats</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
