@@ -186,11 +186,11 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
   if (!mapsApiKey && open) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
-          <DialogHeader>
+        <DialogContent className="max-w-7xl w-[95vw] h-[90vh] md:h-[85vh] p-3 md:p-4 flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Resource Map</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center flex-1">
             <p className="text-muted-foreground">Loading map...</p>
           </div>
         </DialogContent>
@@ -200,8 +200,8 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[85vh] md:h-[80vh] p-3 md:p-6">
-        <DialogHeader className="pb-2 md:pb-4">
+      <DialogContent className="max-w-7xl w-[95vw] h-[90vh] md:h-[85vh] p-3 md:p-4 flex flex-col">
+        <DialogHeader className="pb-1 md:pb-2 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-base md:text-lg">
             <MapPin size={18} className="md:hidden" />
             <MapPin size={20} className="hidden md:block" />
@@ -210,11 +210,10 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 relative min-h-0">
+        <div className="flex-1 relative min-h-0 mb-2">
           <div 
             ref={mapContainer} 
             className="absolute inset-0 rounded-lg w-full h-full"
-            style={{ minHeight: '300px' }}
           />
           {(!googleMapsLoaded || resources.length === 0) && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 rounded-lg">
@@ -224,7 +223,7 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             </div>
           )}
         </div>
-        <div className="text-xs text-muted-foreground pt-2 md:pt-0">
+        <div className="text-xs text-muted-foreground flex-shrink-0">
           Showing {resources.length} resource{resources.length !== 1 ? 's' : ''} • Tap markers for details
         </div>
       </DialogContent>
