@@ -79,9 +79,11 @@ const ResourcesPage = () => {
     }
   };
 
-  const filteredResources = resources.filter(resource => 
-    selectedCategory === "all" || resource.category?.toLowerCase().includes(selectedCategory)
-  );
+  const filteredResources = resources
+    .filter(resource => 
+      selectedCategory === "all" || resource.category?.toLowerCase().includes(selectedCategory)
+    )
+    .sort((a, b) => (a.distance_mi || 999) - (b.distance_mi || 999));
 
   const toggleFavorite = async (resourceId: string) => {
     // This would integrate with user preferences when auth is implemented
@@ -245,13 +247,18 @@ const ResourcesPage = () => {
                         />
                       </Button>
                     </div>
+                    {resource.phone && (
+                      <p className="text-sm text-muted-foreground mb-2 font-medium">
+                        📞 {resource.phone}
+                      </p>
+                    )}
                     <p className="text-sm text-muted-foreground mb-2">
                       {resource.description}
                     </p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                       <MapPin size={12} />
                       <span>
-                        {resource.address && `${resource.address} • `}
+                        {resource.city && `${resource.city} • `}
                         {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
                       </span>
                     </div>
