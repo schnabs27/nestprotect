@@ -177,19 +177,19 @@ serve(async (req) => {
                     console.log(`Found ${place.displayName?.text || 'Unknown'} at distance: ${distance.toFixed(1)} miles`);
                     
                     if (distance <= 30) { // Within 30 miles
-                      // Filter out generic types and include phone if available
+                      // Filter out generic types and clean up description
                       const filteredTypes = place.types?.filter(type => 
                         type !== 'point_of_interest' && 
                         type !== 'establishment'
                       ) || [];
                       
-                      const typeDescription = filteredTypes.slice(0, 2).join(', ') || query;
-                      const phoneInfo = place.nationalPhoneNumber ? ` • ${place.nationalPhoneNumber}` : '';
+                      const typeDescription = (filteredTypes.slice(0, 2).join(', ') || query)
+                        .replace(/_/g, ' '); // Replace underscores with spaces
                       
                       results.push({
                         name: place.displayName?.text || 'Unknown Place',
                         category: categorizePlace(query, place.types || []),
-                        description: typeDescription + phoneInfo,
+                        description: typeDescription,
                         phone: place.nationalPhoneNumber || '',
                         website: '',
                         address: place.formattedAddress || '',
