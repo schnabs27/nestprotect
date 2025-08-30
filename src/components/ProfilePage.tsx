@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone } from "lucide-react";
+import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/components/AuthProvider";
+import { toast } from "sonner";
 
 const ProfilePage = () => {
+  const { user, isGuest, signOut, setGuestMode } = useAuth();
+  
   const [notifications, setNotifications] = useState({
     weatherAlerts: true,
     emergencyUpdates: true,
@@ -15,8 +19,20 @@ const ProfilePage = () => {
 
   const [userInfo, setUserInfo] = useState({
     zipCode: "62701",
-    name: "John Doe"
+    name: user?.email || "Guest User"
   });
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      if (isGuest) {
+        setGuestMode(false);
+      }
+      toast.success("Successfully signed out");
+    } catch (error) {
+      toast.error("Error signing out");
+    }
+  };
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
@@ -192,6 +208,34 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Authentication Status */}
+        <Card className="mb-6 shadow-soft">
+          <CardHeader>
+            <CardTitle className="text-title">Account Status</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium">
+                  {user ? `Signed in as: ${user.email}` : "Guest User"}
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  {user ? "Full access to all features" : "Limited access - some features may be restricted"}
+                </p>
+              </div>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleSignOut}
+              className="w-full justify-start text-destructive hover:text-destructive"
+            >
+              <LogOut size={16} className="mr-2" />
+              {user ? "Sign Out" : "Exit Guest Mode"}
+            </Button>
           </CardContent>
         </Card>
 
