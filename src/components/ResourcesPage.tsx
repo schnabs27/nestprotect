@@ -265,12 +265,12 @@ const ResourcesPage = () => {
                     {resource.phone && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <Phone size={14} className="text-green-500 flex-shrink-0" />
-                        <span className="font-medium">{resource.phone}</span>
+                        <span>{resource.phone}</span>
                       </div>
                     )}
 
                     {/* Address with distance */}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <MapPin size={14} className="text-red-500 flex-shrink-0" />
                       <span>
                         {resource.address && resource.city && `${resource.address}, ${resource.city}`}
