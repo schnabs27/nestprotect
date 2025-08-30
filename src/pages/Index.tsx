@@ -1,12 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import MobileNavigation from "@/components/MobileNavigation";
+import ResourcesPage from "@/components/ResourcesPage";
+import WeatherPage from "@/components/WeatherPage";
+import PreparednessPage from "@/components/PreparednessPage";
+import DocumentsPage from "@/components/DocumentsPage";
+import InventoryPage from "@/components/InventoryPage";
+import ProfilePage from "@/components/ProfilePage";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("resources");
+
+  const renderPage = () => {
+    switch (activeTab) {
+      case "resources":
+        return <ResourcesPage />;
+      case "weather":
+        return <WeatherPage />;
+      case "preparedness":
+        return <PreparednessPage />;
+      case "documents":
+        return <DocumentsPage />;
+      case "inventory":
+        return <InventoryPage />;
+      case "profile":
+        return <ProfilePage />;
+      default:
+        return <ResourcesPage />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {renderPage()}
+      <MobileNavigation activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
