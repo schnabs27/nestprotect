@@ -25,12 +25,12 @@ const ResourcesPage = () => {
   };
 
   const categories = [
-    { id: "all", label: "All", color: "bg-secondary" },
+    { id: "all", label: "All", color: "bg-green-600" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-yellow" },
     { id: "medical", label: "Medical", color: "bg-accent" },
     { id: "cleanup", label: "Cleanup", color: "bg-primary" },
-    { id: "legal", label: "Legal", color: "bg-muted" }
+    { id: "legal", label: "Legal", color: "bg-gray-700" }
   ];
 
   const handleSearch = async () => {
