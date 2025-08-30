@@ -196,7 +196,7 @@ const ResourcesPage = () => {
       <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
         <h1 className="text-2xl font-bold mb-2">Local Disaster Relief</h1>
         <p className="text-primary-foreground/90 text-sm">
-          Find nearby resources within 30 miles using ZIP code or location
+          Find nearby resources within 30 miles
         </p>
       </div>
 
@@ -237,7 +237,7 @@ const ResourcesPage = () => {
                     isSelected 
                       ? `${category.color} ${isFavorites ? "text-yellow-foreground" : "text-white"} ring-2 ring-primary`
                       : isFavorites 
-                        ? `${category.color} text-yellow-foreground`
+                        ? "bg-white border border-yellow text-muted-foreground"
                         : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
                   }`}
                   onClick={() => setSelectedCategory(category.id)}
