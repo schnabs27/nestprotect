@@ -69,7 +69,7 @@ serve(async (req) => {
       );
     }
 
-    // Aggregate data from Google Maps Places API only (for now)
+    // Aggregate data from Google Maps Places API and OpenAI
     const results: DisasterResource[] = [];
     const errors: string[] = [];
 
@@ -237,6 +237,108 @@ serve(async (req) => {
     } catch (error) {
       errors.push('Google Maps API error');
       console.error('Google Maps API error:', error);
+    }
+
+    // Call OpenAI API for additional disaster relief resources
+    try {
+      console.log('Calling OpenAI API for disaster relief resources...');
+      const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+      
+      if (!openaiApiKey) {
+        errors.push('OpenAI API key not configured');
+        console.error('OpenAI API key missing from environment variables');
+      } else {
+        console.log('OpenAI API key found, making request...');
+        
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openaiApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a disaster relief resource finder. Return ONLY a valid JSON array of disaster relief resources near the given ZIP code. Each resource must have this exact structure:
+{
+  "name": "Resource Name",
+  "category": "food|shelter|medical|emergency services|relief organization",
+  "description": "Brief description",
+  "phone": "Phone number if known",
+  "website": "Website URL if known", 
+  "address": "Street address if known",
+  "city": "City name",
+  "state": "State abbreviation",
+  "source": "OpenAI Knowledge"
+}
+
+Focus on real, well-known organizations like Red Cross, Salvation Army, local food banks, hospitals, emergency services, and community centers. Do not include fictional or uncertain information.`
+              },
+              {
+                role: 'user',
+                content: `Find disaster relief resources near ZIP code ${zipCode}. Return maximum 10 resources as a JSON array.`
+              }
+            ],
+            max_tokens: 2000,
+            temperature: 0.3
+          }),
+        });
+
+        console.log('OpenAI response status:', openaiResponse.status, openaiResponse.statusText);
+
+        if (openaiResponse.ok) {
+          const openaiData = await openaiResponse.json();
+          console.log('OpenAI response received');
+          
+          const aiContent = openaiData.choices[0]?.message?.content;
+          if (aiContent) {
+            try {
+              // Parse the JSON response from OpenAI
+              const aiResources = JSON.parse(aiContent);
+              console.log(`OpenAI returned ${aiResources.length} resources`);
+              
+              // Transform AI results to match our schema
+              for (const aiResource of aiResources) {
+                results.push({
+                  name: aiResource.name || 'Unknown Resource',
+                  category: aiResource.category || 'general',
+                  description: aiResource.description || '',
+                  phone: aiResource.phone || '',
+                  website: aiResource.website || '',
+                  address: aiResource.address || '',
+                  city: aiResource.city || '',
+                  state: aiResource.state || '',
+                  postal_code: zipCode,
+                  latitude: null, // OpenAI doesn't provide coordinates
+                  longitude: null,
+                  distance_mi: null,
+                  source: 'OpenAI Knowledge',
+                  source_id: `openai_${aiResource.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
+                  hours: ''
+                });
+              }
+              console.log(`Added ${aiResources.length} OpenAI resources to results`);
+            } catch (parseError) {
+              console.error('Error parsing OpenAI JSON response:', parseError);
+              console.error('Raw AI content:', aiContent);
+              errors.push('OpenAI returned invalid JSON format');
+            }
+          } else {
+            console.error('No content in OpenAI response');
+            errors.push('OpenAI returned empty response');
+          }
+        } else {
+          console.error('OpenAI API HTTP error:', openaiResponse.status, openaiResponse.statusText);
+          const errorText = await openaiResponse.text();
+          console.error('OpenAI error response:', errorText);
+          errors.push(`OpenAI API error: ${openaiResponse.status}`);
+        }
+      }
+    } catch (error) {
+      errors.push('OpenAI API error');
+      console.error('OpenAI API error:', error);
     }
     // Remove duplicates based on name and location proximity
     const uniqueResults = removeDuplicates(results);
