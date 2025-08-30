@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ResourceMap from "@/components/ResourceMap";
 
 const ResourcesPage = () => {
   const [zipCode, setZipCode] = useState("");
@@ -15,6 +16,7 @@ const ResourcesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cachedResults, setCachedResults] = useState<any>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const { toast } = useToast();
 
   // Helper function to convert text to title case
@@ -189,7 +191,11 @@ const ResourcesPage = () => {
         {/* View Map Button */}
         {resources.length > 0 && (
           <div className="mb-4">
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setShowMap(true)}
+            >
               <MapPin size={16} className="mr-2" />
               View Map
             </Button>
@@ -335,8 +341,15 @@ const ResourcesPage = () => {
             </Card>
           ))}
         </div>
-
       </div>
+
+      {/* Resource Map */}
+      <ResourceMap 
+        resources={resources}
+        open={showMap}
+        onOpenChange={setShowMap}
+        zipCode={zipCode}
+      />
     </div>
   );
 };
