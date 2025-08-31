@@ -295,7 +295,7 @@ const ResourcesPage = () => {
           {isSearching && (
             <div className="bg-yellow/20 border border-yellow/30 rounded-lg p-3 mb-4">
               <p className="text-sm text-yellow-foreground font-medium">
-                🔍 Searching — thanks for your patience!
+                🔍 Searching multiple directories, then compiling and cleaning the listings. This could take a little bit of time. Thanks for your patience!
               </p>
             </div>
           )}
@@ -338,7 +338,7 @@ const ResourcesPage = () => {
         <div className="space-y-4">
           {filteredResources.length === 0 && resources.length === 0 && !isSearching && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Enter a ZIP code or location to search for disaster relief resources</p>
+              <p className="text-muted-foreground">Enter an address and press the *search* button for disaster relief resources</p>
             </div>
           )}
           
