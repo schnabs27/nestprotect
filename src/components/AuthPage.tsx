@@ -16,6 +16,7 @@ interface AuthPageProps {
 const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +32,10 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            zip_code: zipCode
+          }
         }
       });
 
@@ -178,6 +182,19 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                       required
                       minLength={6}
                     />
+                  </div>
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Zip Code (Optional)"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value)}
+                      maxLength={10}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <Map className="w-3 h-3" />
+                      This will be your default starting point for location-based content
+                    </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Create Account"}
