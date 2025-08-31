@@ -95,7 +95,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         {/* Value Proposition */}
         <Card className="border-0 shadow-lg">
           <CardContent className="space-y-4 pt-6">
-            <p className="text-gray-700 text-center">
+            <p className="text-gray-700 text-center leading-tight">
               Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
             </p>
             <div className="space-y-3 text-sm">
