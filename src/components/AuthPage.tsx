@@ -229,7 +229,25 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         </Card>
 
         <p className="text-center text-xs text-gray-500">
-          By using NestProtect, you agree to our terms of service and privacy policy.
+          By using NestProtect, you agree to our{" "}
+          <a 
+            href="https://www.blueskynow.org/terms" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            terms of service
+          </a>{" "}
+          and{" "}
+          <a 
+            href="https://www.blueskynow.org/privacy" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            privacy policy
+          </a>
+          .
         </p>
         <p className="text-center text-xs text-gray-400 mt-2">
           © 2025 www.blueskynow.org
