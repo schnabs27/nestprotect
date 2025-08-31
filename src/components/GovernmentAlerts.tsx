@@ -16,6 +16,45 @@ interface GovernmentAlertsProps {
   alerts: Alert[];
 }
 
+interface AlertCardProps {
+  alert: Alert;
+  index: number;
+}
+
+const AlertCard: React.FC<AlertCardProps> = ({ alert, index }) => {
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const maxLength = 150;
+  const isLongDescription = alert.description.length > maxLength;
+  const displayDescription = showFullDescription 
+    ? alert.description 
+    : alert.description.slice(0, maxLength) + (isLongDescription ? '...' : '');
+
+  return (
+    <div className="border border-coral/20 rounded-lg p-3 bg-coral/5 mb-2">
+      <div className="flex items-start justify-between mb-1">
+        <h5 className="font-medium text-coral text-sm">{alert.event}</h5>
+        <Badge variant="destructive" className="text-xs bg-coral">
+          ALERT
+        </Badge>
+      </div>
+      <div className="text-sm text-muted-foreground mb-1">
+        {displayDescription}
+        {isLongDescription && (
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            className="ml-1 text-coral hover:underline text-xs font-medium"
+          >
+            {showFullDescription ? 'Read less' : 'Read more'}
+          </button>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        From: {alert.senderName} | Expires: {new Date(alert.end * 1000).toLocaleString()}
+      </p>
+    </div>
+  );
+};
+
 const GovernmentAlerts: React.FC<GovernmentAlertsProps> = ({ alerts }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -27,24 +66,11 @@ const GovernmentAlerts: React.FC<GovernmentAlertsProps> = ({ alerts }) => {
       </h4>
       {alerts.length > 0 ? (
         <div className="space-y-2">
-          <div className={`${expanded ? 'max-h-96 overflow-y-auto' : 'max-h-32 overflow-hidden'} transition-all duration-300`}>
-            {alerts.map((alert, index) => (
-              <div key={index} className="border border-coral/20 rounded-lg p-3 bg-coral/5 mb-2">
-                <div className="flex items-start justify-between mb-1">
-                  <h5 className="font-medium text-coral text-sm">{alert.event}</h5>
-                  <Badge variant="destructive" className="text-xs bg-coral">
-                    ALERT
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mb-1">
-                  {alert.description}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  From: {alert.senderName} | Expires: {new Date(alert.end * 1000).toLocaleString()}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div className={`${expanded ? 'max-h-96 overflow-y-auto' : 'max-h-32 overflow-hidden'} transition-all duration-300`}>
+          {alerts.map((alert, index) => (
+            <AlertCard key={index} alert={alert} index={index} />
+          ))}
+        </div>
           {alerts.length > 1 && (
             <Button
               variant="ghost"
