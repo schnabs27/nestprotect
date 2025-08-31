@@ -18,6 +18,8 @@ export const useUserLocation = (): UserLocationData => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user || isGuest) {
+        // Set default zip code for guests
+        setZipCode('78028');
         setLoading(false);
         return;
       }

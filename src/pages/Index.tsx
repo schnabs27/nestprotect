@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import AuthPage from "@/components/AuthPage";
 import MobileNavigation from "@/components/MobileNavigation";
+import ZipCodeHeader from "@/components/ZipCodeHeader";
 import ResourcesPage from "@/components/ResourcesPage";
 import WeatherPage from "@/components/WeatherPage";
 import PreparednessPage from "@/components/PreparednessPage";
@@ -10,7 +11,7 @@ import InventoryPage from "@/components/InventoryPage";
 import ProfilePage from "@/components/ProfilePage";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("resources");
+  const [activeTab, setActiveTab] = useState("before");
   const { user, loading, isGuest, setGuestMode } = useAuth();
 
   // Show loading state
@@ -36,25 +37,22 @@ const Index = () => {
 
   const renderPage = () => {
     switch (activeTab) {
-      case "resources":
-        return <ResourcesPage />;
-      case "weather":
-        return <WeatherPage />;
-      case "preparedness":
+      case "before":
         return <PreparednessPage />;
-      case "documents":
-        return <DocumentsPage />;
-      case "inventory":
-        return <InventoryPage />;
-      case "profile":
+      case "during":
+        return <WeatherPage />;
+      case "after":
+        return <ResourcesPage />;
+      case "settings":
         return <ProfilePage />;
       default:
-        return <ResourcesPage />;
+        return <PreparednessPage />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
+      <ZipCodeHeader />
       {renderPage()}
       <MobileNavigation activeTab={activeTab} onTabChange={setActiveTab} />
     </div>

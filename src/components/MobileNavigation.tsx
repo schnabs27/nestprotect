@@ -1,4 +1,4 @@
-import { Shield, Cloud, CheckSquare, FileText, Package, Settings } from "lucide-react";
+import { Shield, Cloud, LifeBuoy, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MobileNavigationProps {
@@ -7,18 +7,16 @@ interface MobileNavigationProps {
 }
 
 const tabs = [
-  { id: "resources", label: "Resources", icon: Shield },
-  { id: "weather", label: "Weather", icon: Cloud },
-  { id: "preparedness", label: "Ready", icon: CheckSquare },
-  { id: "documents", label: "Docs", icon: FileText },
-  { id: "inventory", label: "Items", icon: Package },
-  { id: "profile", label: "Settings", icon: Settings },
+  { id: "before", label: "Before", icon: Shield },
+  { id: "during", label: "During", icon: Cloud },
+  { id: "after", label: "After", icon: LifeBuoy },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
-      <div className="grid grid-cols-6 h-16">
+      <div className="grid grid-cols-4 h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
