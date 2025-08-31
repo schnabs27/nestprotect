@@ -79,13 +79,11 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Branding */}
         <div className="text-center space-y-4">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mx-auto p-2">
-            <img 
-              src="/lovable-uploads/0de7c778-50fa-452d-b71f-bc6781f7befd.png" 
-              alt="NestProtect Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <img 
+            src="/lovable-uploads/0de7c778-50fa-452d-b71f-bc6781f7befd.png" 
+            alt="NestProtect Logo" 
+            className="w-20 h-20 object-contain mx-auto"
+          />
           <div>
             <h1 className="text-3xl font-bold text-gray-900">NestProtect™</h1>
             <p className="text-gray-600 mt-2">Your personal natural disaster guide</p>
