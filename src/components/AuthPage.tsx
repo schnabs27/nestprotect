@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy } from "lucide-react";
+import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, Home } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
@@ -101,7 +101,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             <div className="space-y-3 text-sm">
               <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50">
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-yellow-600" />
+                  <Sun className="w-5 h-5 text-yellow-600" />
                   <div>
                     <span className="font-bold text-gray-900 text-base">BEFORE</span>
                     <p className="text-gray-700 mt-1">Interactive checklists and guides to prepare</p>
@@ -110,7 +110,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </div>
               <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50/50">
                 <div className="flex items-center gap-3">
-                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                  <AlertTriangle className="w-5 h-5 text-orange-600" />
                   <div>
                     <span className="font-bold text-gray-900 text-base">DURING</span>
                     <p className="text-gray-700 mt-1">Real-time weather, fire, and traffic conditions</p>
@@ -119,7 +119,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </div>
               <div className="border-2 border-red-300 rounded-lg p-3 bg-red-50/50">
                 <div className="flex items-center gap-3">
-                  <LifeBuoy className="w-5 h-5 text-red-600" />
+                  <Home className="w-5 h-5 text-red-600" />
                   <div>
                     <span className="font-bold text-gray-900 text-base">AFTER</span>
                     <p className="text-gray-700 mt-1">AI-driven search of disaster resources</p>
