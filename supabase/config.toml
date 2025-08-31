@@ -16,3 +16,12 @@ port = 54323
 
 [functions.search-disaster-resources]
 verify_jwt = false
+
+[functions.get-weather-data]
+verify_jwt = false
+
+[functions.get-fire-data]
+verify_jwt = false
+
+[functions.get-maps-api-key]
+verify_jwt = false
