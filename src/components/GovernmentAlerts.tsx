@@ -30,14 +30,14 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, index }) => {
     : alert.description.slice(0, maxLength) + (isLongDescription ? '...' : '');
 
   return (
-    <div className="border border-coral/20 rounded-lg p-3 bg-coral/5 mb-2">
-      <div className="flex items-start justify-between mb-1">
+    <div className="border border-coral/20 rounded-lg p-3 bg-coral/5 mb-2 min-h-[100px]">
+      <div className="flex items-start justify-between mb-2">
         <h5 className="font-medium text-coral text-sm">{alert.event}</h5>
         <Badge variant="destructive" className="text-xs bg-coral">
           ALERT
         </Badge>
       </div>
-      <div className="text-sm text-muted-foreground mb-1">
+      <div className="text-sm text-muted-foreground mb-2 leading-relaxed">
         {displayDescription}
         {isLongDescription && (
           <button
@@ -66,31 +66,31 @@ const GovernmentAlerts: React.FC<GovernmentAlertsProps> = ({ alerts }) => {
       </h4>
       {alerts.length > 0 ? (
         <div className="space-y-2">
-        <div className={`${expanded ? 'max-h-96 overflow-y-auto' : 'max-h-32 overflow-hidden'} transition-all duration-300`}>
+        <div className={`${expanded ? 'max-h-96 overflow-y-auto' : 'max-h-44 overflow-hidden'} transition-all duration-300`}>
           {alerts.map((alert, index) => (
             <AlertCard key={index} alert={alert} index={index} />
           ))}
         </div>
-          {alerts.length > 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setExpanded(!expanded)}
-              className="w-full text-xs text-muted-foreground h-6"
-            >
-              {expanded ? (
-                <>
-                  <ChevronUp className="h-3 w-3 mr-1" />
-                  Show less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-3 w-3 mr-1" />
-                  View all {alerts.length} alerts
-                </>
-              )}
-            </Button>
-          )}
+        {alerts.length > 1 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded(!expanded)}
+            className="w-full text-xs text-muted-foreground h-6 mt-2"
+          >
+            {expanded ? (
+              <>
+                <ChevronUp className="h-3 w-3 mr-1" />
+                Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3 mr-1" />
+                View all {alerts.length} alerts
+              </>
+            )}
+          </Button>
+        )}
         </div>
       ) : (
         <div className="bg-muted/30 rounded-lg p-3">
