@@ -118,7 +118,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                   <Home className="w-5 h-5 text-red-600" />
                   <span className="font-bold text-gray-900 text-base">AFTER</span>
                 </div>
-                <p className="text-gray-700">AI-driven resource search, plus tips for recovery</p>
+                <p className="text-gray-700">AI-driven resource search, plus tips for easier recovery</p>
               </div>
             </div>
             <p className="text-gray-600 text-center text-sm pt-2">
