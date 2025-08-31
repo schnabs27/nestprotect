@@ -186,14 +186,14 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                   <div>
                     <Input
                       type="text"
-                      placeholder="Zip Code (Optional)"
+                      placeholder="Zip Code (optional)"
                       value={zipCode}
                       onChange={(e) => setZipCode(e.target.value)}
-                      maxLength={10}
+                      maxLength={5}
+                      pattern="[0-9]{5}"
                     />
-                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                      <Map className="w-3 h-3" />
-                      This will be your default starting point for location-based content
+                    <p className="text-xs text-gray-500 mt-1">
+                      This will be the default starting point for all location-based content in the app
                     </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
