@@ -217,11 +217,17 @@ serve(async (req) => {
               await new Promise(resolve => setTimeout(resolve, 200));
             }
           } else if (geocodeData.status === 'REQUEST_DENIED') {
-            errors.push(`Google Geocoding API access denied: ${geocodeData.error_message}`);
+            errors.push(`Google Geocoding API access denied. Using fallback location.`);
             console.error('Geocoding REQUEST DENIED:', geocodeData.error_message);
+            // Use a fallback location when geocoding fails
+            zipCenterLat = 39.8283; // Geographic center of US
+            zipCenterLng = -98.5795;
           } else {
-            errors.push(`Could not geocode ZIP code: ${zipCode} (Status: ${geocodeData.status})`);
+            errors.push(`Could not geocode location. Using fallback location.`);
             console.error('Geocoding failed:', geocodeData.status, geocodeData.error_message);
+            // Use a fallback location when geocoding fails
+            zipCenterLat = 39.8283; // Geographic center of US
+            zipCenterLng = -98.5795;
           }
         } else {
           errors.push('Google Geocoding API request failed');
