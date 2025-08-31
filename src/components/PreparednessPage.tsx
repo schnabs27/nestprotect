@@ -5,74 +5,128 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PreparednessPage = () => {
-  const [activeHazard, setActiveHazard] = useState("flood");
+  const [activeHazard, setActiveHazard] = useState("all");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   const hazards = [
-    { id: "flood", label: "Flood", icon: Waves, color: "text-primary" },
-    { id: "fire", label: "Fire", icon: Flame, color: "text-coral" },
+    { id: "all", label: "All Types", icon: AlertTriangle, color: "text-primary" },
+    { id: "wildfire", label: "Wildfire", icon: Flame, color: "text-coral" },
+    { id: "flood", label: "Flood", icon: Waves, color: "text-blue-600" },
     { id: "storm", label: "Storm", icon: AlertTriangle, color: "text-accent" }
   ];
 
   const checklists = {
-    flood: {
-      before: [
-        { id: "flood-before-1", title: "Create evacuation plan", notes: "Plan multiple routes out of your area", links: ["fema.gov/evacuation"] },
-        { id: "flood-before-2", title: "Prepare emergency kit", notes: "Water, food, medications for 3+ days", links: ["ready.gov/kit"] },
-        { id: "flood-before-3", title: "Know flood zones", notes: "Check if you're in a flood zone", links: ["fema.gov/flood-maps"] },
-        { id: "flood-before-4", title: "Review insurance coverage", notes: "Standard homeowner's doesn't cover floods", links: ["floodsmart.gov"] }
+    all: {
+      now: [
+        { id: "all-now-1", title: "Make a household emergency plan", notes: "evacuation routes, meeting spots, communication plan", links: ["ready.gov/plan"] },
+        { id: "all-now-2", title: "Assemble an emergency supply kit", notes: "3+ days food, 1 gallon water per person per day, meds, flashlight, batteries, NOAA weather radio", links: ["ready.gov/kit"] },
+        { id: "all-now-3", title: "Keep important documents safe", notes: "fireproof/waterproof safe + encrypted digital copies", links: [] },
+        { id: "all-now-4", title: "Sign up for local alerts and FEMA app", notes: "Stay informed about emergencies in your area", links: [] },
+        { id: "all-now-5", title: "Photograph property and review insurance", notes: "update insurance coverage as needed", links: [] }
+      ],
+      coming: [
+        { id: "all-coming-1", title: "Stay tuned to NOAA Weather Radio, FEMA app, or local alerts", notes: "Monitor official channels for updates", links: [] },
+        { id: "all-coming-2", title: "Charge phones and backup batteries", notes: "Ensure all devices are fully charged", links: [] },
+        { id: "all-coming-3", title: "Refill prescriptions, fuel vehicles, and pack 'go bags'", notes: "Prepare for potential evacuation", links: [] },
+        { id: "all-coming-4", title: "Secure pets", notes: "carriers, leashes, food, water", links: [] }
       ],
       during: [
-        { id: "flood-during-1", title: "Monitor weather alerts", notes: "Stay informed through official channels", links: ["weather.gov"] },
-        { id: "flood-during-2", title: "Evacuate if ordered", notes: "Don't wait - leave immediately", links: [] },
-        { id: "flood-during-3", title: "Avoid walking/driving in water", notes: "6 inches can knock you down, 12 inches can carry away a car", links: [] },
-        { id: "flood-during-4", title: "Get to higher ground", notes: "Move to the highest floor if trapped", links: [] }
+        { id: "all-during-1", title: "Evacuate immediately if ordered", notes: "Don't delay when authorities give evacuation orders", links: [] },
+        { id: "all-during-2", title: "Shelter in safest place based on threat type", notes: "Follow specific shelter guidelines for your situation", links: [] },
+        { id: "all-during-3", title: "Keep emergency kit and devices with you", notes: "Stay prepared and connected", links: [] },
+        { id: "all-during-4", title: "Help neighbors if safe to do so", notes: "Community support during emergencies", links: [] }
       ],
       after: [
-        { id: "flood-after-1", title: "Wait for all-clear", notes: "Don't return until authorities say it's safe", links: [] },
-        { id: "flood-after-2", title: "Document damage", notes: "Take photos/videos for insurance", links: [] },
-        { id: "flood-after-3", title: "Contact insurance company", notes: "File claims as soon as possible", links: [] },
-        { id: "flood-after-4", title: "Be careful with cleanup", notes: "Wear protective gear, watch for hazards", links: ["cdc.gov/disasters/cleanup"] }
+        { id: "all-after-1", title: "Return home only when officials say it's safe", notes: "Wait for all-clear from authorities", links: [] },
+        { id: "all-after-2", title: "Wear protective gear when cleaning debris", notes: "boots, gloves, masks", links: [] },
+        { id: "all-after-3", title: "Document damage before cleanup or repairs", notes: "Take photos/videos for insurance", links: [] },
+        { id: "all-after-4", title: "Contact insurance promptly; apply for FEMA assistance if eligible", notes: "Start recovery process quickly", links: ["fema.gov/assistance"] },
+        { id: "all-after-5", title: "Watch for hazards", notes: "power lines, gas leaks, unstable structures", links: [] }
       ]
     },
-    fire: {
-      before: [
-        { id: "fire-before-1", title: "Create defensible space", notes: "Clear vegetation 30+ feet around home", links: ["readyforwildfire.org"] },
-        { id: "fire-before-2", title: "Prepare go-bag", notes: "Keep packed and ready by exit", links: [] },
-        { id: "fire-before-3", title: "Plan evacuation routes", notes: "Know multiple ways out of your neighborhood", links: [] },
-        { id: "fire-before-4", title: "Install smoke alarms", notes: "Test monthly, change batteries yearly", links: [] }
+    wildfire: {
+      now: [
+        { id: "wildfire-now-1", title: "Create defensible space", notes: "clear brush and flammable material 30–100 ft from home", links: ["ready.gov/wildfires"] },
+        { id: "wildfire-now-2", title: "Clean roofs, gutters, and vents regularly", notes: "Remove debris that could ignite", links: [] },
+        { id: "wildfire-now-3", title: "Use fire-resistant materials when possible", notes: "For roofing, siding, and landscaping", links: [] },
+        { id: "wildfire-now-4", title: "Store tools", notes: "hoses, shovels, rakes, buckets", links: [] },
+        { id: "wildfire-now-5", title: "Add N95 masks to supply kit for smoke", notes: "Protect against smoke inhalation", links: [] }
+      ],
+      coming: [
+        { id: "wildfire-coming-1", title: "Move flammable items away from house", notes: "patio furniture, firewood, propane", links: [] },
+        { id: "wildfire-coming-2", title: "Shut off gas and propane", notes: "Reduce fire fuel sources", links: [] },
+        { id: "wildfire-coming-3", title: "Close all windows, doors, and vents", notes: "Prevent embers from entering", links: [] },
+        { id: "wildfire-coming-4", title: "Park car facing outward, fueled and packed", notes: "Ready for quick evacuation", links: [] },
+        { id: "wildfire-coming-5", title: "Monitor fire updates closely", notes: "Stay informed about fire progression", links: [] }
       ],
       during: [
-        { id: "fire-during-1", title: "Follow evacuation orders", notes: "Leave immediately when told", links: [] },
-        { id: "fire-during-2", title: "Close all windows/doors", notes: "Turn off gas, leave lights on", links: [] },
-        { id: "fire-during-3", title: "Stay low if trapped", notes: "Smoke rises - crawl below it", links: [] },
-        { id: "fire-during-4", title: "Call 911", notes: "Report your location if trapped", links: [] }
+        { id: "wildfire-during-1", title: "Leave at once if evacuation is ordered", notes: "Don't delay evacuation orders", links: [] },
+        { id: "wildfire-during-2", title: "Wear protective clothing", notes: "long sleeves, boots, N95 mask", links: [] },
+        { id: "wildfire-during-3", title: "Drive with windows closed, air on recirculate", notes: "Protect against smoke while driving", links: [] },
+        { id: "wildfire-during-4", title: "If trapped: Stay in cleared area or inside car", notes: "Seek shelter in safest available location", links: [] },
+        { id: "wildfire-during-5", title: "Lie face down in a ditch/depression if outdoors", notes: "Last resort protection from flames", links: [] }
       ],
       after: [
-        { id: "fire-after-1", title: "Wait for all-clear", notes: "Don't return until authorities allow", links: [] },
-        { id: "fire-after-2", title: "Check for hazards", notes: "Look for hot spots, damaged structures", links: [] },
-        { id: "fire-after-3", title: "Document everything", notes: "Photos for insurance and FEMA", links: [] },
-        { id: "fire-after-4", title: "Contact professionals", notes: "Have electrical/gas systems inspected", links: [] }
+        { id: "wildfire-after-1", title: "Be alert for smoldering hot spots and weakened structures", notes: "Fire can reignite or structures can collapse", links: [] },
+        { id: "wildfire-after-2", title: "Check attic, roof, and yard for embers", notes: "Look for remaining fire hazards", links: [] },
+        { id: "wildfire-after-3", title: "Wear N95 masks to avoid breathing ash", notes: "Protect respiratory health", links: [] },
+        { id: "wildfire-after-4", title: "File insurance claim promptly", notes: "Document all fire damage", links: [] }
+      ]
+    },
+    flood: {
+      now: [
+        { id: "flood-now-1", title: "Check FEMA flood maps for risk", notes: "Know your flood zone", links: ["ready.gov/floods"] },
+        { id: "flood-now-2", title: "Buy flood insurance", notes: "standard homeowner's does not cover floods", links: [] },
+        { id: "flood-now-3", title: "Elevate appliances, utilities, and electrical panels", notes: "Move above potential flood level", links: [] },
+        { id: "flood-now-4", title: "Install sump pump with backup", notes: "Prepare for water removal", links: [] },
+        { id: "flood-now-5", title: "Store valuables/documents in waterproof containers", notes: "Protect important items", links: [] }
+      ],
+      coming: [
+        { id: "flood-coming-1", title: "Move valuables and electronics to higher floors", notes: "Protect from rising water", links: [] },
+        { id: "flood-coming-2", title: "Fill clean containers with water; fill bathtub", notes: "for washing/cleaning if water supply is cut", links: [] },
+        { id: "flood-coming-3", title: "Place sandbags around doors and drains if available", notes: "Try to divert water away", links: [] },
+        { id: "flood-coming-4", title: "Turn off gas, electricity, and water if advised", notes: "Follow utility shutdown procedures", links: [] }
+      ],
+      during: [
+        { id: "flood-during-1", title: "Never walk or drive through floodwaters", notes: "Turn Around, Don't Drown - 6 inches can knock you down", links: [] },
+        { id: "flood-during-2", title: "Move to higher ground or highest floor if trapped", notes: "Get above the water level", links: [] },
+        { id: "flood-during-3", title: "Disconnect power only if safe", notes: "Avoid electrical hazards in water", links: [] },
+        { id: "flood-during-4", title: "Keep tuned to alerts", notes: "Monitor conditions and evacuation orders", links: [] }
+      ],
+      after: [
+        { id: "flood-after-1", title: "Avoid standing water", notes: "contamination/electricity risk", links: [] },
+        { id: "flood-after-2", title: "Check buildings for structural damage before entering", notes: "Ensure safety before re-entry", links: [] },
+        { id: "flood-after-3", title: "Discard any food, water, or medicine touched by floodwater", notes: "Prevent contamination illness", links: [] },
+        { id: "flood-after-4", title: "Dry home quickly to prevent mold", notes: "Use fans, dehumidifiers, open windows", links: [] }
       ]
     },
     storm: {
-      before: [
-        { id: "storm-before-1", title: "Secure outdoor items", notes: "Bring in or tie down anything that could fly", links: [] },
-        { id: "storm-before-2", title: "Stock emergency supplies", notes: "Water, food, flashlights, batteries", links: ["ready.gov/kit"] },
-        { id: "storm-before-3", title: "Charge devices", notes: "Phones, tablets, portable chargers", links: [] },
-        { id: "storm-before-4", title: "Know shelter locations", notes: "Identify safest room in your home", links: [] }
+      now: [
+        { id: "storm-now-1", title: "Know if you're in a hurricane evacuation zone or tornado-prone area", notes: "Understand your specific risks", links: ["ready.gov/hurricanes", "ready.gov/tornadoes"] },
+        { id: "storm-now-2", title: "Reinforce home", notes: "storm shutters, secure roof/doors", links: [] },
+        { id: "storm-now-3", title: "Stockpile food, water, and medicine for 3+ days", notes: "Prepare for extended power outages", links: [] },
+        { id: "storm-now-4", title: "Identify shelters", notes: "basement/interior room for tornado; community shelter for hurricane", links: [] },
+        { id: "storm-now-5", title: "Back up devices and store property records", notes: "Protect digital information", links: [] }
+      ],
+      coming: [
+        { id: "storm-coming-1", title: "Bring outdoor furniture/items indoors", notes: "Prevent them from becoming projectiles", links: [] },
+        { id: "storm-coming-2", title: "Charge all electronics; set fridge/freezer to coldest setting", notes: "Prepare for power outages", links: [] },
+        { id: "storm-coming-3", title: "Fuel vehicles; park in garage or away from trees", notes: "Protect vehicles and ensure mobility", links: [] },
+        { id: "storm-coming-4", title: "Secure windows with shutters/plywood", notes: "Protect against wind and debris", links: [] },
+        { id: "storm-coming-5", title: "Identify safe room or shelter location", notes: "Know where to go when storm hits", links: [] }
       ],
       during: [
-        { id: "storm-during-1", title: "Stay indoors", notes: "Avoid windows, stay in interior rooms", links: [] },
-        { id: "storm-during-2", title: "Monitor weather radio", notes: "Listen for tornado warnings", links: [] },
-        { id: "storm-during-3", title: "Avoid electrical hazards", notes: "Unplug appliances, avoid water", links: [] },
-        { id: "storm-during-4", title: "Take shelter if tornado warning", notes: "Basement or interior room, lowest floor", links: [] }
+        { id: "storm-during-1", title: "Hurricane: Shelter in interior room, away from windows/glass doors", notes: "Stay away from wind and flying debris", links: [] },
+        { id: "storm-during-2", title: "Tornado: Shelter in basement or lowest-floor interior room", notes: "protect head with blankets or helmets", links: [] },
+        { id: "storm-during-3", title: "Stay tuned to alerts", notes: "Monitor weather conditions", links: [] },
+        { id: "storm-during-4", title: "Do not leave until officials confirm storm has passed", notes: "Eye of hurricane can be deceiving", links: [] }
       ],
       after: [
-        { id: "storm-after-1", title: "Check for injuries", notes: "Give first aid, call 911 if needed", links: [] },
-        { id: "storm-after-2", title: "Inspect home safely", notes: "Look for structural damage, gas leaks", links: [] },
-        { id: "storm-after-3", title: "Avoid downed power lines", notes: "Stay at least 35 feet away", links: [] },
-        { id: "storm-after-4", title: "Document damage", notes: "Take photos before cleanup starts", links: [] }
+        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] },
+        { id: "storm-after-2", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
+        { id: "storm-after-3", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
+        { id: "storm-after-4", title: "Photograph/document damage before cleanup", notes: "Evidence for insurance claims", links: [] },
+        { id: "storm-after-5", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] }
       ]
     }
   };
@@ -103,7 +157,7 @@ const PreparednessPage = () => {
         {/* Hazard Selection */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-title mb-3">Select Hazard Type</h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {hazards.map((hazard) => {
               const Icon = hazard.icon;
               return (
@@ -126,23 +180,27 @@ const PreparednessPage = () => {
         </div>
 
         {/* Checklist Tabs */}
-        <Tabs defaultValue="before" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="before">Before</TabsTrigger>
+        <Tabs defaultValue="now" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 text-xs">
+            <TabsTrigger value="now">Now</TabsTrigger>
+            <TabsTrigger value="coming">It's Coming</TabsTrigger>
             <TabsTrigger value="during">During</TabsTrigger>
-            <TabsTrigger value="after">After</TabsTrigger>
+            <TabsTrigger value="after">Recovery</TabsTrigger>
           </TabsList>
           
-          {["before", "during", "after"].map((phase) => (
+          {["now", "coming", "during", "after"].map((phase) => (
             <TabsContent key={phase} value={phase} className="mt-4">
               <Card className="shadow-soft">
                 <CardHeader>
-                  <CardTitle className="text-title capitalize">
-                    {phase} the {hazards.find(h => h.id === activeHazard)?.label}
+                  <CardTitle className="text-title">
+                    {phase === "now" && "Now - Prepare for any disaster"}
+                    {phase === "coming" && "It's Coming - Final preparations"}
+                    {phase === "during" && "During - Stay safe"}
+                    {phase === "after" && "Recovery - After the disaster"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {currentChecklist[phase as keyof typeof currentChecklist].map((item) => (
+                  {currentChecklist[phase as keyof typeof currentChecklist]?.map((item) => (
                     <div 
                       key={item.id}
                       className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
