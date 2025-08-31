@@ -146,7 +146,7 @@ serve(async (req) => {
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Goog-Api-Key': mapsApiKey,
-                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber'
+                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber,places.websiteUri'
                 },
                 body: JSON.stringify(requestBody)
               });
@@ -186,7 +186,7 @@ serve(async (req) => {
                         category: categorizePlace(query, place.types || []),
                         description: typeDescription,
                         phone: place.nationalPhoneNumber || '',
-                        website: '',
+                        website: place.websiteUri || '',
                         address: extractStreetAddress(place.formattedAddress || ''),
                         city: extractCity(place.formattedAddress || ''),
                         state: extractState(place.formattedAddress || ''),

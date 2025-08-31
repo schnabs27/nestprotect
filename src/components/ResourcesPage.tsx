@@ -58,6 +58,7 @@ const ResourcesPage = () => {
       });
 
       if (error) {
+        console.error('Edge function error:', error);
         throw error;
       }
 
