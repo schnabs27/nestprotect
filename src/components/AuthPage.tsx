@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Shield, Users, Clock, Map } from "lucide-react";
+import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
@@ -99,25 +99,31 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
             </p>
             <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">Before:</span>
-                  <span className="text-gray-600 ml-1">Interactive checklists and tools to be prepared</span>
+              <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-yellow-600" />
+                  <div>
+                    <span className="font-bold text-gray-900 text-base">BEFORE</span>
+                    <p className="text-gray-700 mt-1">Interactive checklists and guides to prepare</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">During:</span>
-                  <span className="text-gray-600 ml-1">Real-time fire, storm, and traffic data</span>
+              <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50/50">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                  <div>
+                    <span className="font-bold text-gray-900 text-base">DURING</span>
+                    <p className="text-gray-700 mt-1">Real-time weather, fire, and traffic conditions</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <span className="font-medium text-gray-900">After:</span>
-                  <span className="text-gray-600 ml-1">AI-driven search of disaster relief resources and tips for easier recovery</span>
+              <div className="border-2 border-red-300 rounded-lg p-3 bg-red-50/50">
+                <div className="flex items-center gap-3">
+                  <LifeBuoy className="w-5 h-5 text-red-600" />
+                  <div>
+                    <span className="font-bold text-gray-900 text-base">AFTER</span>
+                    <p className="text-gray-700 mt-1">AI-driven search of disaster resources</p>
+                  </div>
                 </div>
               </div>
             </div>
