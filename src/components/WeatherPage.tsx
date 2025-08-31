@@ -266,9 +266,9 @@ const WeatherPage = () => {
                 {/* Government Alerts */}
                 <GovernmentAlerts alerts={weatherData.alerts} />
 
-                {/* 48-Hour Outlook */}
+                {/* Weather Outlook */}
                 <div className="bg-muted/30 rounded-lg p-3">
-                  <h4 className="font-semibold mb-2 text-sm">48-Hour Severe Weather Outlook</h4>
+                  <h4 className="font-semibold mb-2 text-sm">Weather Outlook</h4>
                   <div className="max-h-32 overflow-y-auto space-y-1">
                     {weatherData.forecast48h.slice(0, 12).map((hour, index) => (
                       <div key={index} className="flex items-center justify-between text-sm py-1 border-b border-border/30 last:border-0">
@@ -276,9 +276,6 @@ const WeatherPage = () => {
                         <div className="flex items-center gap-2">
                           <span className="capitalize">{hour.description}</span>
                           <span className="font-medium">{hour.temp}°F</span>
-                          {hour.precipitationChance > 0 && (
-                            <span className="text-blue-600 text-xs">{hour.precipitationChance}%</span>
-                          )}
                         </div>
                       </div>
                     ))}
