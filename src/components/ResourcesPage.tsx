@@ -12,6 +12,7 @@ import ResourceMap from "@/components/ResourceMap";
 const ResourcesPage = () => {
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
   const [zipCode, setZipCode] = useState("");
+  const [hasUserClearedField, setHasUserClearedField] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [resources, setResources] = useState<any[]>([]);
@@ -22,12 +23,26 @@ const ResourcesPage = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
-  // Set user's zip code as default when available
+  // Set user's zip code as default when available, but only if user hasn't manually cleared it
   useEffect(() => {
-    if (userZipCode && !zipCode) {
+    if (userZipCode && !zipCode && !hasUserClearedField) {
       setZipCode(userZipCode);
     }
-  }, [userZipCode, zipCode]);
+  }, [userZipCode, zipCode, hasUserClearedField]);
+
+  // Handle input changes and track if user manually clears the field
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setZipCode(value);
+    
+    // If user clears the field completely, mark it as manually cleared
+    if (value === "" && zipCode !== "") {
+      setHasUserClearedField(true);
+    } else if (value !== "" && hasUserClearedField) {
+      // Reset the flag if user starts typing again
+      setHasUserClearedField(false);
+    }
+  };
 
   // Helper function to convert text to title case
   const toTitleCase = (str: string) => {
@@ -232,7 +247,7 @@ const ResourcesPage = () => {
               <Input
                 placeholder="Enter ZIP code or address"
                 value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
+                onChange={handleZipCodeChange}
                 className="h-12"
               />
             </div>
