@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import ResourceMap from "@/components/ResourceMap";
 
 const ResourcesPage = () => {
+  const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
   const [zipCode, setZipCode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -19,6 +21,13 @@ const ResourcesPage = () => {
   const [showMap, setShowMap] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // Set user's zip code as default when available
+  useEffect(() => {
+    if (userZipCode && !zipCode) {
+      setZipCode(userZipCode);
+    }
+  }, [userZipCode, zipCode]);
 
   // Helper function to convert text to title case
   const toTitleCase = (str: string) => {
@@ -193,11 +202,16 @@ const ResourcesPage = () => {
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
-        <h1 className="text-2xl font-bold mb-2">Local Disaster Relief</h1>
-        <p className="text-primary-foreground/90 text-sm">
-          Find nearby resources within 30 miles
-        </p>
+      <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold mb-1">Local Disaster Relief</h1>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-3 w-3" />
+              <p className="text-sm text-primary-foreground/90">{userZipCode || 'Enter location'}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search Section */}
