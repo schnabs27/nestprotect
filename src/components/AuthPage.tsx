@@ -99,22 +99,22 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
             </p>
             <div className="space-y-3 text-sm">
-              <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50">
-                <div className="flex items-center gap-3 mb-2">
+              <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50 text-center">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   <Sun className="w-5 h-5 text-yellow-600" />
                   <span className="font-bold text-gray-900 text-base">BEFORE</span>
                 </div>
                 <p className="text-gray-700">Interactive checklists and guides to prepare</p>
               </div>
-              <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50/50">
-                <div className="flex items-center gap-3 mb-2">
+              <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50/50 text-center">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   <AlertTriangle className="w-5 h-5 text-orange-600" />
                   <span className="font-bold text-gray-900 text-base">DURING</span>
                 </div>
                 <p className="text-gray-700">Real-time weather, fire, and traffic conditions</p>
               </div>
-              <div className="border-2 border-red-300 rounded-lg p-3 bg-red-50/50">
-                <div className="flex items-center gap-3 mb-2">
+              <div className="border-2 border-red-300 rounded-lg p-3 bg-red-50/50 text-center">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   <Home className="w-5 h-5 text-red-600" />
                   <span className="font-bold text-gray-900 text-base">AFTER</span>
                 </div>
