@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info, Clock, RefreshCw } from "lucide-react";
+import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -210,84 +210,98 @@ const ResourcesPage = () => {
         </div>
       </div>
 
-      {/* Search Section */}
-      <div className="p-4 bg-background shadow-soft">
-        <div className="flex gap-2 mb-4">
-          <div className="flex-1">
-            <Input
-              placeholder="Enter ZIP code or address"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value)}
-              className="h-12"
-            />
-          </div>
-          <Button 
-            onClick={handleSearch}
-            size="lg"
-            className="bg-gradient-primary border-0 shadow-medium hover:shadow-strong transition-all duration-300"
-            disabled={isSearching}
-          >
-            <Search size={20} />
-          </Button>
-        </div>
+      <div className="p-4 space-y-6">
+        {/* Recovery Action Plan Button */}
+        <Card className="shadow-soft border-primary/20">
+          <CardContent className="p-4">
+            <Button 
+              className="w-full h-12 text-base font-semibold"
+              size="lg"
+            >
+              <CheckSquare className="mr-2" size={20} />
+              Recovery Action Plan
+            </Button>
+          </CardContent>
+        </Card>
 
-        {/* Category Filters */}
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
-          <div className="flex flex-wrap gap-2">
-            {mainCategories.map((category) => {
-              const isSelected = selectedCategory === category.id;
-              const isFavorites = category.id === "favorites";
-              
-              return (
-                <Badge
-                  key={category.id}
-                  variant="secondary"
-                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
-                    isSelected 
-                      ? `${category.color} ${isFavorites ? "text-yellow-foreground" : "text-white"} ring-2 ring-primary`
-                      : isFavorites 
-                        ? "bg-white border border-yellow text-muted-foreground"
-                        : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
-                  }`}
-                  onClick={() => setSelectedCategory(category.id)}
+        {/* Search Section */}
+        <div className="bg-background shadow-soft p-4">
+          <div className="flex gap-2 mb-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Enter ZIP code or address"
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+                className="h-12"
+              />
+            </div>
+            <Button 
+              onClick={handleSearch}
+              size="lg"
+              className="bg-gradient-primary border-0 shadow-medium hover:shadow-strong transition-all duration-300"
+              disabled={isSearching}
+            >
+              <Search size={20} />
+            </Button>
+          </div>
+
+          {/* Category Filters */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
+            <div className="flex flex-wrap gap-2">
+              {mainCategories.map((category) => {
+                const isSelected = selectedCategory === category.id;
+                const isFavorites = category.id === "favorites";
+                
+                return (
+                  <Badge
+                    key={category.id}
+                    variant="secondary"
+                    className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                      isSelected 
+                        ? `${category.color} ${isFavorites ? "text-yellow-foreground" : "text-white"} ring-2 ring-primary`
+                        : isFavorites 
+                          ? "bg-white border border-yellow text-muted-foreground"
+                          : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
+                    }`}
+                    onClick={() => setSelectedCategory(category.id)}
+                  >
+                    {category.label}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Cached Results Notice */}
+          {cachedResults && (
+            <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4">
+              <p className="text-xs text-muted-foreground">
+                Showing cached results from {cachedResults.cachedAt}. 
+                <Button 
+                  variant="link" 
+                  size="sm" 
+                  className="h-auto p-0 ml-1 text-xs"
+                  onClick={handleSearch}
                 >
-                  {category.label}
-                </Badge>
-              );
-            })}
-          </div>
+                  Run fresh search ↻
+                </Button>
+              </p>
+            </div>
+          )}
+
+          {/* Search Banner */}
+          {isSearching && (
+            <div className="bg-yellow/20 border border-yellow/30 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-foreground font-medium">
+                🔍 Searching — thanks for your patience!
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Cached Results Notice */}
-        {cachedResults && (
-          <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4">
-            <p className="text-xs text-muted-foreground">
-              Showing cached results from {cachedResults.cachedAt}. 
-              <Button 
-                variant="link" 
-                size="sm" 
-                className="h-auto p-0 ml-1 text-xs"
-                onClick={handleSearch}
-              >
-                Run fresh search ↻
-              </Button>
-            </p>
-          </div>
-        )}
-
-        {/* Search Banner */}
-        {isSearching && (
-          <div className="bg-yellow/20 border border-yellow/30 rounded-lg p-3 mb-4">
-            <p className="text-sm text-yellow-foreground font-medium">
-              🔍 Searching — thanks for your patience!
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Results */}
-      <div className="p-4">
+        {/* Results */}
+        <div>
         {/* View Map Button */}
         {resources.length > 0 && (
           <div className="mb-4">
@@ -434,6 +448,7 @@ const ResourcesPage = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
         </div>
       </div>
 
