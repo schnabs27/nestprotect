@@ -206,10 +206,6 @@ const ResourcesPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold mb-1">Local Disaster Relief</h1>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              <p className="text-sm text-primary-foreground/90">{userZipCode || 'Enter location'}</p>
-            </div>
           </div>
         </div>
       </div>
