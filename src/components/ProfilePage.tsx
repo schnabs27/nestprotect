@@ -31,8 +31,14 @@ const ProfilePage = () => {
         ...prev,
         zipCode: profile.zip_code
       }));
+    } else if (!profile?.zip_code && user && !isGuest) {
+      // If user is authenticated but has no ZIP code, set to empty
+      setUserInfo(prev => ({
+        ...prev,
+        zipCode: ""
+      }));
     }
-  }, [profile]);
+  }, [profile, user, isGuest]);
 
   const handleZipCodeUpdate = async () => {
     if (!user || isGuest) {
@@ -40,7 +46,7 @@ const ProfilePage = () => {
       return;
     }
 
-    if (userInfo.zipCode.length !== 5 || !/^\d{5}$/.test(userInfo.zipCode)) {
+    if (!userInfo.zipCode || userInfo.zipCode.length !== 5 || !/^\d{5}$/.test(userInfo.zipCode)) {
       toast.error("Please enter a valid 5-digit ZIP code");
       return;
     }

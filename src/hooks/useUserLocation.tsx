@@ -40,9 +40,12 @@ export const useUserLocation = (): UserLocationData => {
         if (error) {
           console.error('useUserLocation: Error fetching profile:', error);
           setError(error.message);
+        } else if (data) {
+          console.log('useUserLocation: Setting ZIP code from database:', data.zip_code);
+          setZipCode(data.zip_code || null);
         } else {
-          console.log('useUserLocation: Setting ZIP code from database:', data?.zip_code);
-          setZipCode(data?.zip_code || null);
+          console.log('useUserLocation: No profile found, ZIP code will be null');
+          setZipCode(null);
         }
       } catch (err) {
         console.error('useUserLocation: Unexpected error fetching profile:', err);
@@ -88,24 +91,35 @@ export const useUserLocation = (): UserLocationData => {
   }, [user, isGuest]);
 
   const updateZipCode = async (newZipCode: string) => {
-    if (!user || isGuest) return;
+    console.log('useUserLocation: updateZipCode called with:', newZipCode);
+    console.log('useUserLocation: Current user:', user?.id);
+    console.log('useUserLocation: isGuest:', isGuest);
+    
+    if (!user || isGuest) {
+      console.log('useUserLocation: User not authenticated, throwing error');
+      throw new Error("Please sign in to update your ZIP code");
+    }
 
     try {
       console.log('useUserLocation: Updating zip code to:', newZipCode);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .upsert({
           user_id: user.id,
           zip_code: newZipCode
-        });
+        }, {
+          onConflict: 'user_id'
+        })
+        .select('zip_code')
+        .single();
 
       if (error) {
         console.error('useUserLocation: Error updating zip code:', error);
         throw new Error(error.message);
       }
 
-      console.log('useUserLocation: ZIP code updated successfully in database');
+      console.log('useUserLocation: ZIP code updated successfully in database:', data);
       // Update local state immediately for instant feedback
       setZipCode(newZipCode);
       console.log('useUserLocation: Local state updated to:', newZipCode);

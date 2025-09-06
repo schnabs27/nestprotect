@@ -1,16 +1,22 @@
 import { useState } from "react";
-import { MapPin, Edit3, Check, X } from "lucide-react";
+import { MapPin, Edit3, Check, X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
 const ZipCodeHeader = () => {
   const { zipCode, updateZipCode } = useUserLocation();
+  const { isGuest } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
 
   const handleEdit = () => {
+    if (isGuest) {
+      toast.error("Please sign in to update your ZIP code");
+      return;
+    }
     setEditValue(zipCode || "78028");
     setIsEditing(true);
   };
@@ -25,13 +31,13 @@ const ZipCodeHeader = () => {
         setIsEditing(false);
         
         console.log('ZipCodeHeader: Update completed, current ZIP code:', zipCode);
-        toast.success("Zip code updated successfully");
+        toast.success("ZIP code updated successfully");
       } catch (error) {
         console.error('ZipCodeHeader: Failed to update zip code:', error);
-        toast.error("Failed to update zip code");
+        toast.error("Failed to update ZIP code");
       }
     } else {
-      toast.error("Please enter a valid 5-digit zip code");
+      toast.error("Please enter a valid 5-digit ZIP code");
     }
   };
 
@@ -78,7 +84,11 @@ const ZipCodeHeader = () => {
             className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
           >
             <span className="font-mono">{displayZipCode}</span>
-            <Edit3 size={12} />
+            {isGuest ? (
+              <Lock size={12} className="text-muted-foreground" />
+            ) : (
+              <Edit3 size={12} />
+            )}
           </button>
         )}
       </div>
