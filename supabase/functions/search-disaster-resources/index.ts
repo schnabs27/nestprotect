@@ -32,16 +32,39 @@ serve(async (req) => {
   }
 
   try {
-    const { zipCode } = await req.json();
+    const body = await req.json();
+    const { zipCode } = body;
     
-    if (!zipCode) {
+    // Enhanced input validation
+    if (!zipCode || typeof zipCode !== 'string') {
+      console.error('Invalid ZIP code provided:', zipCode);
       return new Response(
-        JSON.stringify({ error: 'ZIP code is required' }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Valid ZIP code is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    // Validate ZIP code format (5 digits or 5+4 format)
+    const zipCodeRegex = /^[0-9]{5}(-[0-9]{4})?$/;
+    const sanitizedZipCode = zipCode.trim();
+    
+    if (!zipCodeRegex.test(sanitizedZipCode)) {
+      console.error('Invalid ZIP code format:', zipCode);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid ZIP code format. Use 5 digits (e.g., 12345) or 5+4 format (e.g., 12345-6789)' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
-    console.log(`Starting disaster resource search for ZIP: ${zipCode}`);
+    console.log(`Starting disaster resource search for ZIP: ${sanitizedZipCode}`);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -51,9 +74,9 @@ serve(async (req) => {
     // Check for cached results (24h cache) using the new secure function
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: cachedResults } = await supabase
-      .rpc('get_public_disaster_resources')
+      .rpc('get_public_disaster_resources_secure')
       .gte('last_seen_at', oneDayAgo)
-      .eq('postal_code', zipCode)
+      .eq('postal_code', sanitizedZipCode)
       .order('distance_mi', { ascending: true });
 
     if (cachedResults && cachedResults.length > 0) {

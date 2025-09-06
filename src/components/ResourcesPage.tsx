@@ -75,13 +75,25 @@ const ResourcesPage = () => {
       return;
     }
     
-    if (!zipCode.trim()) return;
+    const sanitizedZip = zipCode.trim();
+    if (!sanitizedZip) return;
+    
+    // Client-side ZIP code validation
+    const zipCodeRegex = /^[0-9]{5}(-[0-9]{4})?$/;
+    if (!zipCodeRegex.test(sanitizedZip)) {
+      toast({
+        title: "Invalid ZIP Code",
+        description: "Please enter a valid ZIP code (e.g., 12345 or 12345-6789)",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsSearching(true);
     
     try {
       const { data, error } = await supabase.functions.invoke('search-disaster-resources', {
-        body: { zipCode: zipCode.trim() }
+        body: { zipCode: sanitizedZip }
       });
 
       if (error) {
