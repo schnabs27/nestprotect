@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Edit3, Check, X, Lock } from "lucide-react";
+import { MapPin, Edit3, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUserLocation } from "@/hooks/useUserLocation";
@@ -84,11 +84,7 @@ const ZipCodeHeader = () => {
             className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
           >
             <span className="font-mono">{displayZipCode}</span>
-            {isGuest ? (
-              <Lock size={12} className="text-muted-foreground" />
-            ) : (
-              <Edit3 size={12} />
-            )}
+            <Edit3 size={12} />
           </button>
         )}
       </div>
