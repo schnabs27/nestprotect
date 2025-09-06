@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,10 +6,12 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/components/AuthProvider";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 
 const ProfilePage = () => {
   const { user, isGuest, signOut, setGuestMode } = useAuth();
+  const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
   
   const [notifications, setNotifications] = useState({
     weatherAlerts: true,
@@ -18,9 +20,38 @@ const ProfilePage = () => {
   });
 
   const [userInfo, setUserInfo] = useState({
-    zipCode: "62701",
+    zipCode: "",
     name: user?.email || "Guest User"
   });
+
+  // Update local state when profile loads
+  useEffect(() => {
+    if (profile?.zip_code) {
+      setUserInfo(prev => ({
+        ...prev,
+        zipCode: profile.zip_code
+      }));
+    }
+  }, [profile]);
+
+  const handleZipCodeUpdate = async () => {
+    if (!user || isGuest) {
+      toast.error("Please sign in to update your profile");
+      return;
+    }
+
+    if (userInfo.zipCode.length !== 5 || !/^\d{5}$/.test(userInfo.zipCode)) {
+      toast.error("Please enter a valid 5-digit ZIP code");
+      return;
+    }
+
+    const success = await updateProfile({ zip_code: userInfo.zipCode });
+    if (success) {
+      toast.success("ZIP code updated successfully");
+    } else {
+      toast.error("Failed to update ZIP code");
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -101,12 +132,24 @@ const ProfilePage = () => {
             
             <div>
               <Label htmlFor="zipcode">ZIP Code</Label>
-              <Input
-                id="zipcode"
-                value={userInfo.zipCode}
-                onChange={(e) => setUserInfo({...userInfo, zipCode: e.target.value})}
-                placeholder="Your ZIP code"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="zipcode"
+                  value={userInfo.zipCode}
+                  onChange={(e) => setUserInfo({...userInfo, zipCode: e.target.value})}
+                  placeholder="Your ZIP code"
+                  maxLength={5}
+                  pattern="[0-9]{5}"
+                  disabled={isGuest}
+                />
+                <Button 
+                  onClick={handleZipCodeUpdate}
+                  disabled={isGuest || profileLoading}
+                  size="sm"
+                >
+                  Save
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Used for local weather and disaster relief searches
               </p>
