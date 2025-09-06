@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
+import { validateZipCode, sanitizeZipCode, rateLimiter } from '@/utils/security';
 
 const ZipCodeHeader = () => {
   const { zipCode, updateZipCode } = useUserLocation();
@@ -22,22 +23,32 @@ const ZipCodeHeader = () => {
   };
 
   const handleSave = async () => {
-    if (editValue.length === 5 && /^\d{5}$/.test(editValue)) {
-      try {
-        console.log('ZipCodeHeader: Attempting to update ZIP code to:', editValue);
-        console.log('ZipCodeHeader: Current ZIP code before update:', zipCode);
-        
-        await updateZipCode(editValue);
-        setIsEditing(false);
-        
-        console.log('ZipCodeHeader: Update completed, current ZIP code:', zipCode);
-        toast.success("ZIP code updated successfully");
-      } catch (error) {
-        console.error('ZipCodeHeader: Failed to update zip code:', error);
-        toast.error("Failed to update ZIP code");
-      }
-    } else {
+    // Rate limiting for ZIP code updates
+    const clientId = 'zip_update_' + (navigator.userAgent?.slice(0, 50) || 'unknown');
+    if (!rateLimiter.isAllowed(clientId, 10, 60000)) {
+      toast.error("Too many attempts. Please wait before updating your ZIP code again.");
+      return;
+    }
+
+    const sanitizedZip = sanitizeZipCode(editValue);
+    
+    if (!validateZipCode(sanitizedZip)) {
       toast.error("Please enter a valid 5-digit ZIP code");
+      return;
+    }
+
+    try {
+      console.log('ZipCodeHeader: Attempting to update ZIP code to:', sanitizedZip);
+      console.log('ZipCodeHeader: Current ZIP code before update:', zipCode);
+      
+      await updateZipCode(sanitizedZip);
+      setIsEditing(false);
+      
+      console.log('ZipCodeHeader: Update completed, current ZIP code:', zipCode);
+      toast.success("ZIP code updated successfully");
+    } catch (error) {
+      console.error('ZipCodeHeader: Failed to update zip code:', error);
+      toast.error("Failed to update ZIP code");
     }
   };
 

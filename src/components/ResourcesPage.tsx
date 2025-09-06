@@ -148,7 +148,11 @@ const ResourcesPage = () => {
   const loadFavorites = async (resourceList: any[]) => {
     try {
       // For now, use device-based storage for unauthenticated users
-      const deviceId = localStorage.getItem('device-id') || generateDeviceId();
+      let deviceId = localStorage.getItem('device-id');
+      if (!deviceId) {
+        deviceId = await generateDeviceId();
+        localStorage.setItem('device-id', deviceId);
+      }
       
       const resourceIds = resourceList.map(r => `${r.source_id}-${r.source}`);
       
@@ -167,8 +171,9 @@ const ResourcesPage = () => {
     }
   };
 
-  const generateDeviceId = () => {
-    const deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+  const generateDeviceId = async () => {
+    const { generateSecureDeviceId } = await import('@/utils/security');
+    const deviceId = await generateSecureDeviceId();
     localStorage.setItem('device-id', deviceId);
     return deviceId;
   };
@@ -190,7 +195,10 @@ const ResourcesPage = () => {
 
   const toggleFavorite = async (resource: any) => {
     try {
-      const deviceId = localStorage.getItem('device-id') || generateDeviceId();
+      let deviceId = localStorage.getItem('device-id');
+      if (!deviceId) {
+        deviceId = await generateDeviceId();
+      }
       const resourceKey = `${resource.source_id}-${resource.source}`;
       const isFavorited = favorites.has(resourceKey);
 

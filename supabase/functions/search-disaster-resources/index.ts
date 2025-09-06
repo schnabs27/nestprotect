@@ -42,7 +42,20 @@ serve(async (req) => {
         JSON.stringify({ error: 'Valid ZIP code is required' }),
         { 
           status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    // Use database function to validate ZIP code format
+    const { data: isValid } = await supabase.rpc('is_valid_zip_code', { zip_code: zipCode });
+    if (!isValid) {
+      console.error('Invalid ZIP code format:', zipCode);
+      return new Response(
+        JSON.stringify({ error: 'Invalid ZIP code format. Please enter a 5-digit ZIP code.' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }

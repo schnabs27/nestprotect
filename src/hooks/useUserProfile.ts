@@ -72,6 +72,16 @@ export const useUserProfile = (user: User | null) => {
     if (!user || !profile) return false;
 
     try {
+      // Validate ZIP code if being updated
+      if (updates.zip_code) {
+        const { data: isValid } = await supabase.rpc('is_valid_zip_code', { 
+          zip_code: updates.zip_code 
+        });
+        if (!isValid) {
+          throw new Error('Invalid ZIP code format. Please enter a 5-digit ZIP code.');
+        }
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update(updates)
