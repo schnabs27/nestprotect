@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves } from "lucide-react";
+import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const PreparednessPage = () => {
   const [activeHazard, setActiveHazard] = useState("all");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   const hazards = [
     { id: "all", label: "All Types", icon: AlertTriangle, color: "text-primary" },
@@ -18,11 +21,91 @@ const PreparednessPage = () => {
   const checklists = {
     all: {
       now: [
-        { id: "all-now-1", title: "Make a household emergency plan", notes: "evacuation routes, meeting spots, communication plan", links: ["ready.gov/plan"] },
-        { id: "all-now-2", title: "Assemble an emergency supply kit", notes: "3+ days food, 1 gallon water per person per day, meds, flashlight, batteries, NOAA weather radio", links: ["ready.gov/kit"] },
-        { id: "all-now-3", title: "Keep important documents safe", notes: "fireproof/waterproof safe + encrypted digital copies", links: [] },
-        { id: "all-now-4", title: "Sign up for local alerts and FEMA app", notes: "Stay informed about emergencies in your area", links: [] },
-        { id: "all-now-5", title: "Photograph property and review insurance", notes: "update insurance coverage as needed", links: [] }
+        {
+          id: "family-plan",
+          title: "Create a family plan with contacts, meeting places, and evacuation routes.",
+          criticalTasks: [
+            { id: "plan-1", text: "Create a shared Google Doc titled \"Family Emergency Plan\" with household info and roles." },
+            { id: "plan-2", text: "In Google Contacts, add an out-of-area contact under a new label \"Emergency.\"" },
+            { id: "plan-3", text: "In Google Maps, make a list \"Emergency Meeting Places\" and save two locations (near home and outside neighborhood)." }
+          ],
+          additionalTasks: [
+            { id: "plan-4", text: "Save two evacuation routes in Google Maps and download offline maps." },
+            { id: "plan-5", text: "Assign roles in your Google Doc (who grabs kit, manages pets, helps elderly)." },
+            { id: "plan-6", text: "Set a Google Calendar reminder to practice twice a year." }
+          ],
+          learnMore: "https://www.ready.gov/plan"
+        },
+        {
+          id: "emergency-kit",
+          title: "Gather essentials in a kit and track them with Google Keep.",
+          criticalTasks: [
+            { id: "kit-1", text: "Make a Google Keep checklist titled \"Emergency Kit\" with FEMA basics (water, food, flashlight, batteries)." },
+            { id: "kit-2", text: "Add personal needs such as medications, glasses, infant and pet supplies." }
+          ],
+          additionalTasks: [
+            { id: "kit-3", text: "Photograph kit items and save to a Google Photos album \"Emergency Kit.\"" },
+            { id: "kit-4", text: "Create smaller kits for car and work and add to the same Keep note." },
+            { id: "kit-5", text: "Share the Keep note with household members." },
+            { id: "kit-6", text: "Set a Google Calendar reminder to refresh supplies twice a year." }
+          ],
+          learnMore: "https://www.ready.gov/kit"
+        },
+        {
+          id: "documents",
+          title: "Store critical papers securely in Google Drive and at home.",
+          criticalTasks: [
+            { id: "docs-1", text: "Use the Google Drive app → Scan → upload IDs, insurance, and medical records." },
+            { id: "docs-2", text: "Organize into a folder \"Emergency Documents\" and share only with trusted family." }
+          ],
+          additionalTasks: [
+            { id: "docs-3", text: "Mark key files \"Available Offline\" in Drive." },
+            { id: "docs-4", text: "Place physical originals in a fireproof, waterproof container at home." },
+            { id: "docs-5", text: "Add a one-page Google Doc summary of where originals are stored." }
+          ],
+          learnMore: "https://www.ready.gov/protecting-documents"
+        },
+        {
+          id: "alerts",
+          title: "Get fast emergency alerts on your phone and add key contacts.",
+          criticalTasks: [
+            { id: "alerts-1", text: "Download and enable alerts in the FEMA App (Android or iOS)." },
+            { id: "alerts-2", text: "Search Google for \"[Your City] emergency alerts\" and register with your local system." },
+            { id: "alerts-3", text: "Enable Wireless Emergency Alerts in phone settings." }
+          ],
+          additionalTasks: [
+            { id: "alerts-4", text: "In Google Contacts, create a label \"Emergency Services\" and add police, fire, utilities, and emergency management." },
+            { id: "alerts-5", text: "Test by sending a message to your \"Emergency\" label group." }
+          ],
+          learnMore: "https://www.fema.gov/mobile-app"
+        },
+        {
+          id: "inventory",
+          title: "Document your belongings with Google Photos and check your coverage.",
+          criticalTasks: [
+            { id: "inventory-1", text: "Take photos of every room and major item, then save in a Google Photos album \"Home Inventory.\"" },
+            { id: "inventory-2", text: "Upload receipts and warranties to a Google Drive folder \"Home Inventory.\"" }
+          ],
+          additionalTasks: [
+            { id: "inventory-3", text: "Use the Info field in Photos to add notes such as serial numbers and purchase year." },
+            { id: "inventory-4", text: "Search Drive or email for your insurance policy and confirm coverage for local hazards such as flood, wildfire, or storm." },
+            { id: "inventory-5", text: "Update photos after major purchases and share the album with a trusted family member." }
+          ],
+          learnMore: "https://www.ready.gov/financial-preparedness"
+        },
+        {
+          id: "deadline",
+          title: "Set a deadline to complete your prep.",
+          criticalTasks: [
+            { id: "deadline-1", text: "Schedule an emergency practice day when you will have all or most of your prep completed." },
+            { id: "deadline-2", text: "Schedule weekly work sessions to complete the tasks before your deadline." }
+          ],
+          additionalTasks: [
+            { id: "deadline-3", text: "Create a Google Keep task list by category for easy completion, such as Shopping or Photos." },
+            { id: "deadline-4", text: "Ask your household members to help and share responsibilities." }
+          ],
+          learnMore: ""
+        }
       ],
       coming: [
         { id: "all-coming-1", title: "Stay tuned to NOAA Weather Radio, FEMA app, or local alerts", notes: "Monitor official channels for updates", links: [] },
@@ -141,6 +224,16 @@ const PreparednessPage = () => {
     setCheckedItems(newChecked);
   };
 
+  const toggleOpen = (itemId: string) => {
+    const newOpen = new Set(openItems);
+    if (newOpen.has(itemId)) {
+      newOpen.delete(itemId);
+    } else {
+      newOpen.add(itemId);
+    }
+    setOpenItems(newOpen);
+  };
+
   const currentChecklist = checklists[activeHazard as keyof typeof checklists];
 
   return (
@@ -200,47 +293,129 @@ const PreparednessPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {currentChecklist[phase as keyof typeof currentChecklist]?.map((item) => (
-                    <div 
-                      key={item.id}
-                      className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
-                    >
-                      <button
-                        onClick={() => toggleCheck(item.id)}
-                        className="mt-1"
+                  {phase === "now" && activeHazard === "all" ? (
+                    // Special interactive checklist for "All Types - Now"
+                    currentChecklist.now.map((section: any) => (
+                      <Collapsible 
+                        key={section.id} 
+                        open={openItems.has(section.id)}
+                        onOpenChange={() => toggleOpen(section.id)}
                       >
-                        {checkedItems.has(item.id) ? (
-                          <CheckCircle2 size={20} className="text-primary" />
-                        ) : (
-                          <Circle size={20} className="text-muted-foreground" />
-                        )}
-                      </button>
-                      
-                      <div className="flex-1">
-                        <h4 className={`font-medium ${checkedItems.has(item.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                          {item.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {item.notes}
-                        </p>
-                        {item.links.length > 0 && (
-                          <div className="mt-2">
-                            {item.links.map((link, index) => (
-                              <a
-                                key={index}
-                                href={`https://${link}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-primary hover:underline mr-3"
-                              >
-                                {link}
-                              </a>
-                            ))}
-                          </div>
-                        )}
+                        <div className="border border-border rounded-lg">
+                          <CollapsibleTrigger className="w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-smooth">
+                            <Checkbox
+                              checked={checkedItems.has(section.id)}
+                              onCheckedChange={() => toggleCheck(section.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 text-left">
+                              <h4 className={`font-medium ${checkedItems.has(section.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                {section.title}
+                              </h4>
+                            </div>
+                            <ChevronDown 
+                              size={16} 
+                              className={`text-muted-foreground transition-transform ${openItems.has(section.id) ? 'rotate-180' : ''}`} 
+                            />
+                          </CollapsibleTrigger>
+                          
+                          <CollapsibleContent className="px-4 pb-4">
+                            <div className="space-y-4 ml-7">
+                              {/* Critical Tasks */}
+                              <div>
+                                <h5 className="font-medium text-sm text-foreground mb-2">Critical tasks (minimum must-do)</h5>
+                                <div className="space-y-2">
+                                  {section.criticalTasks.map((task: any) => (
+                                    <div key={task.id} className="flex items-start gap-2">
+                                      <Checkbox
+                                        checked={checkedItems.has(task.id)}
+                                        onCheckedChange={() => toggleCheck(task.id)}
+                                        className="mt-0.5"
+                                      />
+                                      <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                        {task.text}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Additional Tasks */}
+                              <div>
+                                <h5 className="font-medium text-sm text-foreground mb-2">Additional tasks (optional, deeper prep)</h5>
+                                <div className="space-y-2">
+                                  {section.additionalTasks.map((task: any) => (
+                                    <div key={task.id} className="flex items-start gap-2">
+                                      <Checkbox
+                                        checked={checkedItems.has(task.id)}
+                                        onCheckedChange={() => toggleCheck(task.id)}
+                                        className="mt-0.5"
+                                      />
+                                      <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                        {task.text}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Learn More */}
+                              {section.learnMore && (
+                                <div className="pt-2 border-t border-border">
+                                  <p className="text-xs text-muted-foreground">
+                                    Learn More: {section.learnMore}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    ))
+                  ) : (
+                    // Original checklist for other tabs/hazards
+                    currentChecklist[phase as keyof typeof currentChecklist]?.map((item: any) => (
+                      <div 
+                        key={item.id}
+                        className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                      >
+                        <button
+                          onClick={() => toggleCheck(item.id)}
+                          className="mt-1"
+                        >
+                          {checkedItems.has(item.id) ? (
+                            <CheckCircle2 size={20} className="text-primary" />
+                          ) : (
+                            <Circle size={20} className="text-muted-foreground" />
+                          )}
+                        </button>
+                        
+                        <div className="flex-1">
+                          <h4 className={`font-medium ${checkedItems.has(item.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                            {item.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {item.notes}
+                          </p>
+                          {item.links && item.links.length > 0 && (
+                            <div className="mt-2">
+                              {item.links.map((link: string, index: number) => (
+                                <a
+                                  key={index}
+                                  href={`https://${link}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-primary hover:underline mr-3"
+                                >
+                                  {link}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
