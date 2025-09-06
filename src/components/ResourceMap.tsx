@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Globe, Navigation } from "lucide-react";
+import { MapPin, Globe, Navigation } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Resource {
@@ -162,18 +162,17 @@ const ResourceMap: React.FC<ResourceMapProps> = ({ resources, open, onOpenChange
             }
           });
 
-          // Create info window content
+          // Create info window content (without sensitive contact info)
           const infoContent = `
             <div style="max-width: 250px; padding: 10px;">
               <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">${resource.name}</h3>
               <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">${resource.description}</p>
-              ${resource.phone ? `<p style="margin: 0 0 4px 0; font-size: 12px;"><strong>Phone:</strong> ${resource.phone}</p>` : ''}
               ${resource.address ? `<p style="margin: 0 0 8px 0; font-size: 12px;"><strong>Address:</strong> ${resource.address}${resource.city ? `, ${resource.city}` : ''}</p>` : ''}
               <div style="display: flex; gap: 4px; margin-top: 8px;">
-                ${resource.phone ? `<button onclick="window.open('tel:${resource.phone}')" style="font-size: 11px; background: #22c55e; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Call</button>` : ''}
                 ${resource.website ? `<button onclick="window.open('${resource.website.startsWith('http') ? resource.website : `https://${resource.website}`}', '_blank')" style="font-size: 11px; background: #3b82f6; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Website</button>` : ''}
                 <button onclick="window.open('https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}', '_blank')" style="font-size: 11px; background: #ef4444; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer;">Directions</button>
               </div>
+              <p style="margin: 8px 0 0 0; font-size: 10px; color: #888;">Sign in to view contact information</p>
             </div>
           `;
 

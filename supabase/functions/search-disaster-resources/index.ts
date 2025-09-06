@@ -48,13 +48,12 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check for cached results (24h cache)
+    // Check for cached results (24h cache) using the new secure function
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: cachedResults } = await supabase
-      .from('disaster_resources')
-      .select('*')
-      .eq('postal_code', zipCode)
+      .rpc('get_public_disaster_resources')
       .gte('last_seen_at', oneDayAgo)
+      .eq('postal_code', zipCode)
       .order('distance_mi', { ascending: true });
 
     if (cachedResults && cachedResults.length > 0) {
@@ -512,7 +511,7 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
 
     return new Response(
       JSON.stringify({ 
-        resources: uniqueResults,
+        resources: publicSafeResults,
         cached: false,
         errors: errors.length > 0 ? errors : undefined
       }),

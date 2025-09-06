@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, MapPin, Star, Phone, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare } from "lucide-react";
+import { Search, MapPin, Star, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import ResourceMap from "@/components/ResourceMap";
+import SecureContactInfo from "@/components/SecureContactInfo";
 
 const ResourcesPage = () => {
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
@@ -393,13 +394,12 @@ const ResourcesPage = () => {
                   <span>{toTitleCase(resource.description)}</span>
                 </div>
 
-                {/* Phone */}
-                {resource.phone && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <Phone size={14} className="text-green-500 flex-shrink-0" />
-                    <span>{resource.phone}</span>
-                  </div>
-                )}
+                {/* Secure Contact Information */}
+                <SecureContactInfo 
+                  resourceId={resource.id} 
+                  resourceName={resource.name}
+                  className="mb-2"
+                />
 
                 {/* Address with distance */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -427,17 +427,6 @@ const ResourcesPage = () => {
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
-                  {resource.phone && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => window.open(`tel:${resource.phone}`)}
-                    >
-                      <Phone size={16} className="mr-1" />
-                      Call
-                    </Button>
-                  )}
                   {resource.website && (
                     <Button 
                       variant="outline" 
