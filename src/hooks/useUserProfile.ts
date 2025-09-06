@@ -42,6 +42,30 @@ export const useUserProfile = (user: User | null) => {
     };
 
     fetchProfile();
+
+    // Set up real-time subscription for profile changes
+    const channel = supabase
+      .channel('user-profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Profile updated:', payload);
+          if (payload.new) {
+            setProfile(payload.new as UserProfile);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const updateProfile = async (updates: Partial<Pick<UserProfile, 'zip_code'>>) => {

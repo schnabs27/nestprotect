@@ -46,6 +46,32 @@ export const useUserLocation = (): UserLocationData => {
     };
 
     fetchUserProfile();
+
+    // Set up real-time subscription for profile changes
+    if (user && !isGuest) {
+      const channel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'profiles',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Profile updated:', payload);
+            if (payload.new && 'zip_code' in payload.new) {
+              setZipCode(payload.new.zip_code);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [user, isGuest]);
 
   const updateZipCode = async (newZipCode: string) => {
