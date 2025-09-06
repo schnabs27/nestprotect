@@ -12,10 +12,12 @@ serve(async (req) => {
   }
 
   try {
+    console.log('get-maps-api-key function called');
     const mapsApiKey = Deno.env.get('MAPS_API_KEY');
     
     if (!mapsApiKey) {
       console.error('MAPS_API_KEY not found in environment variables');
+      console.log('Available environment variables:', Object.keys(Deno.env.toObject()));
       return new Response(
         JSON.stringify({ error: 'Maps API key not configured' }),
         { 
@@ -24,6 +26,11 @@ serve(async (req) => {
         }
       );
     }
+
+    console.log('MAPS_API_KEY found, returning key');
+    // Mask the key in logs for security
+    const maskedKey = mapsApiKey.substring(0, 10) + '...';
+    console.log('Returning masked API key:', maskedKey);
 
     return new Response(
       JSON.stringify({ apiKey: mapsApiKey }),
