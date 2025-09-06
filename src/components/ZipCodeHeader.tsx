@@ -18,10 +18,16 @@ const ZipCodeHeader = () => {
   const handleSave = async () => {
     if (editValue.length === 5 && /^\d{5}$/.test(editValue)) {
       try {
+        console.log('ZipCodeHeader: Attempting to update ZIP code to:', editValue);
+        console.log('ZipCodeHeader: Current ZIP code before update:', zipCode);
+        
         await updateZipCode(editValue);
         setIsEditing(false);
+        
+        console.log('ZipCodeHeader: Update completed, current ZIP code:', zipCode);
         toast.success("Zip code updated successfully");
       } catch (error) {
+        console.error('ZipCodeHeader: Failed to update zip code:', error);
         toast.error("Failed to update zip code");
       }
     } else {
@@ -34,6 +40,9 @@ const ZipCodeHeader = () => {
     setEditValue("");
   };
 
+  console.log('ZipCodeHeader: Current zipCode from hook:', zipCode);
+  console.log('ZipCodeHeader: Display ZIP code will be:', zipCode || "78028");
+  
   const displayZipCode = zipCode || "78028";
 
   return (
