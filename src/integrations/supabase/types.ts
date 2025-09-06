@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_access_logs: {
+        Row: {
+          accessed_at: string | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessed_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessed_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       disaster_resources: {
         Row: {
           address: string | null
@@ -151,6 +178,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_secure_device_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_disaster_resource_contact: {
         Args: { resource_id: string }
         Returns: {
@@ -182,6 +213,34 @@ export type Database = {
           updated_at: string
           website: string
         }[]
+      }
+      get_public_disaster_resources_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          address: string
+          category: string
+          city: string
+          created_at: string
+          description: string
+          distance_mi: number
+          hours: string
+          id: string
+          is_archived: boolean
+          last_seen_at: string
+          last_verified_at: string
+          latitude: number
+          longitude: number
+          name: string
+          postal_code: string
+          source: string
+          state: string
+          updated_at: string
+          website: string
+        }[]
+      }
+      is_valid_zip_code: {
+        Args: { zip_code: string }
+        Returns: boolean
       }
     }
     Enums: {
