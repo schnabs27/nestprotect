@@ -58,18 +58,8 @@ const SelfAssessmentPage = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
-        <div className="flex items-center gap-4 mb-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-primary-foreground hover:bg-primary-foreground/20"
-          >
-            <ArrowLeft size={20} />
-            Back to Home
-          </Button>
-        </div>
-        <h1 className="text-2xl font-bold mb-2">Disaster Prep Self-Assessment</h1>
+      <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
+        <h1 className="text-2xl font-bold mb-2">Self-Assessment</h1>
         <p className="text-primary-foreground/90 text-sm">
           Check your emergency preparedness with Nestor
         </p>
