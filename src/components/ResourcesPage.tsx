@@ -456,13 +456,6 @@ const ResourcesPage = () => {
                       <span>{toTitleCase(resource.description)}</span>
                     </div>
 
-                    {/* Secure Contact Information */}
-                    <SecureContactInfo 
-                      resourceId={resource.id} 
-                      resourceName={resource.name}
-                      className="mb-2"
-                    />
-
                     {/* Address with distance */}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <MapPin size={14} className="text-red-500 flex-shrink-0" />
@@ -511,6 +504,10 @@ const ResourcesPage = () => {
                           Directions
                         </Button>
                       )}
+                      <SecureContactInfo 
+                        resourceId={resource.id} 
+                        resourceName={resource.name}
+                      />
                     </div>
                   </CardContent>
                 </Card>

@@ -169,7 +169,7 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className={`${className}`}>
       {/* Always show Call button - no access restrictions for phone */}
       <Button
         variant="outline"
@@ -181,45 +181,6 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
         <Phone size={14} />
         <span>{isLoading ? "Loading..." : "Call"}</span>
       </Button>
-
-      {/* Show email access button with restrictions */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleRevealContact}
-        disabled={isLoading || canAccess === false}
-        className="flex items-center space-x-1"
-      >
-        <Mail size={14} />
-        <span>
-          {isLoading ? "Loading..." : 
-           canAccess === false ? "Email Restricted" : 
-           "Show Email"}
-        </span>
-      </Button>
-
-      {!user && (
-        <span className="text-xs text-gray-500">Sign in for email</span>
-      )}
-      {user && canAccess === false && (
-        <span className="text-xs text-yellow-600">Email: local area only</span>
-      )}
-
-      {/* Show revealed email */}
-      {isRevealed && contactInfo?.email && (
-        <div className="flex items-center space-x-2 mt-2">
-          <Mail size={14} className="text-blue-500 flex-shrink-0" />
-          <span className="text-sm">{contactInfo.email}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(`mailto:${contactInfo.email}`)}
-            className="p-1 h-auto text-blue-600 hover:text-blue-800"
-          >
-            Email
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
