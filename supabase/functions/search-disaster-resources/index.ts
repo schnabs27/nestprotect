@@ -574,7 +574,7 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
 
     // Create public-safe results by removing sensitive contact information
     const publicSafeResults = uniqueResults.map(resource => ({
-      id: resource.source_id,
+      id: resource.id || crypto.randomUUID(), // Use actual database ID or generate new UUID
       name: resource.name,
       category: resource.category,
       description: resource.description,
