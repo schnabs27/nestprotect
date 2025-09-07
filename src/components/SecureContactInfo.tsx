@@ -69,7 +69,7 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to access contact information for emergency resources.",
+        description: "Please sign in to access email information for emergency resources.",
         variant: "destructive",
       });
       return;
@@ -78,7 +78,7 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     if (canAccess === false) {
       toast({
         title: "Access Restricted",
-        description: "Contact information is only available for resources in your local area. Please update your zip code in your profile to match the resource location.",
+        description: "Email information is only available for resources in your local area. Please update your zip code in your profile to match the resource location.",
         variant: "destructive",
       });
       return;
@@ -94,7 +94,7 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
         console.error('Error fetching contact info:', error);
         toast({
           title: "Error",
-          description: "Unable to retrieve contact information. Please try again.",
+          description: "Unable to retrieve email information. Please try again.",
           variant: "destructive",
         });
         return;
@@ -105,12 +105,12 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
         setIsRevealed(true);
         toast({
           title: "Contact Information Loaded",
-          description: "Contact details are now visible. This access has been logged for security purposes.",
+          description: "Email details are now visible. This access has been logged for security purposes.",
         });
       } else {
         toast({
           title: "Access Denied",
-          description: "Contact information is restricted to users in the same general area as the resource.",
+          description: "Email information is restricted to users in the same general area as the resource.",
           variant: "destructive",
         });
       }
@@ -126,51 +126,88 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     }
   };
 
-  if (!isRevealed) {
-    return (
-      <div className={`flex items-center space-x-2 ${className}`}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRevealContact}
-          disabled={isLoading || canAccess === false}
-          className="flex items-center space-x-1"
-        >
-          <Shield size={14} />
-          <span>
-            {isLoading ? "Loading..." : 
-             canAccess === false ? "Access Restricted" : 
-             "Show Contact"}
-          </span>
-        </Button>
-        {!user && (
-          <span className="text-xs text-gray-500">Sign in required</span>
-        )}
-        {user && canAccess === false && (
-          <span className="text-xs text-yellow-600">Local area access only</span>
-        )}
-      </div>
-    );
-  }
+  const handlePhoneCall = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('get_disaster_resource_contact_secure', {
+        resource_id: resourceId
+      });
+
+      if (error) {
+        console.error('Error fetching phone info:', error);
+        toast({
+          title: "Error",
+          description: "Unable to retrieve phone information. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data && data.length > 0 && data[0].phone) {
+        window.open(`tel:${data[0].phone}`);
+        toast({
+          title: "Calling Resource",
+          description: "Opening phone dialer for this resource.",
+        });
+      } else {
+        toast({
+          title: "No Phone Available",
+          description: "No phone number is available for this resource.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className={`flex flex-col space-y-2 ${className}`}>
-      {contactInfo?.phone && (
-        <div className="flex items-center space-x-2">
-          <Phone size={14} className="text-green-500 flex-shrink-0" />
-          <span className="text-sm">{contactInfo.phone}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(`tel:${contactInfo.phone}`)}
-            className="p-1 h-auto text-green-600 hover:text-green-800"
-          >
-            Call
-          </Button>
-        </div>
+    <div className={`flex items-center space-x-2 ${className}`}>
+      {/* Always show Call button - no access restrictions for phone */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handlePhoneCall}
+        disabled={isLoading}
+        className="flex items-center space-x-1"
+      >
+        <Phone size={14} />
+        <span>{isLoading ? "Loading..." : "Call"}</span>
+      </Button>
+
+      {/* Show email access button with restrictions */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleRevealContact}
+        disabled={isLoading || canAccess === false}
+        className="flex items-center space-x-1"
+      >
+        <Mail size={14} />
+        <span>
+          {isLoading ? "Loading..." : 
+           canAccess === false ? "Email Restricted" : 
+           "Show Email"}
+        </span>
+      </Button>
+
+      {!user && (
+        <span className="text-xs text-gray-500">Sign in for email</span>
       )}
-      {contactInfo?.email && (
-        <div className="flex items-center space-x-2">
+      {user && canAccess === false && (
+        <span className="text-xs text-yellow-600">Email: local area only</span>
+      )}
+
+      {/* Show revealed email */}
+      {isRevealed && contactInfo?.email && (
+        <div className="flex items-center space-x-2 mt-2">
           <Mail size={14} className="text-blue-500 flex-shrink-0" />
           <span className="text-sm">{contactInfo.email}</span>
           <Button
@@ -182,9 +219,6 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
             Email
           </Button>
         </div>
-      )}
-      {!contactInfo?.phone && !contactInfo?.email && (
-        <span className="text-sm text-gray-500">No contact information available</span>
       )}
     </div>
   );
