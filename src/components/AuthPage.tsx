@@ -45,7 +45,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         setError(error.message);
       } else {
         toast.success("Check your email for verification link!");
-        navigate("/self-assessment");
+        navigate("/");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -69,7 +69,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         setError(error.message);
       } else {
         onAuthSuccess();
-        navigate("/self-assessment");
+        navigate("/");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -224,7 +224,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               variant="outline"
               onClick={() => {
                 onGuestAccess();
-                navigate("/self-assessment");
+                navigate("/");
               }}
               className="w-full"
             >
