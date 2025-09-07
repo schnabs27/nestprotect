@@ -41,6 +41,7 @@ const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => 
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentActiveTab === tab.id;
+          const isDuringTab = tab.id === "during";
           
           return (
             <button
@@ -48,6 +49,7 @@ const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => 
               onClick={() => handleTabClick(tab)}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 text-xs transition-smooth",
+                isDuringTab && "bg-orange-50/50",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
