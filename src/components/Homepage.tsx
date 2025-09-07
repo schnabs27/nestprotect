@@ -84,7 +84,7 @@ const Homepage = () => {
               </div>
               <Button 
                 onClick={() => navigate("/self-assessment")}
-                className="w-full bg-muted hover:bg-muted/80"
+                className="w-full bg-muted hover:bg-muted/80 text-foreground"
               >
                 Take Self-Assessment
               </Button>
