@@ -44,6 +44,9 @@ const SelfAssessmentPage = () => {
         answers: newAnswers,
         isComplete: true
       });
+      // Store the score in localStorage
+      const score = newAnswers.filter(answer => answer).length;
+      localStorage.setItem('selfAssessmentScore', score.toString());
     }
   };
 

@@ -16,8 +16,8 @@ const Homepage = () => {
   // Mock data - in a real app, this would come from state management or API
   const prepCompletedItems = 0; // This would track completed "All - Now" items
   const prepTotalItems = 10; // This would be the total "All - Now" items
-  const assessmentTrueItems = 0; // This would track true statements from assessment
-  const assessmentTotalItems = 15; // Total assessment statements
+  const assessmentTrueItems = parseInt(localStorage.getItem('selfAssessmentScore') || '0'); // Get from localStorage
+  const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
 
   const getDaysUntilDate = () => {
     if (!completionDate) return null;
