@@ -129,11 +129,73 @@ const PreparednessPage = () => {
     },
     wildfire: {
       now: [
-        { id: "wildfire-now-1", title: "Create defensible space", notes: "clear brush and flammable material 30–100 ft from home", links: ["ready.gov/wildfires"] },
-        { id: "wildfire-now-2", title: "Clean roofs, gutters, and vents regularly", notes: "Remove debris that could ignite", links: [] },
-        { id: "wildfire-now-3", title: "Use fire-resistant materials when possible", notes: "For roofing, siding, and landscaping", links: [] },
-        { id: "wildfire-now-4", title: "Store tools", notes: "hoses, shovels, rakes, buckets", links: [] },
-        { id: "wildfire-now-5", title: "Add N95 masks to supply kit for smoke", notes: "Protect against smoke inhalation", links: [] }
+        {
+          id: "defensible-space",
+          title: "Clear defensible space around your home.",
+          criticalTasks: [
+            { id: "space-1", text: "Remove dry leaves, pine needles, and debris from your roof, gutters, and deck." },
+            { id: "space-2", text: "Clear flammable vegetation and brush within 30 feet of your house." },
+            { id: "space-3", text: "Trim tree branches at least 10 feet away from your home and power lines." }
+          ],
+          additionalTasks: [
+            { id: "space-4", text: "Create a 100-foot defensible zone if possible, focusing on thinning vegetation." },
+            { id: "space-5", text: "Stack firewood, propane tanks, and other combustibles at least 30 feet from the home." },
+            { id: "space-6", text: "Use gravel, stone, or other non-combustible materials in landscaping near the house." }
+          ],
+          learnMore: "https://www.ready.gov/wildfires"
+        },
+        {
+          id: "ember-resistant",
+          title: "Install ember-resistant features on your home.",
+          criticalTasks: [
+            { id: "ember-1", text: "Cover exterior attic and crawl space vents with 1/8-inch metal mesh." },
+            { id: "ember-2", text: "Seal gaps in siding, roofing, and around eaves where embers could enter." }
+          ],
+          additionalTasks: [
+            { id: "ember-3", text: "Upgrade to fire-resistant roofing, siding, and double-pane windows if possible." },
+            { id: "ember-4", text: "Add metal flashing where wood decking connects to the house." }
+          ],
+          learnMore: "https://www.ready.gov/wildfires"
+        },
+        {
+          id: "go-bags",
+          title: "Prepare go-bags for each family member.",
+          criticalTasks: [
+            { id: "bag-1", text: "Pack 3 days of clothes, water, snacks, and medications." },
+            { id: "bag-2", text: "Include copies of IDs, insurance info, and critical phone numbers." }
+          ],
+          additionalTasks: [
+            { id: "bag-3", text: "Add comfort items (blankets, children's toys, pet supplies)." },
+            { id: "bag-4", text: "Include cash in small bills and a portable phone charger." }
+          ],
+          learnMore: "https://www.ready.gov/kit"
+        },
+        {
+          id: "evacuation-routes",
+          title: "Identify wildfire evacuation routes and shelters.",
+          criticalTasks: [
+            { id: "route-1", text: "Use Google Maps to star at least two exit routes from your neighborhood." },
+            { id: "route-2", text: "Identify a primary evacuation shelter or friend/family house outside your area." }
+          ],
+          additionalTasks: [
+            { id: "route-3", text: "Download offline maps in Google Maps in case cell service fails." },
+            { id: "route-4", text: "Make a list of nearby hotels or motels as backup shelter options." }
+          ],
+          learnMore: "https://www.ready.gov/wildfires"
+        },
+        {
+          id: "wildfire-alerts",
+          title: "Sign up for wildfire alerts.",
+          criticalTasks: [
+            { id: "alert-1", text: "Download FEMA App and enable notifications." },
+            { id: "alert-2", text: "Register for local emergency alert systems through your county or city." }
+          ],
+          additionalTasks: [
+            { id: "alert-3", text: "In Google Contacts, create an \"Emergency\" label and add alert hotlines and contacts." },
+            { id: "alert-4", text: "Follow your state's forestry or fire agency on social media for real-time updates." }
+          ],
+          learnMore: "https://www.fema.gov/mobile-app"
+        }
       ],
       coming: [
         { id: "wildfire-coming-1", title: "Move flammable items away from house", notes: "patio furniture, firewood, propane", links: [] },
