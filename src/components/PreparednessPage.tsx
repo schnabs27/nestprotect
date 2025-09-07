@@ -12,6 +12,29 @@ const PreparednessPage = () => {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
+  // Helper function to render text with clickable links
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   const hazards = [
     { id: "all", label: "All Types", icon: AlertTriangle, color: "text-primary" },
     { id: "wildfire", label: "Wildfire", icon: Flame, color: "text-coral" },
@@ -505,9 +528,9 @@ const PreparednessPage = () => {
                                         onCheckedChange={() => toggleCheck(task.id)}
                                         className="mt-0.5"
                                       />
-                                      <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                        {task.text}
-                                      </span>
+                                       <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                         {renderTextWithLinks(task.text)}
+                                       </span>
                                     </div>
                                   ))}
                                 </div>
@@ -524,9 +547,9 @@ const PreparednessPage = () => {
                                         onCheckedChange={() => toggleCheck(task.id)}
                                         className="mt-0.5"
                                       />
-                                      <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                        {task.text}
-                                      </span>
+                                       <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                         {renderTextWithLinks(task.text)}
+                                       </span>
                                     </div>
                                   ))}
                                 </div>
@@ -535,9 +558,16 @@ const PreparednessPage = () => {
                               {/* Learn More */}
                               {section.learnMore && (
                                 <div className="pt-2 border-t border-border">
-                                  <p className="text-xs text-muted-foreground">
-                                    Learn More: {section.learnMore}
-                                  </p>
+                                   <p className="text-xs text-muted-foreground">
+                                     Learn More: <a 
+                                       href={section.learnMore} 
+                                       target="_blank" 
+                                       rel="noopener noreferrer" 
+                                       className="text-primary hover:underline"
+                                     >
+                                       {section.learnMore}
+                                     </a>
+                                   </p>
                                 </div>
                               )}
                             </div>
