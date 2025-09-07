@@ -416,8 +416,8 @@ const PreparednessPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {phase === "now" && activeHazard === "all" ? (
-                    // Special interactive checklist for "All Types - Now"
+                  {phase === "now" && (activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood") ? (
+                    // Interactive checklist for hazards with detailed structure
                     currentChecklist.now.map((section: any) => (
                       <Collapsible 
                         key={section.id} 
