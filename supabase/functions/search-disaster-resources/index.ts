@@ -32,6 +32,11 @@ serve(async (req) => {
   }
 
   try {
+    // Initialize Supabase client first
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     const body = await req.json();
     const { zipCode } = body;
     
@@ -78,11 +83,6 @@ serve(async (req) => {
     }
 
     console.log(`Starting disaster resource search for ZIP: ${sanitizedZipCode}`);
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Check for cached results (24h cache) using the new secure function
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
