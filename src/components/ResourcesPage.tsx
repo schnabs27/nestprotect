@@ -272,7 +272,7 @@ const ResourcesPage = () => {
                 Access to disaster relief resources requires a free account to ensure data privacy and prevent misuse.
               </p>
               <Button 
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate("/")}
                 className="bg-gradient-primary border-0"
                 size="lg"
               >
