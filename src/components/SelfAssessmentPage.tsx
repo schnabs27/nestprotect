@@ -48,7 +48,7 @@ const SelfAssessmentPage = () => {
   };
 
   const scoreTrue = assessment.answers.filter(answer => answer).length;
-  const isAllTrue = scoreTrue === 7;
+  const isAllTrue = scoreTrue === statements.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
@@ -195,7 +195,7 @@ const SelfAssessmentPage = () => {
                     You marked {scoreTrue} of {statements.length} as true.
                   </p>
                   <p className="text-sm font-medium text-primary mb-3">
-                    {isAllTrue ? "Basics are done!" : "Almost there!"}
+                    {isAllTrue ? "Great job - basics are done!" : "Almost there - keep prepping!"}
                   </p>
                   <Button 
                     onClick={() => navigate("/")} 
