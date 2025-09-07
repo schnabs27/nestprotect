@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import MobileNavigation from "@/components/MobileNavigation";
 
 interface AssessmentState {
   currentStep: number;
@@ -46,6 +46,8 @@ const SelfAssessmentPage = () => {
       });
     }
   };
+
+  const [activeTab, setActiveTab] = useState("before");
 
   const scoreTrue = assessment.answers.filter(answer => answer).length;
   const isAllTrue = scoreTrue === statements.length;
@@ -210,25 +212,8 @@ const SelfAssessmentPage = () => {
           )}
         </div>
 
-        {/* Progress Indicator */}
-        <div className="mt-6 space-y-2">
-          <div className="text-center text-sm text-muted-foreground">
-            {assessment.isComplete 
-              ? "Assessment Complete" 
-              : `Question ${assessment.currentStep + 1} of ${statements.length}`
-            }
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ 
-                width: `${((assessment.currentStep + (assessment.isComplete ? 1 : 0)) / statements.length) * 100}%` 
-              }}
-            />
-          </div>
-        </div>
+        {/* Mobile Navigation */}
+        <MobileNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>
   );
