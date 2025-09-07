@@ -22,8 +22,21 @@ const PreparednessPage = () => {
     all: {
       now: [
         {
-          id: "family-plan",
-          title: "Create a family plan with contacts, meeting places, and evacuation routes.",
+          id: "know-risk",
+          title: "Know your risk for each type of disaster.",
+          criticalTasks: [
+            { id: "risk-1", text: "Search your address at https://hazards.fema.gov/nri/map to identify risks (flood, wildfire, storm, etc.)." },
+            { id: "risk-2", text: "Prepare for the risks with \"Very High\" ratings in your area." }
+          ],
+          additionalTasks: [
+            { id: "risk-3", text: "Share the FEMA map results with your household." },
+            { id: "risk-4", text: "Bookmark the FEMA National Risk Index for quick reference." }
+          ],
+          learnMore: "https://hazards.fema.gov/nri/map"
+        },
+        {
+          id: "household-plan",
+          title: "Make a household emergency plan.",
           criticalTasks: [
             { id: "plan-1", text: "Create a shared Google Doc titled \"Family Emergency Plan\" with household info and roles." },
             { id: "plan-2", text: "In Google Contacts, add an out-of-area contact under a new label \"Emergency.\"" },
@@ -38,7 +51,7 @@ const PreparednessPage = () => {
         },
         {
           id: "emergency-kit",
-          title: "Gather essentials in a kit and track them with Google Keep.",
+          title: "Assemble an emergency supply kit.",
           criticalTasks: [
             { id: "kit-1", text: "Make a Google Keep checklist titled \"Emergency Kit\" with FEMA basics (water, food, flashlight, batteries)." },
             { id: "kit-2", text: "Add personal needs such as medications, glasses, infant and pet supplies." }
@@ -52,8 +65,21 @@ const PreparednessPage = () => {
           learnMore: "https://www.ready.gov/kit"
         },
         {
+          id: "go-bags",
+          title: "Prepare go-bags for each family member.",
+          criticalTasks: [
+            { id: "gobag-1", text: "Pack 3 days of clothes, water, snacks, and medications." },
+            { id: "gobag-2", text: "Include copies of IDs, insurance info, and critical phone numbers." }
+          ],
+          additionalTasks: [
+            { id: "gobag-3", text: "Add comfort items such as blankets, children's toys, and pet supplies." },
+            { id: "gobag-4", text: "Include cash in small bills and a portable phone charger." }
+          ],
+          learnMore: "https://www.ready.gov/kit"
+        },
+        {
           id: "documents",
-          title: "Store critical papers securely in Google Drive and at home.",
+          title: "Keep important documents safe.",
           criticalTasks: [
             { id: "docs-1", text: "Use the Google Drive app → Scan → upload IDs, insurance, and medical records." },
             { id: "docs-2", text: "Organize into a folder \"Emergency Documents\" and share only with trusted family." }
@@ -67,7 +93,7 @@ const PreparednessPage = () => {
         },
         {
           id: "alerts",
-          title: "Get fast emergency alerts on your phone and add key contacts.",
+          title: "Sign up for local alerts and FEMA app.",
           criticalTasks: [
             { id: "alerts-1", text: "Download and enable alerts in the FEMA App (Android or iOS)." },
             { id: "alerts-2", text: "Search Google for \"[Your City] emergency alerts\" and register with your local system." },
@@ -81,7 +107,7 @@ const PreparednessPage = () => {
         },
         {
           id: "inventory",
-          title: "Document your belongings with Google Photos and check your coverage.",
+          title: "Photograph property and review insurance.",
           criticalTasks: [
             { id: "inventory-1", text: "Take photos of every room and major item, then save in a Google Photos album \"Home Inventory.\"" },
             { id: "inventory-2", text: "Upload receipts and warranties to a Google Drive folder \"Home Inventory.\"" }
@@ -104,7 +130,7 @@ const PreparednessPage = () => {
             { id: "deadline-3", text: "Create a Google Keep task list by category for easy completion, such as Shopping or Photos." },
             { id: "deadline-4", text: "Ask your household members to help and share responsibilities." }
           ],
-          learnMore: ""
+          learnMore: "https://www.ready.gov/plan"
         }
       ],
       coming: [
