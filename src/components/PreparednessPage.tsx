@@ -9,7 +9,10 @@ import MobileNavigation from "@/components/MobileNavigation";
 
 const PreparednessPage = () => {
   const [activeHazard, setActiveHazard] = useState("all");
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('prepCheckedItems');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
   // Helper function to render text with clickable links
@@ -418,6 +421,9 @@ const PreparednessPage = () => {
       newChecked.add(itemId);
     }
     setCheckedItems(newChecked);
+    
+    // Save checked items to localStorage
+    localStorage.setItem('prepCheckedItems', JSON.stringify(Array.from(newChecked)));
   };
 
   const toggleOpen = (itemId: string) => {

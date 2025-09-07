@@ -13,9 +13,11 @@ const Homepage = () => {
   const [completionDate, setCompletionDate] = useState<Date>();
   const navigate = useNavigate();
 
-  // Mock data - in a real app, this would come from state management or API
-  const prepCompletedItems = 0; // This would track completed "All - Now" items
-  const prepTotalItems = 10; // This would be the total "All - Now" items
+  // Get checked items from localStorage and calculate progress
+  const checkedItems = JSON.parse(localStorage.getItem('prepCheckedItems') || '[]');
+  const allNowToplineItems = ['know-risk', 'household-plan', 'emergency-kit', 'go-bags', 'important-documents', 'shelter-plan', 'communication-plan', 'financial-prep', 'special-needs', 'practice-plan'];
+  const prepCompletedItems = allNowToplineItems.filter(item => checkedItems.includes(item)).length;
+  const prepTotalItems = allNowToplineItems.length;
   const assessmentTrueItems = parseInt(localStorage.getItem('selfAssessmentScore') || '0'); // Get from localStorage
   const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
 
@@ -59,7 +61,7 @@ const Homepage = () => {
                 <div className="text-3xl font-bold text-primary">
                   {prepCompletedItems}/{prepTotalItems}
                 </div>
-                <p className="text-sm text-muted-foreground">Essential items completed</p>
+                <p className="text-sm text-muted-foreground">Prep tasks completed "Now" for all types of disaster</p>
               </div>
               <Button 
                 onClick={() => navigate("/preparedness")}
