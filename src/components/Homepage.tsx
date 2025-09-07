@@ -84,8 +84,7 @@ const Homepage = () => {
               </div>
               <Button 
                 onClick={() => navigate("/self-assessment")}
-                variant="outline"
-                className="w-full"
+                className="w-full bg-muted hover:bg-muted/80"
               >
                 Take Self-Assessment
               </Button>
@@ -96,8 +95,7 @@ const Homepage = () => {
         {/* Completion Date Goal */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="text-lg text-title flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+            <CardTitle className="text-lg text-title">
               Emergency Prep Goal
             </CardTitle>
           </CardHeader>
