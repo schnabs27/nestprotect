@@ -218,7 +218,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         <Card className="border-0 shadow-lg">
           <CardContent className="p-6 text-center">
             <CardDescription className="mb-4">
-              Want to explore without creating an account?
+              Want a preview? (limited functionality)
             </CardDescription>
             <Button
               variant="outline"
