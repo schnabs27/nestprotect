@@ -321,11 +321,47 @@ const PreparednessPage = () => {
     },
     storm: {
       now: [
-        { id: "storm-now-1", title: "Know if you're in a hurricane evacuation zone or tornado-prone area", notes: "Understand your specific risks", links: ["ready.gov/hurricanes", "ready.gov/tornadoes"] },
-        { id: "storm-now-2", title: "Reinforce home", notes: "storm shutters, secure roof/doors", links: [] },
-        { id: "storm-now-3", title: "Stockpile food, water, and medicine for 3+ days", notes: "Prepare for extended power outages", links: [] },
-        { id: "storm-now-4", title: "Identify shelters", notes: "basement/interior room for tornado; community shelter for hurricane", links: [] },
-        { id: "storm-now-5", title: "Back up devices and store property records", notes: "Protect digital information", links: [] }
+        {
+          id: "shelter-options",
+          title: "Identify in-place shelter options at home, work, or school.",
+          criticalTasks: [
+            { id: "shelter-1", text: "Choose a small, windowless, interior room on the lowest level of your home (e.g., basement or interior bathroom)." },
+            { id: "shelter-2", text: "At work or school, learn where the designated severe weather shelter areas are." }
+          ],
+          additionalTasks: [
+            { id: "shelter-3", text: "Reinforce your chosen shelter space with extra blankets, helmets, or padding to protect from debris." },
+            { id: "shelter-4", text: "Mark shelter areas clearly for all family members or coworkers." }
+          ],
+          learnMore: "https://www.ready.gov/tornadoes"
+        },
+        {
+          id: "secure-home",
+          title: "Secure or reinforce your home against storm damage.",
+          criticalTasks: [
+            { id: "secure-1", text: "Check and reinforce windows and doors; consider installing storm shutters." },
+            { id: "secure-2", text: "Bring in outdoor items (furniture, trash bins, decorations) that could become projectiles." }
+          ],
+          additionalTasks: [
+            { id: "secure-3", text: "Reinforce your roof and garage door if you live in a hurricane-prone area." },
+            { id: "secure-4", text: "Trim nearby trees and branches to reduce the risk of damage." }
+          ],
+          learnMore: "https://www.ready.gov/hurricanes"
+        },
+        {
+          id: "storm-supplies",
+          title: "Stock emergency supplies specific to storms.",
+          criticalTasks: [
+            { id: "supplies-1", text: "Keep a 3-day supply of water and non-perishable food ready." },
+            { id: "supplies-2", text: "Have flashlights, extra batteries, and a hand-crank radio accessible." },
+            { id: "supplies-3", text: "Keep power banks and/or a generator, checked regularly to ensure they work." }
+          ],
+          additionalTasks: [
+            { id: "supplies-4", text: "Store plastic sheeting and duct tape to temporarily cover broken windows." },
+            { id: "supplies-5", text: "Include extra blankets or ponchos for warmth and protection from rain." },
+            { id: "supplies-6", text: "Keep a cooler ready to preserve food." }
+          ],
+          learnMore: "https://www.ready.gov/kit"
+        }
       ],
       coming: [
         { id: "storm-coming-1", title: "Bring outdoor furniture/items indoors", notes: "Prevent them from becoming projectiles", links: [] },
