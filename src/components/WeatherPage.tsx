@@ -176,30 +176,10 @@ const WeatherPage = () => {
       {/* Header */}
       <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold mb-1">During Emergency</h1>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              <p className="text-sm text-primary-foreground/90">{zipCode}</p>
-            </div>
-          </div>
+          <h1 className="text-xl font-bold">During Emergency</h1>
           <div className="flex items-center gap-2">
-            {lastRefresh && (
-              <div className="flex items-center gap-1 text-xs text-primary-foreground/80">
-                <Clock className="h-3 w-3" />
-                <span>{Math.round((Date.now() - lastRefresh) / 60000)}m</span>
-              </div>
-            )}
-            <Button 
-              onClick={handleRefresh} 
-              disabled={loading || !canRefresh()}
-              variant="outline"
-              size="sm"
-              className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30 h-8 px-2"
-            >
-              <RefreshCw className={`h-3 w-3 mr-1 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
+            <MapPin className="h-3 w-3" />
+            <p className="text-sm text-primary-foreground/90">{zipCode}</p>
           </div>
         </div>
       </div>
