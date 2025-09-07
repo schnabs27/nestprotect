@@ -47,7 +47,7 @@ const SelfAssessmentPage = () => {
     }
   };
 
-  const [activeTab, setActiveTab] = useState("before");
+  const [activeTab] = useState("before");
 
   const scoreTrue = assessment.answers.filter(answer => answer).length;
   const isAllTrue = scoreTrue === statements.length;
@@ -213,7 +213,7 @@ const SelfAssessmentPage = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <MobileNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        <MobileNavigation activeTab={activeTab} />
       </div>
     </div>
   );
