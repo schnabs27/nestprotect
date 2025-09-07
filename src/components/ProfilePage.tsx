@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
 import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { user, isGuest, signOut, setGuestMode } = useAuth();
   const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
   
@@ -67,6 +69,7 @@ const ProfilePage = () => {
         setGuestMode(false);
       }
       toast.success("Successfully signed out");
+      navigate("/auth");
     } catch (error) {
       toast.error("Error signing out");
     }
