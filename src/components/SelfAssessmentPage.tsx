@@ -73,7 +73,7 @@ const SelfAssessmentPage = () => {
         {/* Chat Container */}
         <div className="space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Initial Introduction Message */}
-          <div className="flex items-start gap-3 animate-fade-in">
+          <div className="flex items-start gap-3 animate-fade-in delay-75">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
               <img 
                 src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
@@ -93,7 +93,7 @@ const SelfAssessmentPage = () => {
 
           {/* Chat History - Previous Questions and Answers */}
           {assessment.answers.map((answer, index) => (
-            <div key={index} className="space-y-3 animate-fade-in">
+            <div key={index} className={`space-y-3 animate-fade-in ${index === 0 ? 'delay-150' : index === 1 ? 'delay-200' : index === 2 ? 'delay-300' : index === 3 ? 'delay-500' : index === 4 ? 'delay-700' : index === 5 ? 'delay-1000' : index === 6 ? 'delay-1000' : 'delay-1000'}`}>
               {/* Nestor's Question */}
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -140,7 +140,7 @@ const SelfAssessmentPage = () => {
 
           {/* Current Question (if not complete) */}
           {!assessment.isComplete && (
-            <div className="space-y-3 animate-fade-in">
+            <div className="space-y-3 animate-fade-in delay-200">
               {/* Nestor's Current Question */}
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -185,7 +185,7 @@ const SelfAssessmentPage = () => {
 
           {/* Completion Message */}
           {assessment.isComplete && (
-            <div className="flex items-start gap-3 animate-fade-in">
+            <div className="flex items-start gap-3 animate-fade-in delay-300">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                 <img 
                   src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
