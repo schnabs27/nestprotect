@@ -56,25 +56,26 @@ const SelfAssessmentPage = () => {
   const isAllTrue = scoreTrue === statements.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Header */}
+      <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
+        <div className="flex items-center gap-4 mb-4">
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-primary-foreground hover:bg-primary-foreground/20"
           >
             <ArrowLeft size={20} />
             Back to Home
           </Button>
         </div>
+        <h1 className="text-2xl font-bold mb-2">Disaster Prep Self-Assessment</h1>
+        <p className="text-primary-foreground/90 text-sm">
+          Check your emergency preparedness with Nestor
+        </p>
+      </div>
 
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Disaster Prep Self-Assessment</h1>
-        </div>
-
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Chat Container */}
         <div className="space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Initial Introduction Message */}
