@@ -65,103 +65,153 @@ const SelfAssessmentPage = () => {
           </Button>
         </div>
 
-        <div className="space-y-6">
-          {/* Nestor's Introduction */}
-          <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+        {/* Chat Container */}
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Initial Introduction Message */}
+          <div className="flex items-start gap-3 animate-fade-in">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img 
+                src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                alt="Nestor" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-primary">Nestor</span>
+              <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
+                <p className="text-sm text-foreground">
+                  Let's see how ready you are for a disaster coming your way.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Chat History - Previous Questions and Answers */}
+          {assessment.answers.map((answer, index) => (
+            <div key={index} className="space-y-3 animate-fade-in">
+              {/* Nestor's Question */}
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
                     src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
                     alt="Nestor" 
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-primary mb-2">Nestor</h3>
-                  <p className="text-muted-foreground">
-                    Let's see how ready you are for a disaster coming your way.
-                  </p>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-primary">Nestor</span>
+                  <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                    <p className="text-sm text-foreground">
+                      {statements[index]}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Current Question or Completion */}
-          {!assessment.isComplete ? (
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
-                      alt="Nestor" 
-                      className="w-full h-full object-cover"
-                    />
+              {/* User's Answer */}
+              <div className="flex items-start gap-3 justify-end">
+                <div className="flex flex-col gap-1 items-end">
+                  <span className="text-sm font-medium text-muted-foreground">You</span>
+                  <div className={`rounded-2xl rounded-tr-md px-4 py-3 max-w-xs ${
+                    answer 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-red-500 text-white'
+                  }`}>
+                    <p className="text-sm font-medium">
+                      {answer ? 'True' : 'False'}
+                    </p>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-primary mb-2">Nestor</h3>
-                    <p className="text-foreground mb-4">
+                </div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                  {answer ? (
+                    <CheckCircle size={16} className="text-green-600" />
+                  ) : (
+                    <XCircle size={16} className="text-red-600" />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Current Question (if not complete) */}
+          {!assessment.isComplete && (
+            <div className="space-y-3 animate-fade-in">
+              {/* Nestor's Current Question */}
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <img 
+                    src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                    alt="Nestor" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-primary">Nestor</span>
+                  <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                    <p className="text-sm text-foreground mb-3">
                       {statements[assessment.currentStep]}
                     </p>
                     
-                    {/* True/False Chips */}
-                    <div className="flex gap-3">
+                    {/* True/False Response Buttons */}
+                    <div className="flex gap-2">
                       <Button
                         onClick={() => handleAnswer(true)}
-                        className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+                        size="sm"
+                        className="bg-green-500 hover:bg-green-600 text-white"
                       >
-                        <CheckCircle size={16} />
+                        <CheckCircle size={14} className="mr-1" />
                         True
                       </Button>
                       <Button
                         onClick={() => handleAnswer(false)}
+                        size="sm"
                         variant="outline"
-                        className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50"
+                        className="border-red-500 text-red-500 hover:bg-red-50"
                       >
-                        <XCircle size={16} />
+                        <XCircle size={14} className="mr-1" />
                         False
                       </Button>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            /* Completion Message */
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
-                      alt="Nestor" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-primary mb-2">Nestor</h3>
-                    <div className="space-y-3">
-                      <p className="text-foreground">
-                        You marked {scoreTrue} of 7 as true.
-                      </p>
-                      <p className="text-lg font-medium text-primary">
-                        {isAllTrue ? "Basics are done!" : "Almost there!"}
-                      </p>
-                      <Button 
-                        onClick={() => navigate("/")} 
-                        className="mt-4"
-                      >
-                        Go to Emergency Preparedness
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
 
-          {/* Progress Indicator */}
+          {/* Completion Message */}
+          {assessment.isComplete && (
+            <div className="flex items-start gap-3 animate-fade-in">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img 
+                  src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                  alt="Nestor" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-primary">Nestor</span>
+                <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                  <p className="text-sm text-foreground mb-2">
+                    You marked {scoreTrue} of {statements.length} as true.
+                  </p>
+                  <p className="text-sm font-medium text-primary mb-3">
+                    {isAllTrue ? "Basics are done!" : "Almost there!"}
+                  </p>
+                  <Button 
+                    onClick={() => navigate("/")} 
+                    size="sm"
+                    className="w-full"
+                  >
+                    Go to Emergency Preparedness
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="mt-6 space-y-2">
           <div className="text-center text-sm text-muted-foreground">
             {assessment.isComplete 
               ? "Assessment Complete" 
