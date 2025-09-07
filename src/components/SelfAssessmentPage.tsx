@@ -70,6 +70,11 @@ const SelfAssessmentPage = () => {
           </Button>
         </div>
 
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-foreground">Disaster Prep Self-Assessment</h1>
+        </div>
+
         {/* Chat Container */}
         <div className="space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Initial Introduction Message */}
@@ -83,7 +88,7 @@ const SelfAssessmentPage = () => {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium text-primary">Nestor</span>
-              <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
+              <div className="bg-white border-4 border-[#66dcb5] rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
                 <p className="text-sm text-foreground">
                   Let's see how ready you are for a disaster coming your way. <strong>Are these statements true for you?</strong>
                 </p>
@@ -105,7 +110,7 @@ const SelfAssessmentPage = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-medium text-primary">Nestor</span>
-                  <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                   <div className="bg-white border-4 border-[#66dcb5] rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
                     <p className="text-sm text-foreground">
                       {statements[index]}
                     </p>
@@ -152,7 +157,7 @@ const SelfAssessmentPage = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-medium text-primary">Nestor</span>
-                  <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                   <div className="bg-white border-4 border-[#66dcb5] rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
                     <p className="text-sm text-foreground mb-3">
                       {statements[assessment.currentStep]}
                     </p>
@@ -194,7 +199,7 @@ const SelfAssessmentPage = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-primary">Nestor</span>
-                <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
+                <div className="bg-white border-4 border-[#66dcb5] rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
                   <p className="text-sm text-foreground mb-2">
                     You marked {scoreTrue} of {statements.length} as true.
                   </p>
