@@ -594,17 +594,6 @@ const PreparednessPage = () => {
           ))}
         </Tabs>
 
-        {/* Action Buttons */}
-        <div className="mt-6 space-y-3">
-          <Button variant="outline" className="w-full">
-            <FileDown size={16} className="mr-2" />
-            Export as PDF
-          </Button>
-          <Button variant="outline" className="w-full">
-            <Share size={16} className="mr-2" />
-            Save to Google Drive
-          </Button>
-        </div>
       </div>
     </div>
   );
