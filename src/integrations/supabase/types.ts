@@ -213,6 +213,7 @@ export type Database = {
           name: string
           postal_code: string
           source: string
+          source_id: string
           state: string
           updated_at: string
           website: string
