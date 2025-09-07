@@ -435,7 +435,7 @@ const PreparednessPage = () => {
               <Card className="shadow-soft">
                 <CardHeader>
                   <CardTitle className="text-title">
-                    {phase === "now" && "Now - Prepare for any disaster"}
+                    {phase === "now" && `Now - Prepare for ${activeHazard === "all" ? "any disaster" : hazards.find(h => h.id === activeHazard)?.label.toLowerCase() || "disaster"}`}
                     {phase === "coming" && "It's Coming - Final preparations"}
                     {phase === "during" && "During - Stay safe"}
                     {phase === "after" && "Recovery - After the disaster"}
