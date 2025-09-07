@@ -107,14 +107,19 @@ const PreparednessPage = () => {
         },
         {
           id: "go-bags",
-          title: "Prepare go-bags for each family member.",
+          title: "Maintain a go-bag for each person in case you need to evacuate.",
           criticalTasks: [
-            { id: "gobag-1", text: "Pack 3 days of clothes, water, snacks, and medications." },
-            { id: "gobag-2", text: "Include copies of IDs, insurance info, and critical phone numbers." }
+            { id: "gobag-1", text: "3 days of clothing and personal items" },
+            { id: "gobag-2", text: "Water bottles and lightweight, non-perishable snacks" },
+            { id: "gobag-3", text: "Copies of IDs, insurance information, critical phone numbers, and printed map in waterproof bag" },
+            { id: "gobag-4", text: "Necessary medications and a small first aid kit" },
+            { id: "gobag-5", text: "Lightweight poncho and flashlight" }
           ],
           additionalTasks: [
-            { id: "gobag-3", text: "Add comfort items such as blankets, children's toys, and pet supplies." },
-            { id: "gobag-4", text: "Include cash in small bills and a portable phone charger." }
+            { id: "gobag-6", text: "Power chargers and charged portable power bank" },
+            { id: "gobag-7", text: "Some cash in small bills" },
+            { id: "gobag-8", text: "Items for children, elderly, or pets as needed" },
+            { id: "gobag-9", text: "Maintain a car kit with water, snacks, blankets, and a phone charger in case you become stranded or stuck in traffic." }
           ],
           learnMore: "https://www.ready.gov/kit"
         },
