@@ -199,75 +199,7 @@ export type Database = {
       }
     }
     Views: {
-      disaster_resources_public: {
-        Row: {
-          address: string | null
-          category: string | null
-          city: string | null
-          created_at: string | null
-          description: string | null
-          distance_mi: number | null
-          hours: string | null
-          id: string | null
-          is_archived: boolean | null
-          last_seen_at: string | null
-          last_verified_at: string | null
-          latitude: number | null
-          longitude: number | null
-          name: string | null
-          postal_code: string | null
-          source: string | null
-          source_id: string | null
-          state: string | null
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          address?: string | null
-          category?: string | null
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          distance_mi?: number | null
-          hours?: string | null
-          id?: string | null
-          is_archived?: boolean | null
-          last_seen_at?: string | null
-          last_verified_at?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          name?: string | null
-          postal_code?: string | null
-          source?: string | null
-          source_id?: string | null
-          state?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          address?: string | null
-          category?: string | null
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          distance_mi?: number | null
-          hours?: string | null
-          id?: string | null
-          is_archived?: boolean | null
-          last_seen_at?: string | null
-          last_verified_at?: string | null
-          latitude?: number | null
-          longitude?: number | null
-          name?: string | null
-          postal_code?: string | null
-          source?: string | null
-          source_id?: string | null
-          state?: string | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_access_contact_info: {
