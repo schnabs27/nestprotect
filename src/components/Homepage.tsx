@@ -31,7 +31,7 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="container mx-auto px-4 py-6 space-y-4">
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
@@ -53,10 +53,10 @@ const Homepage = () => {
         <div className="grid gap-4 md:grid-cols-2">
           {/* Prep Scoreboard */}
           <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg text-title">Emergency Prep Progress</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-title text-center">Emergency Prep Progress</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">
                   {prepCompletedItems}/{prepTotalItems}
@@ -73,20 +73,20 @@ const Homepage = () => {
           </Card>
 
           {/* Self-Assessment Scoreboard */}
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg text-title">Self-Assessment</CardTitle>
+          <Card className="shadow-soft bg-purple-600 border-purple-600">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-white text-center">Self-Assessment</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="text-center">
-                <div className="text-3xl font-bold text-accent">
+                <div className="text-3xl font-bold text-white">
                   {assessmentTrueItems}/{assessmentTotalItems}
                 </div>
-                <p className="text-sm text-muted-foreground">Statements marked true</p>
+                <p className="text-sm text-purple-100">Statements marked true</p>
               </div>
               <Button 
                 onClick={() => navigate("/self-assessment")}
-                className="w-full bg-muted hover:bg-muted/80 text-foreground"
+                className="w-full bg-white hover:bg-gray-100 text-black"
               >
                 Take Self-Assessment
               </Button>
@@ -96,12 +96,12 @@ const Homepage = () => {
 
         {/* Completion Date Goal */}
         <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-lg text-title">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-title text-center">
               Emergency Prep Goal
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-4 items-center">
               <div className="flex-1">
                 <label className="text-sm font-medium text-foreground mb-2 block">
@@ -135,7 +135,7 @@ const Homepage = () => {
               
               {daysRemaining !== null && (
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-coral">
+                  <div className="text-2xl font-bold text-primary">
                     {daysRemaining}
                   </div>
                   <p className="text-sm text-muted-foreground">days remaining</p>
@@ -148,10 +148,10 @@ const Homepage = () => {
 
         {/* About NestProtect */}
         <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-lg text-title">About NestProtect™</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-title text-center">About NestProtect™</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
               Leo, a high school student, created Blue Sky Disaster Relief and the NestProtect app 
               to give people free disaster relief resources. They're the tools his family needed 
