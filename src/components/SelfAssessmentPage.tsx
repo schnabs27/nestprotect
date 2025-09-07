@@ -15,7 +15,7 @@ const statements = [
   "I know my safest place to go right now.",
   "If my safe place is no longer safe, I have a plan B.",
   "I know who to contact if I'm hurt, lost, or trapped.",
-  "My family members know what to do.",
+  "My family members know how to find each other even when internet and phone service is unavailable.",
   "I have 3 days of food, water, medication, and power.",
   "I can quickly access my insurance and property documents.",
   "I know ways to move or protect my property so it's less likely to be damaged."
@@ -85,7 +85,7 @@ const SelfAssessmentPage = () => {
               <span className="text-sm font-medium text-primary">Nestor</span>
               <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
                 <p className="text-sm text-foreground">
-                  Let's see how ready you are for a disaster coming your way. Are these statements true for you?
+                  Let's see how ready you are for a disaster coming your way. <strong>Are these statements true for you?</strong>
                 </p>
               </div>
             </div>
