@@ -1,4 +1,4 @@
-import { Home, Shield, Cloud, LifeBuoy, Settings } from "lucide-react";
+import { Home, Shield, AlertTriangle, Search, Settings } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +10,8 @@ interface MobileNavigationProps {
 const tabs = [
   { id: "home", label: "Home", icon: Home, path: "/" },
   { id: "before", label: "Before", icon: Shield, path: "/preparedness" },
-  { id: "during", label: "During", icon: Cloud, path: "/during" },
-  { id: "after", label: "After", icon: LifeBuoy, path: "/after" },
+  { id: "during", label: "During", icon: AlertTriangle, path: "/during" },
+  { id: "after", label: "After", icon: Search, path: "/after" },
   { id: "settings", label: "Settings", icon: Settings, path: "/settings" },
 ];
 

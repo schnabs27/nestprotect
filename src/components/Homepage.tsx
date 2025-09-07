@@ -143,18 +143,6 @@ const Homepage = () => {
           </CardContent>
         </Card>
 
-        {/* Emergency Button */}
-        <Card className="shadow-soft border-raspberry">
-          <CardContent className="p-6">
-            <Button 
-              onClick={() => navigate("/during")}
-              className="w-full bg-raspberry hover:bg-raspberry/90 text-raspberry-foreground text-lg py-6"
-              size="lg"
-            >
-              🚨 A disaster is coming!
-            </Button>
-          </CardContent>
-        </Card>
 
         {/* About NestProtect */}
         <Card className="shadow-soft">
