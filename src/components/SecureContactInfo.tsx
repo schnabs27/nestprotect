@@ -129,9 +129,12 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
   const handlePhoneCall = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.rpc('get_disaster_resource_contact_secure', {
-        resource_id: resourceId
-      });
+      // For emergency phone access, query the resource directly with less restrictions
+      const { data, error } = await supabase
+        .from('disaster_resources')
+        .select('phone')
+        .eq('id', resourceId)
+        .single();
 
       if (error) {
         console.error('Error fetching phone info:', error);
@@ -143,8 +146,8 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
         return;
       }
 
-      if (data && data.length > 0 && data[0].phone) {
-        window.open(`tel:${data[0].phone}`);
+      if (data?.phone) {
+        window.open(`tel:${data.phone}`);
         toast({
           title: "Calling Resource",
           description: "Opening phone dialer for this resource.",
