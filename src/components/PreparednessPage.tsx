@@ -89,7 +89,7 @@ const PreparednessPage = () => {
         },
         {
           id: "emergency-kit",
-          title: "✅ Assemble an at-home emergency supply kit.",
+          title: "Assemble an at-home emergency supply kit.",
           criticalTasks: [
             { id: "kit-1", text: "At least a 3-day supply of water (1 gallon per person per day)" },
             { id: "kit-2", text: "At least a 3-day supply of non-perishable food" },
@@ -539,7 +539,7 @@ const PreparednessPage = () => {
                             <div className="space-y-4 ml-7">
                               {/* Critical Tasks */}
                               <div>
-                                <h5 className="font-medium text-sm text-foreground mb-2">Critical tasks (minimum must-do)</h5>
+                                <h5 className="font-medium text-sm text-foreground mb-2">Critical items</h5>
                                 <div className="space-y-2">
                                   {section.criticalTasks.map((task: any) => (
                                     <div key={task.id} className="flex items-start gap-2">
@@ -558,7 +558,7 @@ const PreparednessPage = () => {
 
                               {/* Additional Tasks */}
                               <div>
-                                <h5 className="font-medium text-sm text-foreground mb-2">Additional tasks (optional, deeper prep)</h5>
+                                <h5 className="font-medium text-sm text-foreground mb-2">Additional items</h5>
                                 <div className="space-y-2">
                                   {section.additionalTasks.map((task: any) => (
                                     <div key={task.id} className="flex items-start gap-2">
