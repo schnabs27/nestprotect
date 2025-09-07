@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
 import { Search, MapPin, Star, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import ResourceMap from "@/components/ResourceMap";
 import SecureContactInfo from "@/components/SecureContactInfo";
 
 const ResourcesPage = () => {
+  const navigate = useNavigate();
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
   const { user, isGuest, setGuestMode } = useAuth();
   const [zipCode, setZipCode] = useState("");
@@ -270,7 +272,7 @@ const ResourcesPage = () => {
                 Access to disaster relief resources requires a free account to ensure data privacy and prevent misuse.
               </p>
               <Button 
-                onClick={() => setGuestMode(false)}
+                onClick={() => navigate("/auth")}
                 className="bg-gradient-primary border-0"
                 size="lg"
               >
