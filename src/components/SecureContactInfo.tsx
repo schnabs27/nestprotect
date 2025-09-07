@@ -19,23 +19,51 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [canAccess, setCanAccess] = useState<boolean | null>(null);
   const [user, setUser] = useState(null);
   const { toast } = useToast();
 
-  // Check authentication status
+  // Check authentication status and access permissions
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAccessPermission();
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAccessPermission();
+      } else {
+        setCanAccess(null);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [resourceId]);
+
+  const checkAccessPermission = async () => {
+    try {
+      const { data, error } = await supabase.rpc('can_access_contact_info_secure', {
+        resource_id: resourceId
+      });
+      
+      if (error) {
+        console.error('Error checking access permission:', error);
+        setCanAccess(false);
+        return;
+      }
+      
+      setCanAccess(data);
+    } catch (error) {
+      console.error('Error checking access permission:', error);
+      setCanAccess(false);
+    }
+  };
 
   const handleRevealContact = async () => {
     if (!user) {
@@ -47,9 +75,18 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
       return;
     }
 
+    if (canAccess === false) {
+      toast({
+        title: "Access Restricted",
+        description: "Contact information is only available for resources in your local area. Please update your zip code in your profile to match the resource location.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.rpc('get_disaster_resource_contact', {
+      const { data, error } = await supabase.rpc('get_disaster_resource_contact_secure', {
         resource_id: resourceId
       });
 
@@ -66,10 +103,15 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
       if (data && data.length > 0) {
         setContactInfo(data[0]);
         setIsRevealed(true);
+        toast({
+          title: "Contact Information Loaded",
+          description: "Contact details are now visible. This access has been logged for security purposes.",
+        });
       } else {
         toast({
-          title: "No Contact Information",
-          description: "No contact details are available for this resource.",
+          title: "Access Denied",
+          description: "Contact information is restricted to users in the same general area as the resource.",
+          variant: "destructive",
         });
       }
     } catch (error) {
@@ -91,14 +133,21 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
           variant="outline"
           size="sm"
           onClick={handleRevealContact}
-          disabled={isLoading}
+          disabled={isLoading || canAccess === false}
           className="flex items-center space-x-1"
         >
           <Shield size={14} />
-          <span>{isLoading ? "Loading..." : "Show Contact"}</span>
+          <span>
+            {isLoading ? "Loading..." : 
+             canAccess === false ? "Access Restricted" : 
+             "Show Contact"}
+          </span>
         </Button>
         {!user && (
           <span className="text-xs text-gray-500">Sign in required</span>
+        )}
+        {user && canAccess === false && (
+          <span className="text-xs text-yellow-600">Local area access only</span>
         )}
       </div>
     );

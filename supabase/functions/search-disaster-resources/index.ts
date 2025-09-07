@@ -543,7 +543,32 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
       }
     }
 
-    console.log(`Search completed. Found ${uniqueResults.length} resources, ${errors.length} errors`);
+    // Create public-safe results by removing sensitive contact information
+    const publicSafeResults = uniqueResults.map(resource => ({
+      id: resource.source_id,
+      name: resource.name,
+      category: resource.category,
+      description: resource.description,
+      address: resource.address,
+      city: resource.city,
+      state: resource.state,
+      postal_code: resource.postal_code,
+      website: resource.website,
+      hours: resource.hours,
+      latitude: resource.latitude,
+      longitude: resource.longitude,
+      distance_mi: resource.distance_mi,
+      source: resource.source,
+      source_id: resource.source_id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      last_verified_at: null,
+      last_seen_at: new Date().toISOString(),
+      is_archived: false
+      // Intentionally exclude phone and email for security
+    }));
+
+    console.log(`Search completed. Found ${publicSafeResults.length} resources, ${errors.length} errors`);
 
     return new Response(
       JSON.stringify({ 
