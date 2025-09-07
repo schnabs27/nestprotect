@@ -70,8 +70,12 @@ const SelfAssessmentPage = () => {
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                  🦅
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                    alt="Nestor" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-primary mb-2">Nestor</h3>
@@ -88,8 +92,12 @@ const SelfAssessmentPage = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                    🦅
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                      alt="Nestor" 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-primary mb-2">Nestor</h3>
@@ -124,8 +132,12 @@ const SelfAssessmentPage = () => {
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                    🦅
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src="/lovable-uploads/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                      alt="Nestor" 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-primary mb-2">Nestor</h3>
