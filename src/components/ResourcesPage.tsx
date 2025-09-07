@@ -292,6 +292,7 @@ const ResourcesPage = () => {
                 <Button 
                   className="w-full h-12 text-base font-semibold"
                   size="lg"
+                  onClick={() => navigate('/preparedness', { state: { activeTab: 'recovery', activeHazard: 'all' } })}
                 >
                   <CheckSquare className="mr-2" size={20} />
                   Recovery Action Plan

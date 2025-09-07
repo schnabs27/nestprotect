@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,12 +9,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 import MobileNavigation from "@/components/MobileNavigation";
 
 const PreparednessPage = () => {
+  const location = useLocation();
   const [activeHazard, setActiveHazard] = useState("all");
+  const [activeTab, setActiveTab] = useState("now");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('prepCheckedItems');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  // Handle navigation state to set initial tab and hazard
+  useEffect(() => {
+    if (location.state?.activeTab && location.state?.activeHazard) {
+      setActiveHazard(location.state.activeHazard);
+      setActiveTab(location.state.activeTab === "recovery" ? "after" : location.state.activeTab);
+    }
+  }, [location.state]);
 
   // Helper function to render text with clickable links
   const renderTextWithLinks = (text: string) => {
@@ -475,7 +486,7 @@ const PreparednessPage = () => {
         </div>
 
         {/* Checklist Tabs */}
-        <Tabs defaultValue="now" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 text-xs">
             <TabsTrigger value="now">Now</TabsTrigger>
             <TabsTrigger value="coming">It's Coming</TabsTrigger>
