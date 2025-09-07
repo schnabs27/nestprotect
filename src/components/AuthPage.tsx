@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ interface AuthPageProps {
 }
 
 const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [zipCode, setZipCode] = useState("");
@@ -43,6 +45,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         setError(error.message);
       } else {
         toast.success("Check your email for verification link!");
+        navigate("/self-assessment");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -66,6 +69,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         setError(error.message);
       } else {
         onAuthSuccess();
+        navigate("/self-assessment");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -218,7 +222,10 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             </CardDescription>
             <Button
               variant="outline"
-              onClick={onGuestAccess}
+              onClick={() => {
+                onGuestAccess();
+                navigate("/self-assessment");
+              }}
               className="w-full"
             >
               Continue as Guest
