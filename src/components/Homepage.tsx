@@ -32,11 +32,11 @@ const Homepage = () => {
       <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
-          <div className="mx-auto w-32 h-32 rounded-full overflow-hidden bg-gradient-primary flex items-center justify-center">
+          <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src="/lovable-uploads/f7fc105d-755b-4731-892a-75ec2a448d44.png" 
+              src="/lovable-uploads/564fda98-1db0-44eb-97de-a693f9254dea.png" 
               alt="Nestor - Your disaster preparedness guide"
-              className="w-24 h-24 object-contain"
+              className="w-32 h-32 object-contain"
             />
           </div>
           <div className="space-y-2">
