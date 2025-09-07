@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import MobileNavigation from "@/components/MobileNavigation";
 import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -308,6 +309,7 @@ const ProfilePage = () => {
           </Button>
         </div>
       </div>
+      <MobileNavigation />
     </div>
   );
 };

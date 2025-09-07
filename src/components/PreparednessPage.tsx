@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
+import MobileNavigation from "@/components/MobileNavigation";
 
 const PreparednessPage = () => {
   const [activeHazard, setActiveHazard] = useState("all");
@@ -595,6 +596,7 @@ const PreparednessPage = () => {
         </Tabs>
 
       </div>
+      <MobileNavigation />
     </div>
   );
 };

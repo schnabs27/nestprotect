@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MobileNavigation from "@/components/MobileNavigation";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { 
   CheckSquare, 
@@ -362,6 +363,7 @@ const WeatherPage = () => {
           </CardContent>
         </Card>
       </div>
+      <MobileNavigation />
     </div>
   );
 };

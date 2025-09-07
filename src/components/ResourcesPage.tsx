@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import MobileNavigation from "@/components/MobileNavigation";
 import { Search, MapPin, Star, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -525,6 +526,7 @@ const ResourcesPage = () => {
           zipCode={zipCode}
         />
       )}
+      <MobileNavigation />
     </div>
   );
 };

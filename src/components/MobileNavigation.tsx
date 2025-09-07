@@ -1,4 +1,4 @@
-import { Shield, Cloud, LifeBuoy, Settings } from "lucide-react";
+import { Home, Shield, Cloud, LifeBuoy, Settings } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -8,41 +8,36 @@ interface MobileNavigationProps {
 }
 
 const tabs = [
-  { id: "before", label: "Before", icon: Shield, path: "/" },
-  { id: "during", label: "During", icon: Cloud, path: "/" },
-  { id: "after", label: "After", icon: LifeBuoy, path: "/" },
-  { id: "settings", label: "Settings", icon: Settings, path: "/" },
+  { id: "home", label: "Home", icon: Home, path: "/" },
+  { id: "before", label: "Before", icon: Shield, path: "/preparedness" },
+  { id: "during", label: "During", icon: Cloud, path: "/during" },
+  { id: "after", label: "After", icon: LifeBuoy, path: "/after" },
+  { id: "settings", label: "Settings", icon: Settings, path: "/settings" },
 ];
 
 const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Determine current active tab based on URL when not on index page
+  // Determine current active tab based on URL
   const getCurrentTab = () => {
-    if (location.pathname === "/self-assessment") return "before";
-    return activeTab || "before";
+    if (location.pathname === "/") return "home";
+    if (location.pathname === "/preparedness" || location.pathname === "/self-assessment") return "before";
+    if (location.pathname === "/during") return "during";
+    if (location.pathname === "/after") return "after";
+    if (location.pathname === "/settings") return "settings";
+    return activeTab || "home";
   };
 
   const handleTabClick = (tab: { id: string; path: string }) => {
-    if (location.pathname === "/" && onTabChange) {
-      // On index page, use the callback to switch content
-      onTabChange(tab.id);
-    } else {
-      // On other pages, navigate to index with the selected tab
-      navigate("/");
-      // Small delay to ensure navigation completes before setting tab
-      setTimeout(() => {
-        if (onTabChange) onTabChange(tab.id);
-      }, 100);
-    }
+    navigate(tab.path);
   };
 
   const currentActiveTab = getCurrentTab();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
-      <div className="grid grid-cols-4 h-16">
+      <div className="grid grid-cols-5 h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentActiveTab === tab.id;
