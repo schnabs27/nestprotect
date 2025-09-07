@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
+import ContactForm from "@/components/ContactForm";
 import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,11 +176,7 @@ const ProfilePage = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm">Last Updated</span>
-              <span className="text-sm text-muted-foreground">March 2024</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Data Storage</span>
-              <span className="text-sm text-muted-foreground">Your Google Drive</span>
+              <span className="text-sm text-muted-foreground">September 2025</span>
             </div>
           </CardContent>
         </Card>
@@ -223,10 +220,12 @@ const ProfilePage = () => {
             <ExternalLink size={16} className="mr-2" />
             Terms of Service
           </Button>
-          <Button variant="outline" className="w-full justify-start">
-            <ExternalLink size={16} className="mr-2" />
-            Contact Support
-          </Button>
+          <ContactForm>
+            <Button variant="outline" className="w-full justify-start">
+              <ExternalLink size={16} className="mr-2" />
+              Contact Support
+            </Button>
+          </ContactForm>
           <Button variant="outline" className="w-full justify-start">
             <Heart size={16} className="mr-2 text-coral" />
             Leave a Review
