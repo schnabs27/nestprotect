@@ -89,16 +89,19 @@ const PreparednessPage = () => {
         },
         {
           id: "emergency-kit",
-          title: "Assemble an emergency supply kit.",
+          title: "✅ Assemble an at-home emergency supply kit.",
           criticalTasks: [
-            { id: "kit-1", text: "Make a Google Keep checklist titled \"Emergency Kit\" with FEMA basics (water, food, flashlight, batteries)." },
-            { id: "kit-2", text: "Add personal needs such as medications, glasses, infant and pet supplies." }
+            { id: "kit-1", text: "At least a 3-day supply of water (1 gallon per person per day)" },
+            { id: "kit-2", text: "At least a 3-day supply of non-perishable food" },
+            { id: "kit-3", text: "A first aid kit, basic medicines, and personal hygiene items" },
+            { id: "kit-4", text: "A flashlight and a battery-powered radio" },
+            { id: "kit-5", text: "Backup power: batteries, charged power bank, and/or generator" }
           ],
           additionalTasks: [
-            { id: "kit-3", text: "Photograph kit items and save to a Google Photos album \"Emergency Kit.\"" },
-            { id: "kit-4", text: "Create smaller kits for car and work and add to the same Keep note." },
-            { id: "kit-5", text: "Share the Keep note with household members." },
-            { id: "kit-6", text: "Set a Google Calendar reminder to refresh supplies twice a year." }
+            { id: "kit-6", text: "Extra clothing, blankets, and sturdy shoes" },
+            { id: "kit-7", text: "Cash in small bills and local maps" },
+            { id: "kit-8", text: "Tools such as a wrench or pliers for turning off utilities" },
+            { id: "kit-9", text: "Supplies as needed for infants, elderly and/or pets" }
           ],
           learnMore: "https://www.ready.gov/kit"
         },
