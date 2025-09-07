@@ -4,8 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/AuthProvider";
-import Auth from "./pages/Auth";
-import Homepage from "./components/Homepage";
+import AppRouter from "@/components/AppRouter";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 import PreparednessPage from "./components/PreparednessPage";
 import WeatherPage from "./components/WeatherPage";
 import ResourcesPage from "./components/ResourcesPage";
@@ -25,13 +26,13 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/preparedness" element={<PreparednessPage />} />
-            <Route path="/during" element={<WeatherPage />} />
-            <Route path="/after" element={<ResourcesPage />} />
-            <Route path="/settings" element={<ProfilePage />} />
-            <Route path="/self-assessment" element={<SelfAssessmentPage />} />
+            <Route path="/" element={<AppRouter />} />
+            
+            <Route path="/preparedness" element={<ProtectedRoute><PreparednessPage /></ProtectedRoute>} />
+            <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
+            <Route path="/after" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
