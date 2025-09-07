@@ -82,7 +82,7 @@ const SelfAssessmentPage = () => {
               <span className="text-sm font-medium text-primary">Nestor</span>
               <div className="bg-primary/10 rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
                 <p className="text-sm text-foreground">
-                  Let's see how ready you are for a disaster coming your way.
+                  Let's see how ready you are for a disaster coming your way. Are these statements true for you?
                 </p>
               </div>
             </div>
