@@ -220,11 +220,72 @@ const PreparednessPage = () => {
     },
     flood: {
       now: [
-        { id: "flood-now-1", title: "Check FEMA flood maps for risk", notes: "Know your flood zone", links: ["ready.gov/floods"] },
-        { id: "flood-now-2", title: "Buy flood insurance", notes: "standard homeowner's does not cover floods", links: [] },
-        { id: "flood-now-3", title: "Elevate appliances, utilities, and electrical panels", notes: "Move above potential flood level", links: [] },
-        { id: "flood-now-4", title: "Install sump pump with backup", notes: "Prepare for water removal", links: [] },
-        { id: "flood-now-5", title: "Store valuables/documents in waterproof containers", notes: "Protect important items", links: [] }
+        {
+          id: "flood-zone",
+          title: "Know your flood zone and evacuation routes.",
+          criticalTasks: [
+            { id: "zone-1", text: "Look up your address on FEMA's Flood Map Service Center." },
+            { id: "zone-2", text: "Identify two evacuation routes to higher ground and save them in Google Maps." }
+          ],
+          additionalTasks: [
+            { id: "zone-3", text: "Download offline maps in Google Maps in case cell service fails." },
+            { id: "zone-4", text: "Bookmark your city or county's flood evacuation maps on your phone." }
+          ],
+          learnMore: "https://msc.fema.gov"
+        },
+        {
+          id: "elevate-appliances",
+          title: "Elevate major appliances and utilities if possible.",
+          criticalTasks: [
+            { id: "elevate-1", text: "Move furnaces, water heaters, and electrical panels above expected flood levels if feasible." },
+            { id: "elevate-2", text: "Place small appliances and electronics on shelves or upper floors." }
+          ],
+          additionalTasks: [
+            { id: "elevate-3", text: "Hire a contractor to install flood vents or elevate HVAC systems." },
+            { id: "elevate-4", text: "Use waterproof containers for items that cannot be moved." }
+          ],
+          learnMore: "https://www.ready.gov/floods"
+        },
+        {
+          id: "sump-pump",
+          title: "Install a sump pump with backup power.",
+          criticalTasks: [
+            { id: "pump-1", text: "Install a sump pump in your basement or lowest floor to remove water during floods." },
+            { id: "pump-2", text: "Ensure the pump discharges water at least 20 feet from your home." }
+          ],
+          additionalTasks: [
+            { id: "pump-3", text: "Add a battery backup or generator connection in case of power outages." },
+            { id: "pump-4", text: "Test the pump every few months to make sure it's working." }
+          ],
+          learnMore: "https://www.ready.gov/floods"
+        },
+        {
+          id: "waterproof-storage",
+          title: "Store valuables in waterproof containers.",
+          criticalTasks: [
+            { id: "storage-1", text: "Place documents, jewelry, and essential medications in watertight bags or bins." },
+            { id: "storage-2", text: "Keep them in an easy-to-carry container near your emergency kit." }
+          ],
+          additionalTasks: [
+            { id: "storage-3", text: "Use a waterproof/fireproof safe for irreplaceable items." },
+            { id: "storage-4", text: "Make digital backups and upload to Google Drive or another secure cloud." }
+          ],
+          learnMore: "https://www.ready.gov/protecting-documents"
+        },
+        {
+          id: "flood-insurance",
+          title: "Buy flood insurance if you are in a flood-prone area.",
+          criticalTasks: [
+            { id: "insurance-1", text: "Check whether your home is in a Special Flood Hazard Area." },
+            { id: "insurance-2", text: "Contact the National Flood Insurance Program (NFIP) or your insurance agent." }
+          ],
+          additionalTasks: [
+            { id: "insurance-3", text: "Review what your policy covers (structure vs. contents)." },
+            { id: "insurance-4", text: "Store your policy and claims numbers in Google Drive for quick access." },
+            { id: "insurance-5", text: "Create an \"Emergency Fund\" savings account for potential out-of-pocket costs." }
+          ],
+          learnMore: "https://www.floodsmart.gov"
+        }
       ],
       coming: [
         { id: "flood-coming-1", title: "Move valuables and electronics to higher floors", notes: "Protect from rising water", links: [] },
