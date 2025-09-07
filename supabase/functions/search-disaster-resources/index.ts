@@ -530,16 +530,45 @@ Focus on real, well-known organizations like Red Cross, Salvation Army, local fo
     if (uniqueResults.length > 0) {
       console.log(`Storing ${uniqueResults.length} results in database...`);
       
-      // Upsert results
-      for (const resource of uniqueResults) {
-        await supabase
+      try {
+        // Insert or update results in batches
+        const resourcesForDb = uniqueResults.map(resource => ({
+          name: resource.name,
+          category: resource.category,
+          description: resource.description,
+          address: resource.address,
+          city: resource.city,
+          state: resource.state,
+          postal_code: sanitizedZipCode, // Use the search ZIP code consistently
+          website: resource.website,
+          hours: resource.hours,
+          latitude: resource.latitude,
+          longitude: resource.longitude,
+          distance_mi: resource.distance_mi,
+          source: resource.source,
+          source_id: resource.source_id,
+          phone: resource.phone || null,
+          email: resource.email || null,
+          last_seen_at: new Date().toISOString(),
+          last_verified_at: null,
+          is_archived: false
+        }));
+
+        const { error: insertError } = await supabase
           .from('disaster_resources')
-          .upsert({
-            ...resource,
-            last_seen_at: new Date().toISOString()
-          }, {
+          .upsert(resourcesForDb, {
             onConflict: 'source,source_id'
           });
+
+        if (insertError) {
+          console.error('Database insertion error:', insertError);
+          errors.push('Failed to cache results in database');
+        } else {
+          console.log(`Successfully stored ${resourcesForDb.length} resources for ZIP ${sanitizedZipCode}`);
+        }
+      } catch (dbError) {
+        console.error('Database operation failed:', dbError);
+        errors.push('Database operation failed');
       }
     }
 
