@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
-import { User, Heart, MapPin, Bell, Shield, ExternalLink, Info, Smartphone, LogOut } from "lucide-react";
+import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -16,11 +16,6 @@ const ProfilePage = () => {
   const { user, isGuest, signOut, setGuestMode } = useAuth();
   const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
   
-  const [notifications, setNotifications] = useState({
-    weatherAlerts: true,
-    emergencyUpdates: true,
-    weeklyTips: false
-  });
 
   const [userInfo, setUserInfo] = useState({
     zipCode: "",
@@ -167,58 +162,6 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* Notification Settings */}
-        <Card className="mb-6 shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-title flex items-center gap-2">
-              <Bell size={20} />
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="weather-alerts">Weather Alerts</Label>
-                <p className="text-xs text-muted-foreground">Severe weather warnings for your area</p>
-              </div>
-              <Switch
-                id="weather-alerts"
-                checked={notifications.weatherAlerts}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, weatherAlerts: checked})
-                }
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="emergency-updates">Emergency Updates</Label>
-                <p className="text-xs text-muted-foreground">Local emergency and disaster information</p>
-              </div>
-              <Switch
-                id="emergency-updates"
-                checked={notifications.emergencyUpdates}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, emergencyUpdates: checked})
-                }
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="weekly-tips">Weekly Preparedness Tips</Label>
-                <p className="text-xs text-muted-foreground">Helpful tips to stay prepared</p>
-              </div>
-              <Switch
-                id="weekly-tips"
-                checked={notifications.weeklyTips}
-                onCheckedChange={(checked) => 
-                  setNotifications({...notifications, weeklyTips: checked})
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* App Information */}
         <Card className="mb-6 shadow-soft">
@@ -241,28 +184,6 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* Mobile App Notice */}
-        <Card className="mb-6 shadow-soft border-yellow/30">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Smartphone className="text-yellow mt-1" size={20} />
-              <div>
-                <h3 className="font-semibold text-yellow mb-1">Mobile App Available</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Download NestProtect for iOS and Android for the best mobile experience and offline access.
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    📱 iOS App Store
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    🤖 Google Play
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Authentication Status */}
         <Card className="mb-6 shadow-soft">
