@@ -117,11 +117,11 @@ const SelfAssessmentPage = () => {
               <div className="flex items-start gap-3 justify-end">
                 <div className="flex flex-col gap-1 items-end">
                   <span className="text-sm font-medium text-muted-foreground">You</span>
-                  <div className={`rounded-2xl rounded-tr-md px-4 py-3 max-w-xs ${
-                    answer 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-red-500 text-white'
-                  }`}>
+                   <div className={`rounded-2xl rounded-tr-md px-4 py-3 max-w-xs ${
+                     answer 
+                       ? 'bg-green-500 text-white' 
+                       : 'bg-destructive text-destructive-foreground'
+                   }`}>
                     <p className="text-sm font-medium">
                       {answer ? 'True' : 'False'}
                     </p>
@@ -170,8 +170,7 @@ const SelfAssessmentPage = () => {
                       <Button
                         onClick={() => handleAnswer(false)}
                         size="sm"
-                        variant="outline"
-                        className="border-red-500 text-red-500 hover:bg-red-50"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         <XCircle size={14} className="mr-1" />
                         False
