@@ -44,8 +44,8 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
       if (error) {
         setError(error.message);
       } else {
-        toast.success("Check your email for verification link!");
-        navigate("/");
+        toast.success("Account created! Please check your email and click the verification link before signing in.");
+        setError("Please check your email and click the verification link before you can sign in.");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -66,7 +66,11 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
       });
 
       if (error) {
-        setError(error.message);
+        if (error.message === "Invalid login credentials") {
+          setError("Invalid email or password. If you just signed up, please check your email and click the verification link first.");
+        } else {
+          setError(error.message);
+        }
       } else {
         onAuthSuccess();
         navigate("/");
@@ -211,6 +215,12 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-blue-700">
+                <strong>Note:</strong> After creating your account, you'll receive an email verification link. You must click this link before you can sign in.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
