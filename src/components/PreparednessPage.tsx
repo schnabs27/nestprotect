@@ -184,19 +184,6 @@ const PreparednessPage = () => {
           learnMore: "https://www.ready.gov/wildfires"
         },
         {
-          id: "go-bags",
-          title: "Prepare go-bags for each family member.",
-          criticalTasks: [
-            { id: "bag-1", text: "Pack 3 days of clothes, water, snacks, and medications." },
-            { id: "bag-2", text: "Include copies of IDs, insurance info, and critical phone numbers." }
-          ],
-          additionalTasks: [
-            { id: "bag-3", text: "Add comfort items (blankets, children's toys, pet supplies)." },
-            { id: "bag-4", text: "Include cash in small bills and a portable phone charger." }
-          ],
-          learnMore: "https://www.ready.gov/kit"
-        },
-        {
           id: "evacuation-routes",
           title: "Identify wildfire evacuation routes and shelters.",
           criticalTasks: [
