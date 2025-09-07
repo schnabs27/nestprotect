@@ -178,6 +178,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_contact_info: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       generate_secure_device_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -188,6 +192,30 @@ export type Database = {
           email: string
           id: string
           phone: string
+        }[]
+      }
+      get_disaster_resources_public: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          address: string
+          category: string
+          city: string
+          created_at: string
+          description: string
+          distance_mi: number
+          hours: string
+          id: string
+          is_archived: boolean
+          last_seen_at: string
+          last_verified_at: string
+          latitude: number
+          longitude: number
+          name: string
+          postal_code: string
+          source: string
+          state: string
+          updated_at: string
+          website: string
         }[]
       }
       get_public_disaster_resources: {
