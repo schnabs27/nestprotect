@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SelfAssessmentPage from "./components/SelfAssessmentPage";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<AppRouter />} />
+            <Route path="/auth" element={<Auth />} />
             
             <Route path="/preparedness" element={<ProtectedRoute><PreparednessPage /></ProtectedRoute>} />
             <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
