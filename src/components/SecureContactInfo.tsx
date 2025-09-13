@@ -175,14 +175,14 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     <div className={`${className}`}>
       {/* Always show Call button - no access restrictions for phone */}
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={handlePhoneCall}
         disabled={isLoading}
-        className="flex items-center space-x-1"
+        className={className || "flex items-center space-x-1"}
       >
-        <Phone size={14} />
-        <span>{isLoading ? "Loading..." : "Call"}</span>
+        <Phone size={18} className="text-green-500" />
+        {!className && <span>{isLoading ? "Loading..." : "Call"}</span>}
       </Button>
     </div>
   );

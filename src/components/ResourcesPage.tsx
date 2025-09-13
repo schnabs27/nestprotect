@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
-import { Search, MapPin, Star, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare, Lock, LogIn } from "lucide-react";
+import { Search, MapPin, Star, Globe, Navigation, Filter, X, Info, Clock, RefreshCw, CheckSquare, Lock, LogIn, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserLocation } from "@/hooks/useUserLocation";
@@ -59,13 +60,13 @@ const ResourcesPage = () => {
 
   const mainCategories = [
     { id: "all", label: "All", color: "bg-[#06c29a]" },
+    { id: "emergency", label: "Emergency", color: "bg-raspberry" },
+    { id: "medical", label: "Medical", color: "bg-accent" },
+    { id: "veterinarian", label: "Veterinarian", color: "bg-blue-500" },
     { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-orange-500" },
-    { id: "medical", label: "Medical", color: "bg-accent" },
-    { id: "cleanup", label: "Cleanup", color: "bg-primary" },
-    { id: "legal", label: "Legal", color: "bg-gray-700" },
-    { id: "emergency", label: "Emergency Response", color: "bg-raspberry" },
-    { id: "favorites", label: "Favorites", color: "bg-yellow" }
+    { id: "recovery", label: "Recovery Assistance", color: "bg-purple-500" },
+    { id: "utilities", label: "Utilities", color: "bg-gray-700" }
   ];
 
   const handleSearch = async () => {
@@ -192,6 +193,10 @@ const ResourcesPage = () => {
                 return resource.category?.toLowerCase().includes("emergency") || 
                        resource.category?.toLowerCase().includes("response");
               }
+              if (selectedCategory === "recovery") {
+                return resource.category?.toLowerCase().includes("recovery") || 
+                       resource.category?.toLowerCase().includes("assistance");
+              }
               return resource.category?.toLowerCase().includes(selectedCategory);
     })
     .sort((a, b) => (a.distance_mi || 999) - (b.distance_mi || 999));
@@ -306,6 +311,7 @@ const ResourcesPage = () => {
                 <div className="flex-1">
                   <Input
                     placeholder="Enter ZIP code or address"
+                    name="requestedZipcode"
                     value={zipCode}
                     onChange={handleZipCodeChange}
                     className="h-12"
@@ -429,85 +435,88 @@ const ResourcesPage = () => {
               {filteredResources.map((resource, index) => (
                 <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 pr-2">
-                        <h3 className="font-semibold text-title">{resource.name}</h3>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 flex-shrink-0"
-                        onClick={() => toggleFavorite(resource)}
-                      >
-                        <Star 
-                          size={16} 
-                          className={
-                            favorites.has(`${resource.source_id}-${resource.source}`)
-                              ? "text-yellow-500 fill-yellow-500" 
-                              : "text-muted-foreground hover:text-yellow-500"
-                          } 
-                        />
-                      </Button>
-                    </div>
+                    {/* Resource name as heading */}
+                    <h3 className="text-lg font-semibold text-title mb-3">{resource.name}</h3>
                     
-                    {/* Description */}
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground mb-2">
-                      <Info size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span>{toTitleCase(resource.description)}</span>
-                    </div>
+                    {/* Address (text only, no icon) */}
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {resource.address && resource.city && `${resource.address}, ${resource.city}`}
+                      {resource.address && !resource.city && resource.address}
+                      {!resource.address && resource.city && resource.city}
+                      {(resource.address || resource.city) && ` • ${resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}`}
+                    </p>
 
-                    {/* Address with distance */}
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <MapPin size={14} className="text-red-500 flex-shrink-0" />
-                      <span>
-                        {resource.address && resource.city && `${resource.address}, ${resource.city}`}
-                        {resource.address && !resource.city && resource.address}
-                        {!resource.address && resource.city && resource.city}
-                        {(resource.address || resource.city) && ' • '}
-                        {resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}
-                      </span>
-                    </div>
+                    {/* Description (text only) */}
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {toTitleCase(resource.description)}
+                    </p>
 
-                    {/* Source badge */}
-                    <div className="flex gap-1 mb-3">
-                      <Badge variant="secondary" className="text-xs">
-                        {resource.source}
-                      </Badge>
-                      {resource.category && (
-                        <Badge variant="outline" className="text-xs">
-                          {resource.category}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex gap-2">
-                      {resource.website && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => window.open(resource.website.startsWith('http') ? resource.website : `https://${resource.website}`, '_blank')}
-                        >
-                          <Globe size={16} className="mr-1" />
-                          Website
-                        </Button>
-                      )}
+                    {/* Icon row with 3 clickable icons */}
+                    <div className="flex gap-3 mb-3">
+                      {/* Map pin icon for directions */}
                       {resource.latitude && resource.longitude && (
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm" 
-                          className="flex-1"
+                          className="h-8 w-8 p-0"
                           onClick={() => window.open(`https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}`, '_blank')}
                         >
-                          <Navigation size={16} className="mr-1" />
-                          Directions
+                          <MapPin size={18} className="text-red-500" />
                         </Button>
                       )}
+                      
+                      {/* Phone icon for calling */}
                       <SecureContactInfo 
                         resourceId={resource.id} 
                         resourceName={resource.name}
+                        className="h-8 w-8 p-0"
                       />
+                      
+                      {/* Info icon for website with confirmation dialog */}
+                      {resource.website && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0"
+                            >
+                              <Info size={18} className="text-blue-500" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Visit Website</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                You are about to visit the website for {resource.name}. This will open in a new tab.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => window.open(resource.website.startsWith('http') ? resource.website : `https://${resource.website}`, '_blank')}
+                              >
+                                Visit Website
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
+
+                    {/* Category row: List categories as comma-separated text */}
+                    <div className="text-sm text-muted-foreground">
+                      {resource.category && (
+                        <>
+                          <span className="font-medium">Category:</span> {resource.category}
+                        </>
+                      )}
+                      {resource.source && (
+                        <>
+                          {resource.category && ' • '}
+                          <span className="font-medium">Source:</span> {resource.source}
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
