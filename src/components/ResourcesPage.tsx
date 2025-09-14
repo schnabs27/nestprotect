@@ -62,11 +62,11 @@ const ResourcesPage = () => {
     { id: "all", label: "All", color: "bg-[#06c29a]" },
     { id: "emergency", label: "Emergency", color: "bg-raspberry" },
     { id: "medical", label: "Medical", color: "bg-accent" },
-    { id: "veterinarian", label: "Veterinarian", color: "bg-blue-500" },
-    { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "food", label: "Food", color: "bg-orange-500" },
-    { id: "recovery", label: "Recovery Assistance", color: "bg-purple-500" },
-    { id: "utilities", label: "Utilities", color: "bg-gray-700" }
+    { id: "shelter", label: "Shelter", color: "bg-coral" },
+    { id: "community_center", label: "Community Center", color: "bg-blue-500" },
+    { id: "govt_office", label: "Govt Office", color: "bg-purple-500" },
+    { id: "favorites", label: "Favorite", color: "bg-yellow" }
   ];
 
   const handleSearch = async () => {
@@ -185,21 +185,41 @@ const ResourcesPage = () => {
   const filteredResources = resources
     .filter(resource => {
       if (selectedCategory === "all") return true;
-              if (selectedCategory === "favorites") {
-                const resourceKey = `${resource.source_id}-${resource.source}`;
-                return favorites.has(resourceKey);
-              }
-              if (selectedCategory === "emergency") {
-                return resource.category?.toLowerCase().includes("emergency") || 
-                       resource.category?.toLowerCase().includes("response");
-              }
-              if (selectedCategory === "recovery") {
-                return resource.category?.toLowerCase().includes("recovery") || 
-                       resource.category?.toLowerCase().includes("assistance");
-              }
-              return resource.category?.toLowerCase().includes(selectedCategory);
+      if (selectedCategory === "favorites") {
+        const resourceKey = `${resource.source_id}-${resource.source}`;
+        return favorites.has(resourceKey);
+      }
+      
+      // Check categories array for specific category matches
+      if (resource.categories) {
+        if (selectedCategory === "emergency") {
+          return resource.categories.emergency_responder === true;
+        }
+        if (selectedCategory === "medical") {
+          return resource.categories.emergency_medical === true;
+        }
+        if (selectedCategory === "food") {
+          return resource.categories.food_assistance === true;
+        }
+        if (selectedCategory === "shelter") {
+          return resource.categories.shelter_assistance === true;
+        }
+        if (selectedCategory === "community_center") {
+          return resource.categories.community_center === true;
+        }
+        if (selectedCategory === "govt_office") {
+          return resource.categories.local_government_office === true;
+        }
+      }
+      
+      return false;
     })
-    .sort((a, b) => (a.distance_mi || 999) - (b.distance_mi || 999));
+    .sort((a, b) => {
+      // Sort by category first
+      const categoryA = a.category || '';
+      const categoryB = b.category || '';
+      return categoryA.localeCompare(categoryB);
+    });
 
   const toggleFavorite = async (resource: any) => {
     try {
@@ -311,7 +331,7 @@ const ResourcesPage = () => {
                 <div className="flex-1">
                   <Input
                     placeholder="Enter ZIP code or address"
-                    name="requestedZipcode"
+                    name="requested_zipcode"
                     value={zipCode}
                     onChange={handleZipCodeChange}
                     className="h-12"
