@@ -32,9 +32,9 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Supabase client first
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    // Initialize Supabase client with hardcoded values for edge function
+    const supabaseUrl = 'https://mbddyejgznxdlabnlght.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iZGR5ZWpnem54ZGxhYm5sZ2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MjYxMTMsImV4cCI6MjA3MjEwMjExM30.K87nNOV1KQi8jJGgRSAFxXW6HqaboABVJyovlVJ0uMY';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.json();
