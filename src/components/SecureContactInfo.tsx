@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface SecureContactProps {
-  resourceId: string;
+  sourceId: string;
+  source: string;
   resourceName: string;
   className?: string;
 }
@@ -15,7 +16,7 @@ interface ContactInfo {
   email?: string;
 }
 
-const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureContactProps) => {
+const SecureContactInfo = ({ sourceId, source, resourceName, className = "" }: SecureContactProps) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -44,12 +45,12 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     });
 
     return () => subscription.unsubscribe();
-  }, [resourceId]);
+  }, [sourceId]);
 
   const checkAccessPermission = async () => {
     try {
       const { data, error } = await supabase.rpc('can_access_contact_info_secure', {
-        resource_id: resourceId
+        resource_id: sourceId
       });
       
       if (error) {
@@ -87,7 +88,7 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
     setIsLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_disaster_resource_contact_secure', {
-        resource_id: resourceId
+        resource_id: sourceId
       });
 
       if (error) {
@@ -129,12 +130,13 @@ const SecureContactInfo = ({ resourceId, resourceName, className = "" }: SecureC
   const handlePhoneCall = async () => {
     setIsLoading(true);
     try {
-      // For emergency phone access, query the resource directly with less restrictions
+      // Query using source_id and source instead of database id
       const { data, error } = await supabase
         .from('disaster_resources')
         .select('phone')
-        .eq('id', resourceId)
-        .single();
+        .eq('source_id', sourceId)
+        .eq('source', source)
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching phone info:', error);

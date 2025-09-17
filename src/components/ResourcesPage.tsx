@@ -486,7 +486,8 @@ const ResourcesPage = () => {
                       
                       {/* Phone icon for calling */}
                       <SecureContactInfo 
-                        resourceId={resource.id} 
+                        sourceId={resource.source_id}
+                        source={resource.source}
                         resourceName={resource.name}
                         className="h-8 w-8 p-0"
                       />
