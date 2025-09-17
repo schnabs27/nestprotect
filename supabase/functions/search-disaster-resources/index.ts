@@ -32,10 +32,19 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Supabase client with hardcoded values for edge function
+    // Initialize Supabase client with service role key for database operations
     const supabaseUrl = 'https://mbddyejgznxdlabnlght.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iZGR5ZWpnem54ZGxhYm5sZ2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MjYxMTMsImV4cCI6MjA3MjEwMjExM30.K87nNOV1KQi8jJGgRSAFxXW6HqaboABVJyovlVJ0uMY';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseServiceKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY not found in environment');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body = await req.json();
     const { zipCode } = body;
