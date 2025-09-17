@@ -4,35 +4,17 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 };
-
-interface DisasterResource {
-  name: string;
-  category: string;
-  description: string;
-  phone?: string;
-  website?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  latitude?: number;
-  longitude?: number;
-  distance_mi?: number;
-  source: string;
-  source_id: string;
-  hours?: string;
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      headers: corsHeaders
+    });
   }
 
   try {
-    // Initialize Supabase client with service role key for database operations
     const supabaseUrl = 'https://mbddyejgznxdlabnlght.supabase.co';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
@@ -48,684 +30,245 @@ serve(async (req) => {
 
     const body = await req.json();
     const { zipCode } = body;
-    
-    // Enhanced input validation
-    if (!zipCode || typeof zipCode !== 'string') {
-      console.error('Invalid ZIP code provided:', zipCode);
-      return new Response(
-        JSON.stringify({ error: 'Valid ZIP code is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
-    // Use database function to validate ZIP code format
-    const { data: isValid } = await supabase.rpc('is_valid_zip_code', { zip_code: zipCode });
-    if (!isValid) {
-      console.error('Invalid ZIP code format:', zipCode);
-      return new Response(
-        JSON.stringify({ error: 'Invalid ZIP code format. Please enter a 5-digit ZIP code.' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
-    // Validate ZIP code format (5 digits or 5+4 format)
+
+    // Single ZIP code validation
     const zipCodeRegex = /^[0-9]{5}(-[0-9]{4})?$/;
-    const sanitizedZipCode = zipCode.trim();
+    const sanitizedZipCode = zipCode?.trim();
     
-    if (!zipCodeRegex.test(sanitizedZipCode)) {
-      console.error('Invalid ZIP code format:', zipCode);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid ZIP code format. Use 5 digits (e.g., 12345) or 5+4 format (e.g., 12345-6789)' 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    if (!sanitizedZipCode || !zipCodeRegex.test(sanitizedZipCode)) {
+      return new Response(JSON.stringify({
+        error: 'Invalid ZIP code format. Use 5 digits (e.g., 12345) or 5+4 format (e.g., 12345-6789)'
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
 
-    console.log(`Starting disaster resource search for ZIP: ${sanitizedZipCode}`);
+    console.log(`Starting emergency resource search for ZIP: ${sanitizedZipCode}`);
 
-    // Check for cached results (24h cache) using the new secure function
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: cachedResults } = await supabase
-      .rpc('get_public_disaster_resources_secure')
-      .gte('last_seen_at', oneDayAgo)
-      .eq('postal_code', sanitizedZipCode)
-      .order('distance_mi', { ascending: true });
-
-    if (cachedResults && cachedResults.length > 0) {
-      console.log(`Found ${cachedResults.length} cached results for ZIP ${zipCode}`);
-      return new Response(
-        JSON.stringify({ 
-          resources: cachedResults, 
-          cached: true, 
-          cachedAt: cachedResults[0]?.last_seen_at 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Aggregate data from Google Maps Places API and OpenAI
-    const results: DisasterResource[] = [];
-    const errors: string[] = [];
-    let zipCenterLat = 34.1672; // Default to Pasadena
-    let zipCenterLng = -118.1535;
-
-    // Call Google Maps Places API
+    // Check for cached results (24h cache)
+    let cachedResults = [];
     try {
-      console.log('Calling Google Maps Places API...');
-      const mapsApiKey = Deno.env.get('MAPS_API_KEY');
-      
-      if (!mapsApiKey) {
-        errors.push('Google Maps API key not configured');
-        console.error('Google Maps API key missing from environment variables');
-      } else {
-        console.log('Google Maps API key found, length:', mapsApiKey.length);
-        
-        // First, geocode the ZIP code to get coordinates
-        console.log(`Geocoding ZIP code: ${zipCode}`);
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${mapsApiKey}`;
-        console.log('Geocoding URL (key hidden):', geocodeUrl.replace(mapsApiKey, 'HIDDEN_KEY'));
-        
-        const geocodeResponse = await fetch(geocodeUrl);
-        console.log('Geocode response status:', geocodeResponse.status, geocodeResponse.statusText);
-        
-        if (geocodeResponse.ok) {
-          const geocodeData = await geocodeResponse.json();
-          console.log(`Geocode response:`, JSON.stringify(geocodeData, null, 2));
-          
-          if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results.length > 0) {
-            const location = geocodeData.results[0].geometry.location;
-            zipCenterLat = location.lat; // Store for OpenAI geocoding
-            zipCenterLng = location.lng;
-            console.log(`Location found: ${location.lat}, ${location.lng}`);
-            
-            // Search for relevant places with broader search approach
-            const searchQueries = [
-              'food bank',
-              'emergency shelter',
-              'hospital',
-              'fire station', 
-              'police station',
-              'community center',
-              'red cross',
-              'salvation army',
-              'food pantry',
-              'homeless shelter'
-            ];
-            
-            for (const query of searchQueries) {
-              console.log(`Searching for: ${query} near ${zipCode}`);
-              
-              // Use NEW Places API (Text Search)
-              const placesUrl = `https://places.googleapis.com/v1/places:searchText`;
-              console.log('Places search URL:', placesUrl);
-              
-              const requestBody = {
-                textQuery: `${query} near ${zipCode}`,
-                locationBias: {
-                  circle: {
-                    center: {
-                      latitude: location.lat,
-                      longitude: location.lng
-                    },
-                    radius: 50000.0
-                  }
-                },
-                maxResultCount: 10
-              };
-              
-              console.log('Places API request body:', JSON.stringify(requestBody, null, 2));
-              
-              const placesResponse = await fetch(placesUrl, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Goog-Api-Key': mapsApiKey,
-                  'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber,places.websiteUri'
-                },
-                body: JSON.stringify(requestBody)
-              });
-              console.log(`Places API response status for "${query}":`, placesResponse.status, placesResponse.statusText);
-              
-              if (placesResponse.ok) {
-                const placesData = await placesResponse.json();
-                console.log(`Places API response for "${query}":`, JSON.stringify({
-                  placesCount: placesData?.places?.length || 0,
-                  hasPlaces: !!placesData.places
-                }, null, 2));
-                
-                if (placesData.places && placesData.places.length > 0) {
-                  console.log(`Processing ${placesData.places.length} results for "${query}"`);
-                  
-                  for (const place of placesData.places.slice(0, 5)) { // Limit to first 5 results per query
-                    // Calculate distance from ZIP center
-                    const distance = calculateDistance(
-                      location.lat, location.lng,
-                      place.location.latitude, place.location.longitude
-                    );
-                    
-                    console.log(`Found ${place.displayName?.text || 'Unknown'} at distance: ${distance.toFixed(1)} miles`);
-                    
-                    if (distance <= 30) { // Within 30 miles
-                      // Filter out generic types and clean up description
-                      const filteredTypes = place.types?.filter(type => 
-                        type !== 'point_of_interest' && 
-                        type !== 'establishment'
-                      ) || [];
-                      
-                      const typeDescription = (filteredTypes.slice(0, 2).join(', ') || query)
-                        .replace(/_/g, ' '); // Replace underscores with spaces
-                      
-                      results.push({
-                        name: place.displayName?.text || 'Unknown Place',
-                        category: categorizePlace(query, place.types || []),
-                        description: typeDescription,
-                        phone: place.nationalPhoneNumber || '',
-                        website: place.websiteUri || '',
-                        address: extractStreetAddress(place.formattedAddress || ''),
-                        city: extractCity(place.formattedAddress || ''),
-                        state: extractState(place.formattedAddress || ''),
-                        postal_code: zipCode,
-                        latitude: place.location.latitude,
-                        longitude: place.location.longitude,
-                        distance_mi: Math.round(distance * 10) / 10,
-                        source: 'Google Maps',
-                        source_id: place.id || '',
-                        hours: ''
-                      });
-                      console.log(`Added ${place.displayName?.text || 'Unknown'} to results`);
-                    } else {
-                      console.log(`${place.displayName?.text || 'Unknown'} excluded - outside 30 mile radius (${distance.toFixed(1)} miles)`);
-                    }
-                  }
-                } else {
-                  console.log(`No results for "${query}": response contains no places`);
-                }
-              } else {
-                console.error(`Places API HTTP error for "${query}":`, placesResponse.status, placesResponse.statusText);
-                const errorText = await placesResponse.text();
-                console.error('Error response body:', errorText);
-                errors.push(`Places API HTTP error: ${placesResponse.status}`);
-              }
-              
-              // Small delay to avoid rate limits
-              await new Promise(resolve => setTimeout(resolve, 200));
-            }
-          } else if (geocodeData.status === 'REQUEST_DENIED') {
-            errors.push(`Google Geocoding API access denied. Using fallback location.`);
-            console.error('Geocoding REQUEST DENIED:', geocodeData.error_message);
-            // Use a fallback location when geocoding fails
-            zipCenterLat = 39.8283; // Geographic center of US
-            zipCenterLng = -98.5795;
-          } else {
-            errors.push(`Could not geocode location. Using fallback location.`);
-            console.error('Geocoding failed:', geocodeData.status, geocodeData.error_message);
-            // Use a fallback location when geocoding fails
-            zipCenterLat = 39.8283; // Geographic center of US
-            zipCenterLng = -98.5795;
-          }
-        } else {
-          errors.push('Google Geocoding API request failed');
-          console.error('Geocoding API HTTP error:', geocodeResponse.status, geocodeResponse.statusText);
-          const errorText = await geocodeResponse.text();
-          console.error('Geocoding error response:', errorText);
-        }
-      }
-    } catch (error) {
-      errors.push('Google Maps API error');
-      console.error('Google Maps API error:', error);
-    }
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data, error: cacheError } = await supabase
+        .from('disaster_resources')
+        .select('*')
+        .eq('requested_zipcode', sanitizedZipCode)
+        .gte('created_at', oneDayAgo);
 
-    // Call OpenAI API for additional disaster relief resources
-    try {
-      console.log('Calling OpenAI API for disaster relief resources...');
-      const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-      const mapsApiKey = Deno.env.get('MAPS_API_KEY'); // Make sure we have this for geocoding
-      
-      if (!openaiApiKey) {
-        errors.push('OpenAI API key not configured');
-        console.error('OpenAI API key missing from environment variables');
-      } else {
-        console.log('OpenAI API key found, making request...');
-        console.log('Maps API key available for geocoding:', !!mapsApiKey);
-        
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
+      if (!cacheError && data && data.length > 0) {
+        cachedResults = data;
+        // Update cache timestamps
+        await supabase
+          .from('disaster_resources')
+          .update({
+            created_at: new Date().toISOString()
+          })
+          .eq('requested_zipcode', sanitizedZipCode)
+          .gte('created_at', oneDayAgo);
+
+        console.log(`Found ${cachedResults.length} cached results`);
+        return new Response(JSON.stringify({
+          resources: cachedResults,
+          cached: true
+        }), {
           headers: {
-            'Authorization': `Bearer ${openaiApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              {
-                role: 'system',
-                content: `You are a disaster relief resource finder. Return ONLY a valid JSON array of disaster relief resources near the given ZIP code. Each resource must have this exact structure:
-{
-  "name": "Resource Name",
-  "category": "food|shelter|medical|emergency services|relief organization",
-  "description": "Brief description",
-  "phone": "Phone number if known",
-  "website": "Website URL if known", 
-  "address": "Street address if known",
-  "city": "City name",
-  "state": "State abbreviation",
-  "source": "OpenAI Knowledge"
-}
-
-Focus on real, well-known organizations like Red Cross, Salvation Army, local food banks, hospitals, emergency services, and community centers. Do not include fictional or uncertain information.`
-              },
-              {
-                role: 'user',
-                content: `Find disaster relief resources near ZIP code ${zipCode}. Return maximum 10 resources as a JSON array.`
-              }
-            ],
-            max_tokens: 2000,
-            temperature: 0.3
-          }),
-        });
-
-        console.log('OpenAI response status:', openaiResponse.status, openaiResponse.statusText);
-
-        if (openaiResponse.ok) {
-          const openaiData = await openaiResponse.json();
-          console.log('OpenAI response received');
-          
-          const aiContent = openaiData.choices[0]?.message?.content;
-          if (aiContent) {
-            try {
-              console.log('Raw OpenAI content length:', aiContent.length);
-              console.log('Raw OpenAI content preview:', aiContent.substring(0, 200) + '...');
-              
-              // Multiple strategies to extract JSON
-              let jsonData = null;
-              let cleanContent = aiContent.trim();
-              
-              // Strategy 1: Try parsing the raw content first
-              try {
-                jsonData = JSON.parse(cleanContent);
-                console.log('Strategy 1 successful: Raw parse');
-              } catch (e) {
-                console.log('Strategy 1 failed, trying cleanup...');
-              }
-              
-              // Strategy 2: Remove markdown code blocks
-              if (!jsonData) {
-                try {
-                  if (cleanContent.includes('```json')) {
-                    cleanContent = cleanContent.replace(/```json\s*/g, '').replace(/\s*```/g, '');
-                  } else if (cleanContent.includes('```')) {
-                    cleanContent = cleanContent.replace(/```\s*/g, '').replace(/\s*```/g, '');
-                  }
-                  jsonData = JSON.parse(cleanContent);
-                  console.log('Strategy 2 successful: Markdown cleanup');
-                } catch (e) {
-                  console.log('Strategy 2 failed, trying array extraction...');
-                }
-              }
-              
-              // Strategy 3: Extract JSON array from content
-              if (!jsonData) {
-                try {
-                  const jsonStart = cleanContent.indexOf('[');
-                  const jsonEnd = cleanContent.lastIndexOf(']');
-                  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-                    const extractedJson = cleanContent.substring(jsonStart, jsonEnd + 1);
-                    console.log('Extracted JSON preview:', extractedJson.substring(0, 100) + '...');
-                    jsonData = JSON.parse(extractedJson);
-                    console.log('Strategy 3 successful: Array extraction');
-                  }
-                } catch (e) {
-                  console.log('Strategy 3 failed, trying object extraction...');
-                }
-              }
-              
-              // Strategy 4: Look for individual objects and wrap in array
-              if (!jsonData) {
-                try {
-                  const objects = [];
-                  const lines = cleanContent.split('\n');
-                  let currentObject = '';
-                  let braceCount = 0;
-                  
-                  for (const line of lines) {
-                    if (line.trim().startsWith('{')) {
-                      currentObject = line;
-                      braceCount = (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
-                    } else if (braceCount > 0) {
-                      currentObject += '\n' + line;
-                      braceCount += (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
-                      
-                      if (braceCount === 0) {
-                        try {
-                          const obj = JSON.parse(currentObject);
-                          objects.push(obj);
-                          currentObject = '';
-                        } catch (e) {
-                          // Continue to next object
-                        }
-                      }
-                    }
-                  }
-                  
-                  if (objects.length > 0) {
-                    jsonData = objects;
-                    console.log('Strategy 4 successful: Object extraction, found', objects.length, 'objects');
-                  }
-                } catch (e) {
-                  console.log('Strategy 4 failed');
-                }
-              }
-              
-              // If all strategies failed, create a fallback response
-              if (!jsonData) {
-                console.error('All JSON parsing strategies failed');
-                console.error('Final content being parsed:', cleanContent.substring(0, 500));
-                
-                // Create a fallback response based on the content
-                jsonData = [{
-                  name: "American Red Cross",
-                  category: "relief organization",
-                  description: "National disaster relief organization",
-                  phone: "1-800-733-2767",
-                  website: "https://www.redcross.org",
-                  address: "",
-                  city: "",
-                  state: ""
-                }];
-                console.log('Using fallback response');
-              }
-              
-              // Ensure jsonData is an array
-              if (!Array.isArray(jsonData)) {
-                jsonData = [jsonData];
-              }
-              
-              console.log(`OpenAI returned ${jsonData.length} resources after parsing`);
-              
-              // Transform AI results to match our schema and geocode them
-              for (const aiResource of jsonData) {
-                let latitude = null;
-                let longitude = null;
-                let distance_mi = null;
-
-                // Try to geocode the address for distance calculation
-                if (aiResource.address && aiResource.city && mapsApiKey) {
-                  try {
-                    const geocodeAddress = `${aiResource.address}, ${aiResource.city}, ${aiResource.state || ''}`.trim();
-                    console.log(`Geocoding OpenAI resource: ${aiResource.name} at ${geocodeAddress}`);
-                    
-                    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(geocodeAddress)}&key=${mapsApiKey}`;
-                    const geocodeResponse = await fetch(geocodeUrl);
-                    
-                    if (geocodeResponse.ok) {
-                      const geocodeData = await geocodeResponse.json();
-                      if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results.length > 0) {
-                        const location = geocodeData.results[0].geometry.location;
-                        latitude = location.lat;
-                        longitude = location.lng;
-                        
-                        // Calculate distance from ZIP center using the actual coordinates
-                        if (location.lat && location.lng && typeof location.lat === 'number' && typeof location.lng === 'number') {
-                          distance_mi = calculateDistance(zipCenterLat, zipCenterLng, location.lat, location.lng);
-                          console.log(`Calculated distance for ${aiResource.name}: ${distance_mi.toFixed(1)} miles`);
-                        }
-                      } else {
-                        console.log(`Geocoding failed for ${aiResource.name}: ${geocodeData.status}`);
-                      }
-                    }
-                    
-                    // Small delay to avoid rate limits
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                  } catch (geocodeError) {
-                    console.error(`Geocoding error for ${aiResource.name}:`, geocodeError);
-                  }
-                }
-
-                results.push({
-                  name: aiResource.name || 'Unknown Resource',
-                  category: aiResource.category || 'general',
-                  description: aiResource.description || '',
-                  phone: aiResource.phone || '',
-                  website: aiResource.website || '',
-                  address: aiResource.address || '',
-                  city: aiResource.city || '',
-                  state: aiResource.state || '',
-                  postal_code: zipCode,
-                  latitude: latitude,
-                  longitude: longitude,
-                  distance_mi: distance_mi,
-                  source: 'OpenAI Knowledge',
-                  source_id: `openai_${aiResource.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
-                  hours: ''
-                });
-              }
-              console.log(`Added ${jsonData.length} OpenAI resources to results`);
-            } catch (parseError) {
-              console.error('Error in OpenAI parsing:', parseError);
-              console.error('Parse error message:', parseError.message);
-              errors.push('OpenAI parsing failed: ' + parseError.message);
-            }
-          } else {
-            console.error('No content in OpenAI response');
-            errors.push('OpenAI returned empty response');
+            ...corsHeaders,
+            'Content-Type': 'application/json'
           }
-        } else {
-          console.error('OpenAI API HTTP error:', openaiResponse.status, openaiResponse.statusText);
-          const errorText = await openaiResponse.text();
-          console.error('OpenAI error response:', errorText);
-          errors.push(`OpenAI API error: ${openaiResponse.status}`);
-        }
+        });
       }
     } catch (error) {
-      errors.push('OpenAI API error');
-      console.error('OpenAI API error:', error);
+      console.log('Cache lookup failed, proceeding with Google search:', error.message);
     }
 
-    // Remove duplicates based on name and location proximity
+    // Google Maps search
+    const results = [];
+    const mapsApiKey = Deno.env.get('MAPS_API_KEY');
+    
+    if (!mapsApiKey) {
+      throw new Error('Google Maps API key not configured');
+    }
+
+    // Geocode ZIP code
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${sanitizedZipCode}&key=${mapsApiKey}`;
+    const geocodeResponse = await fetch(geocodeUrl);
+    
+    if (!geocodeResponse.ok) {
+      throw new Error('Geocoding failed');
+    }
+
+    const geocodeData = await geocodeResponse.json();
+    
+    if (geocodeData.status !== 'OK' || !geocodeData.results?.[0]) {
+      throw new Error('Invalid ZIP code or geocoding failed');
+    }
+
+    const location = geocodeData.results[0].geometry.location;
+    console.log(`Location: ${location.lat}, ${location.lng}`);
+
+    // Single comprehensive emergency resource search
+    console.log('Starting comprehensive emergency resource search');
+    
+    const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
+    const requestBody = {
+      includedTypes: [
+        'urgent_care',
+        'emergency_room',
+        'police',
+        'fire_station',
+        'community_center',
+        'local_government_office'
+      ],
+      locationRestriction: {
+        circle: {
+          center: {
+            latitude: location.lat,
+            longitude: location.lng
+          },
+          radius: 24140.0 // 15 miles
+        }
+      }
+    };
+
+    const placesResponse = await fetch(placesUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': mapsApiKey,
+        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (placesResponse.ok) {
+      const placesData = await placesResponse.json();
+      if (placesData.places?.length > 0) {
+        console.log(`Found ${placesData.places.length} emergency resources`);
+        
+        for (const place of placesData.places) {
+          const address = parseAddress(place.formattedAddress || '');
+          const placeName = place.displayName?.text || 'Unknown Place';
+          const placeTypes = place.types || [];
+
+          // Categorize based on place types and name content
+          const categories = categorizePlace(placeTypes, placeName);
+
+          results.push({
+            name: placeName,
+            categories: categories,
+            description: placeTypes.filter(t => t !== 'point_of_interest' && t !== 'establishment').slice(0, 2).join(', ').replace(/_/g, ' ') || categories.join(', '),
+            phone: place.nationalPhoneNumber || '',
+            url: `https://maps.google.com/maps/place/?q=place_id:${place.id}`,
+            address: address,
+            requested_zipcode: sanitizedZipCode,
+            latitude: place.location.latitude,
+            longitude: place.location.longitude,
+            source: 'Google Maps',
+            source_id: place.id || '',
+            created_at: new Date().toISOString()
+          });
+        }
+      }
+    } else {
+      console.log(`Places API error: ${placesResponse.status}`);
+    }
+
+    // Remove duplicates and store in database
     const uniqueResults = removeDuplicates(results);
-    console.log(`Filtered ${results.length} results down to ${uniqueResults.length} unique results`);
 
     // Store results in database
     if (uniqueResults.length > 0) {
-      console.log(`Storing ${uniqueResults.length} results in database...`);
-      
-      try {
-        // Insert or update results in batches
-        const resourcesForDb = uniqueResults.map(resource => ({
-          name: resource.name,
-          category: resource.category,
-          description: resource.description,
-          address: resource.address,
-          city: resource.city,
-          state: resource.state,
-          postal_code: sanitizedZipCode, // Use the search ZIP code consistently
-          website: resource.website,
-          hours: resource.hours,
-          latitude: resource.latitude,
-          longitude: resource.longitude,
-          distance_mi: resource.distance_mi,
-          source: resource.source,
-          source_id: resource.source_id,
-          phone: resource.phone || null,
-          email: resource.email || null,
-          last_seen_at: new Date().toISOString(),
-          last_verified_at: null,
-          is_archived: false
-        }));
+      const { error: insertError } = await supabase
+        .from('disaster_resources')
+        .upsert(uniqueResults, {
+          onConflict: 'source,source_id'
+        });
 
-        const { error: insertError } = await supabase
-          .from('disaster_resources')
-          .upsert(resourcesForDb, {
-            onConflict: 'source,source_id'
-          });
-
-        if (insertError) {
-          console.error('Database insertion error:', insertError);
-          errors.push('Failed to cache results in database');
-        } else {
-          console.log(`Successfully stored ${resourcesForDb.length} resources for ZIP ${sanitizedZipCode}`);
-        }
-      } catch (dbError) {
-        console.error('Database operation failed:', dbError);
-        errors.push('Database operation failed');
+      if (insertError) {
+        console.log('Database storage failed:', insertError.message);
+      } else {
+        console.log('Results stored successfully');
       }
     }
 
-    // Create public-safe results by removing sensitive contact information
-    const publicSafeResults = uniqueResults.map(resource => ({
-      id: resource.id || crypto.randomUUID(), // Use actual database ID or generate new UUID
-      name: resource.name,
-      category: resource.category,
-      description: resource.description,
-      address: resource.address,
-      city: resource.city,
-      state: resource.state,
-      postal_code: resource.postal_code,
-      website: resource.website,
-      hours: resource.hours,
-      latitude: resource.latitude,
-      longitude: resource.longitude,
-      distance_mi: resource.distance_mi,
-      source: resource.source,
-      source_id: resource.source_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      last_verified_at: null,
-      last_seen_at: new Date().toISOString(),
-      is_archived: false
-      // Intentionally exclude phone and email for security
-    }));
+    console.log(`Search completed. Found ${uniqueResults.length} emergency resources with comprehensive categorization.`);
 
-    console.log(`Search completed. Found ${publicSafeResults.length} resources, ${errors.length} errors`);
-
-    return new Response(
-      JSON.stringify({ 
-        resources: publicSafeResults,
-        cached: false,
-        errors: errors.length > 0 ? errors : undefined
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({
+      resources: uniqueResults,
+      cached: false
+    }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    });
 
   } catch (error) {
-    console.error('Error in search-disaster-resources function:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.error('Search error:', error.message);
+    return new Response(JSON.stringify({
+      error: error.message
+    }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    });
   }
 });
 
-// Helper function to calculate distance between two coordinates
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 3959; // Earth's radius in miles
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = 
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+// Helper functions
+function parseAddress(formattedAddress) {
+  const parts = formattedAddress.split(',');
+  if (parts.length < 2) return formattedAddress;
+  // Return street address + city only
+  return `${parts[0].trim()}, ${parts[1].trim()}`;
 }
 
-// Helper function to get place type for new Places API
-function getPlaceType(query: string): string {
-  query = query.toLowerCase();
-  
-  if (query.includes('food') || query.includes('bank') || query.includes('pantry')) {
-    return 'food';
+function categorizePlace(placeTypes, placeName) {
+  const categories = [];
+  const lowerName = placeName.toLowerCase();
+
+  // Place type categorization
+  if (placeTypes.includes('urgent_care') || placeTypes.includes('emergency_room')) {
+    categories.push('medical_emergency');
   }
-  if (query.includes('shelter') || query.includes('homeless')) {
-    return 'lodging';
+  if (placeTypes.includes('police') || placeTypes.includes('fire_station')) {
+    categories.push('emergency_responder');
   }
-  if (query.includes('hospital')) {
-    return 'hospital';
+  if (placeTypes.includes('community_center')) {
+    categories.push('community_center');
   }
-  if (query.includes('fire')) {
-    return 'fire_station';
+  if (placeTypes.includes('local_government_office')) {
+    categories.push('local_government_office');
   }
-  if (query.includes('police')) {
-    return 'police';
+
+  // Name-based categorization (case-insensitive word matching)
+  if (lowerName.includes('food')) {
+    categories.push('food');
   }
-  if (query.includes('community')) {
-    return 'community_center';
+  if (lowerName.includes('shelter')) {
+    categories.push('shelter');
   }
-  
-  return 'establishment';
+
+  return categories;
 }
 
-// Helper function to categorize places based on search query and types
-function categorizePlace(query: string, types: string[]): string {
-  query = query.toLowerCase();
-  const typeString = types.join(' ').toLowerCase();
-  
-  if (query.includes('food') || query.includes('bank') || typeString.includes('food')) {
-    return 'food';
-  }
-  if (query.includes('shelter') || typeString.includes('lodging')) {
-    return 'shelter';
-  }
-  if (query.includes('hospital') || query.includes('medical') || typeString.includes('hospital')) {
-    return 'medical';
-  }
-  if (query.includes('fire') || typeString.includes('fire')) {
-    return 'emergency services';
-  }
-  if (query.includes('police') || typeString.includes('police')) {
-    return 'emergency services';
-  }
-  if (query.includes('red cross') || query.includes('salvation army') || query.includes('united way')) {
-    return 'relief organization';
-  }
-  
-  return 'general';
-}
+function removeDuplicates(resources) {
+  const unique = [];
+  const seen = new Set();
 
-// Helper function to extract street address from formatted address
-function extractStreetAddress(address: string): string {
-  const parts = address.split(',');
-  // Return just the first part (street address) if available
-  return parts.length > 0 ? parts[0].trim() : '';
-}
-
-// Helper function to extract city from formatted address
-function extractCity(address: string): string {
-  const parts = address.split(',');
-  return parts.length >= 2 ? parts[parts.length - 3]?.trim() || '' : '';
-}
-
-// Helper function to extract state from formatted address
-function extractState(address: string): string {
-  const parts = address.split(',');
-  const lastPart = parts[parts.length - 2]?.trim() || '';
-  return lastPart.split(' ')[0] || '';
-}
-
-// Helper function to remove duplicate resources
-function removeDuplicates(resources: DisasterResource[]): DisasterResource[] {
-  const unique: DisasterResource[] = [];
-  const seen = new Set<string>();
-  
   for (const resource of resources) {
-    // Create a key based on name and approximate location
     const key = `${resource.name.toLowerCase()}_${Math.round(resource.latitude || 0)}_${Math.round(resource.longitude || 0)}`;
-    
     if (!seen.has(key)) {
       seen.add(key);
       unique.push(resource);
     }
   }
-  
+
   return unique;
 }
