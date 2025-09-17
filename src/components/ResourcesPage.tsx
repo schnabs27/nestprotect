@@ -489,6 +489,8 @@ const ResourcesPage = () => {
                         sourceId={resource.source_id}
                         source={resource.source}
                         resourceName={resource.name}
+                        phone={resource.phone}
+                        skipAccessChecks={true}
                         className="h-8 w-8 p-0"
                       />
                       

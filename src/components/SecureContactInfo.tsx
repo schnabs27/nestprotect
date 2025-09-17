@@ -8,6 +8,8 @@ interface SecureContactProps {
   sourceId: string;
   source: string;
   resourceName: string;
+  phone?: string;
+  skipAccessChecks?: boolean;
   className?: string;
 }
 
@@ -16,7 +18,7 @@ interface ContactInfo {
   email?: string;
 }
 
-const SecureContactInfo = ({ sourceId, source, resourceName, className = "" }: SecureContactProps) => {
+const SecureContactInfo = ({ sourceId, source, resourceName, phone, skipAccessChecks = true, className = "" }: SecureContactProps) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -28,7 +30,7 @@ const SecureContactInfo = ({ sourceId, source, resourceName, className = "" }: S
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
+      if (session?.user && !skipAccessChecks) {
         checkAccessPermission();
       }
     });
@@ -37,15 +39,15 @@ const SecureContactInfo = ({ sourceId, source, resourceName, className = "" }: S
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
+      if (session?.user && !skipAccessChecks) {
         checkAccessPermission();
-      } else {
+      } else if (!session?.user || skipAccessChecks) {
         setCanAccess(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [sourceId]);
+  }, [sourceId, skipAccessChecks]);
 
   const checkAccessPermission = async () => {
     try {
@@ -130,7 +132,17 @@ const SecureContactInfo = ({ sourceId, source, resourceName, className = "" }: S
   const handlePhoneCall = async () => {
     setIsLoading(true);
     try {
-      // Query using source_id and source instead of database id
+      // If phone is provided from the search results, use it directly (user must already be authenticated to see results)
+      if (phone) {
+        window.open(`tel:${phone}`);
+        toast({
+          title: "Calling Resource",
+          description: "Opening phone dialer for this resource.",
+        });
+        return;
+      }
+
+      // Fallback: Query using source_id and source instead of database id
       const { data, error } = await supabase
         .from('disaster_resources')
         .select('phone')

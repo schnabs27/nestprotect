@@ -44,75 +44,57 @@ export type Database = {
       disaster_resources: {
         Row: {
           address: string | null
-          category: string | null
-          city: string | null
+          categories: Json
           created_at: string
           description: string | null
-          distance_mi: number | null
-          email: string | null
-          hours: string | null
-          id: string
-          is_archived: boolean | null
-          last_seen_at: string | null
-          last_verified_at: string | null
+          geolocation: Json | null
+          id: number
           latitude: number | null
           longitude: number | null
           name: string
           phone: string | null
-          postal_code: string | null
-          source: string | null
+          requested_zipcode: string | null
+          source: string
           source_id: string | null
-          state: string | null
           updated_at: string
-          website: string | null
+          url: string | null
+          zipcode: string
         }
         Insert: {
           address?: string | null
-          category?: string | null
-          city?: string | null
+          categories?: Json
           created_at?: string
           description?: string | null
-          distance_mi?: number | null
-          email?: string | null
-          hours?: string | null
-          id?: string
-          is_archived?: boolean | null
-          last_seen_at?: string | null
-          last_verified_at?: string | null
+          geolocation?: Json | null
+          id?: never
           latitude?: number | null
           longitude?: number | null
           name: string
           phone?: string | null
-          postal_code?: string | null
-          source?: string | null
+          requested_zipcode?: string | null
+          source: string
           source_id?: string | null
-          state?: string | null
           updated_at?: string
-          website?: string | null
+          url?: string | null
+          zipcode: string
         }
         Update: {
           address?: string | null
-          category?: string | null
-          city?: string | null
+          categories?: Json
           created_at?: string
           description?: string | null
-          distance_mi?: number | null
-          email?: string | null
-          hours?: string | null
-          id?: string
-          is_archived?: boolean | null
-          last_seen_at?: string | null
-          last_verified_at?: string | null
+          geolocation?: Json | null
+          id?: never
           latitude?: number | null
           longitude?: number | null
           name?: string
           phone?: string | null
-          postal_code?: string | null
-          source?: string | null
+          requested_zipcode?: string | null
+          source?: string
           source_id?: string | null
-          state?: string | null
           updated_at?: string
-          website?: string | null
+          url?: string | null
+          zipcode?: string
         }
         Relationships: []
       }
