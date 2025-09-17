@@ -453,25 +453,25 @@ const ResourcesPage = () => {
               )}
 
               {filteredResources.map((resource, index) => (
-                <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
-                  <CardContent className="p-4">
-                    {/* Resource name as heading */}
-                    <h3 className="text-lg font-semibold text-title mb-3">{resource.name}</h3>
-                    
-                    {/* Address (text only, no icon) */}
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {resource.address && resource.city && `${resource.address}, ${resource.city}`}
-                      {resource.address && !resource.city && resource.address}
-                      {!resource.address && resource.city && resource.city}
-                    </p>
+                 <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
+                   <CardContent className="p-2">
+                     {/* Resource name as heading */}
+                     <h3 className="text-base font-semibold text-title mb-1">{resource.name}</h3>
+                     
+                     {/* Address (text only, no icon) */}
+                     <p className="text-sm text-muted-foreground mb-1">
+                       {resource.address && resource.city && `${resource.address}, ${resource.city}`}
+                       {resource.address && !resource.city && resource.address}
+                       {!resource.address && resource.city && resource.city}
+                     </p>
 
-                    {/* Description (text only) */}
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {toTitleCase(resource.description)}
-                    </p>
+                     {/* Description (text only) */}
+                     <p className="text-xs text-muted-foreground mb-2">
+                       {toTitleCase(resource.description)}
+                     </p>
 
-                    {/* Icon row with 3 clickable icons */}
-                    <div className="flex gap-3 mb-3">
+                     {/* Icon row with 3 clickable icons */}
+                     <div className="flex gap-3 mb-1">
                       {/* Map pin icon for directions */}
                       {(resource.source_id || (resource.latitude && resource.longitude)) && (
                         <Button 
@@ -524,8 +524,8 @@ const ResourcesPage = () => {
                       )}
                     </div>
 
-                    {/* Category row: List categories as comma-separated text */}
-                    <div className="text-sm text-muted-foreground">
+                     {/* Category row: List categories as comma-separated text */}
+                     <div className="text-xs text-muted-foreground">
                       {resource.category && (
                         <>
                           <span className="font-medium">Category:</span> {resource.category}
