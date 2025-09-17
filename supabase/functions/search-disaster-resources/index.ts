@@ -116,13 +116,13 @@ serve(async (req) => {
     const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
     const requestBody = {
       includedTypes: [
-        'urgent_care',
-        'emergency_room',
+        'hospital',
         'police',
         'fire_station',
         'community_center',
         'local_government_office'
       ],
+      maxResultCount: 20,
       locationRestriction: {
         circle: {
           center: {
@@ -134,6 +134,8 @@ serve(async (req) => {
       }
     };
 
+    console.log('Places API request:', JSON.stringify(requestBody, null, 2));
+
     const placesResponse = await fetch(placesUrl, {
       method: 'POST',
       headers: {
@@ -143,6 +145,13 @@ serve(async (req) => {
       },
       body: JSON.stringify(requestBody)
     });
+
+    console.log(`Places API response status: ${placesResponse.status}`);
+    
+    if (!placesResponse.ok) {
+      const errorText = await placesResponse.text();
+      console.error('Places API error response:', errorText);
+    }
 
     if (placesResponse.ok) {
       const placesData = await placesResponse.json();
