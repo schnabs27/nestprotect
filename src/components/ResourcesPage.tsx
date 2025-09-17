@@ -463,7 +463,6 @@ const ResourcesPage = () => {
                       {resource.address && resource.city && `${resource.address}, ${resource.city}`}
                       {resource.address && !resource.city && resource.address}
                       {!resource.address && resource.city && resource.city}
-                      {(resource.address || resource.city) && ` • ${resource.distance_mi ? `${resource.distance_mi.toFixed(1)} mi` : 'Distance unknown'}`}
                     </p>
 
                     {/* Description (text only) */}
@@ -479,7 +478,7 @@ const ResourcesPage = () => {
                           variant="ghost" 
                           size="sm" 
                           className="h-8 w-8 p-0"
-                          onClick={() => window.open(`https://maps.google.com/maps?q=${resource.latitude},${resource.longitude}`, '_blank')}
+                          onClick={() => window.open(`https://maps.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}`, '_blank')}
                         >
                           <MapPin size={18} className="text-red-500" />
                         </Button>
@@ -492,8 +491,8 @@ const ResourcesPage = () => {
                         className="h-8 w-8 p-0"
                       />
                       
-                      {/* Info icon for website with confirmation dialog */}
-                      {resource.website && (
+                      {/* Info icon for Google Maps business listing */}
+                      {resource.url && (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button 
@@ -506,17 +505,17 @@ const ResourcesPage = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Visit Website</AlertDialogTitle>
+                              <AlertDialogTitle>View Business Listing</AlertDialogTitle>
                               <AlertDialogDescription>
-                                You are about to visit the website for {resource.name}. This will open in a new tab.
+                                You are about to view the Google Maps business listing for {resource.name}. This will open in a new tab.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction 
-                                onClick={() => window.open(resource.website.startsWith('http') ? resource.website : `https://${resource.website}`, '_blank')}
+                                onClick={() => window.open(resource.url, '_blank')}
                               >
-                                Visit Website
+                                View Listing
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
