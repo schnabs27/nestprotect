@@ -11,6 +11,7 @@ import PreparednessPage from "./components/PreparednessPage";
 import WeatherPage from "./components/WeatherPage";
 import ResourcesPage from "./components/ResourcesPage";
 import AISearchPage from "./components/AISearchPage";
+import RecoveryIndexPage from "./components/RecoveryIndexPage";
 import ProfilePage from "./components/ProfilePage";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
@@ -33,7 +34,8 @@ const App = () => (
             
             <Route path="/preparedness" element={<ProtectedRoute><PreparednessPage /></ProtectedRoute>} />
             <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
-            <Route path="/after" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
+            <Route path="/after" element={<ProtectedRoute><RecoveryIndexPage /></ProtectedRoute>} />
+            <Route path="/googlesearch" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
             <Route path="/aisearch" element={<ProtectedRoute><AISearchPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
