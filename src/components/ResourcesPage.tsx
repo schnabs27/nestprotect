@@ -473,12 +473,17 @@ const ResourcesPage = () => {
                     {/* Icon row with 3 clickable icons */}
                     <div className="flex gap-3 mb-3">
                       {/* Map pin icon for directions */}
-                      {resource.latitude && resource.longitude && (
+                      {(resource.source_id || (resource.latitude && resource.longitude)) && (
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           className="h-8 w-8 p-0"
-                          onClick={() => window.open(`https://maps.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}`, '_blank')}
+                          onClick={() => {
+                            const directionUrl = resource.source_id 
+                              ? `https://www.google.com/maps/dir/?api=1&destination=place_id:${resource.source_id}&origin=My+Location`
+                              : `https://maps.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}`;
+                            window.open(directionUrl, '_blank');
+                          }}
                         >
                           <MapPin size={18} className="text-red-500" />
                         </Button>
