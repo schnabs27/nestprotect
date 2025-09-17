@@ -495,34 +495,27 @@ const ResourcesPage = () => {
                       />
                       
                       {/* Info icon for Google Maps business listing */}
-                      {resource.url && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                            >
-                              <Info size={18} className="text-blue-500" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>View Business Listing</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                You are about to view the Google Maps business listing for {resource.name}. This will open in a new tab.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                onClick={() => window.open(resource.url, '_blank')}
-                              >
-                                View Listing
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                      {(resource.url || (resource.name && (resource.address || resource.city))) && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={() => {
+                            let mapUrl = resource.url;
+                            
+                            // If no URL or if URL doesn't look like a proper Google Maps business listing, create one
+                            if (!mapUrl || (!mapUrl.includes('maps.google.com') && !mapUrl.includes('maps.app.goo.gl'))) {
+                              const searchQuery = encodeURIComponent(
+                                `${resource.name}${resource.address ? ` ${resource.address}` : ''}${resource.city ? ` ${resource.city}` : ''}`
+                              );
+                              mapUrl = `https://maps.google.com/maps/search/${searchQuery}`;
+                            }
+                            
+                            window.open(mapUrl, '_blank');
+                          }}
+                        >
+                          <Info size={18} className="text-blue-500" />
+                        </Button>
                       )}
                     </div>
 
