@@ -141,7 +141,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': mapsApiKey,
-        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber'
+        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber,places.googleMapsUri'
       },
       body: JSON.stringify(requestBody)
     });
@@ -171,7 +171,7 @@ serve(async (req) => {
             categories: categories,
             description: placeTypes.filter(t => t !== 'point_of_interest' && t !== 'establishment').slice(0, 2).join(', ').replace(/_/g, ' ') || categories.join(', '),
             phone: place.nationalPhoneNumber || '',
-            url: `https://maps.google.com/maps/place/?q=place_id:${place.id}`,
+            url: place.googleMapsUri || `https://maps.google.com/maps/place/?q=place_id:${place.id}`,
             address: address,
             requested_zipcode: sanitizedZipCode,
             latitude: place.location.latitude,
