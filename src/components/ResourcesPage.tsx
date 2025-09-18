@@ -311,22 +311,11 @@ const ResourcesPage = () => {
         {/* Show content only for authenticated users */}
         {user && !isGuest && (
           <>
-            {/* Recovery Action Plan Button */}
-            <Card className="shadow-soft border-primary/20">
-              <CardContent className="p-4">
-                <Button 
-                  className="w-full h-12 text-base font-semibold"
-                  size="lg"
-                  onClick={() => navigate('/preparedness', { state: { activeTab: 'recovery', activeHazard: 'all' } })}
-                >
-                  <CheckSquare className="mr-2" size={20} />
-                  Recovery Action Plan
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Search Section */}
             <div className="bg-background shadow-soft p-4">
+              <p className="text-muted-foreground mb-4">
+                Search Google business listings for disaster emergency resources.
+              </p>
               <div className="flex gap-2 mb-4">
                 <div className="flex-1">
                   <Input
