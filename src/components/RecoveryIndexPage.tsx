@@ -36,18 +36,18 @@ const RecoveryIndexPage = () => {
         {/* Recovery Actions Grid */}
         <div className="grid gap-4">
           {/* Recovery Action Plan */}
-          <Card className="shadow-soft">
+          <Card className="shadow-soft bg-purple-600 border-purple-600">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">Recovery Action Plan</CardTitle>
+              <CardTitle className="text-lg text-white text-center">Recovery Action Plan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground leading-none mb-4">
+                <p className="text-sm text-purple-100 leading-none mb-4">
                   You prepared this list, now you can follow it to guide your recovery process.
                 </p>
                 <Button 
                   onClick={() => navigate("/preparedness")} 
-                  className="w-full bg-gradient-primary hover:opacity-90"
+                  className="w-full bg-white hover:bg-gray-100 text-black"
                 >
                   View Your Action Plan
                 </Button>
@@ -55,41 +55,41 @@ const RecoveryIndexPage = () => {
             </CardContent>
           </Card>
 
-          {/* Google Resource Listings */}
+          {/* Emergency Resources */}
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">Google Resource Listings</CardTitle>
+              <CardTitle className="text-lg text-title text-center">Emergency Resources</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground leading-none mb-4">
-                  View Google's comprehensive directory of local disaster resources and services.
+                  Quick search for businesses to help with safety, health, and other emergencies.
                 </p>
                 <Button 
                   onClick={() => navigate("/googlesearch")} 
                   className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  Search Google Resources
+                  Quick Search: Emergency Resources
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* AI-Driven Resource Search */}
+          {/* More Emergency Resources */}
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">AI-Driven Resource Search</CardTitle>
+              <CardTitle className="text-lg text-title text-center">More Emergency Resources</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground leading-none mb-4">
-                  ChatGPT will search for additional local resources that may not appear in standard directories.
+                  ChatGPT will quick search disaster resources that may not appear in standard directories.
                 </p>
                 <Button 
                   onClick={() => navigate("/aisearch")} 
                   className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  Search with AI
+                  AI Quick Search: Emergency Resources
                 </Button>
               </div>
             </CardContent>
