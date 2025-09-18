@@ -194,7 +194,7 @@ const ResourcesPage = () => {
          const has = (key: string) => Array.isArray(cats) ? cats.includes(key) : cats[key] === true;
  
          if (selectedCategory === "emergency") {
-           return has('emergency_responder') || has('emergency_medical');
+           return has('emergency_responder');
          }
          if (selectedCategory === "medical") {
            return has('emergency_medical');
