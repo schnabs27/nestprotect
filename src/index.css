@@ -46,8 +46,8 @@ All colors MUST be HSL.
     --raspberry: 345 84% 56%; /* #e13363 */
     --raspberry-foreground: 0 0% 100%;
     
-    --success: 142 76% 36%; /* #16a34a */
-    --success-foreground: 0 0% 100%;
+    --success: 170 95% 43%; /* #05d8b5 */
+    --success-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
