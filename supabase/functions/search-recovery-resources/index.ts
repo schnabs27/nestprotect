@@ -118,14 +118,14 @@ serve(async (req) => {
     const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
     const requestBody = {
       includedTypes: [
-        'general_contractor',
+        'contractor',
         'roofing_contractor', 
         'painter',
         'plumber',
         'electrician',
         'storage',
         'moving_company',
-        'truck_rental_agency',
+        'car_rental',
         'hardware_store',
         'home_goods_store'
       ],
@@ -249,7 +249,7 @@ function categorizePlace(placeTypes) {
   const categories = [];
 
   // Recovery service categorization based on place types
-  if (placeTypes.includes('general_contractor') || placeTypes.includes('roofing_contractor')) {
+  if (placeTypes.includes('contractor') || placeTypes.includes('roofing_contractor')) {
     categories.push('contractor');
   }
   if (placeTypes.includes('painter')) {
@@ -261,7 +261,7 @@ function categorizePlace(placeTypes) {
   if (placeTypes.includes('electrician')) {
     categories.push('electrician');
   }
-  if (placeTypes.includes('moving_company') || placeTypes.includes('truck_rental_agency')) {
+  if (placeTypes.includes('moving_company') || placeTypes.includes('car_rental')) {
     categories.push('moving');
   }
   if (placeTypes.includes('hardware_store') || placeTypes.includes('home_goods_store')) {
