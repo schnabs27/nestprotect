@@ -451,59 +451,80 @@ const RecoveryResourcesPage = () => {
                        ))}
                      </div>
 
-                     {/* Action buttons */}
-                     <div className="flex items-center justify-between">
-                       <div className="flex gap-2">
-                         {/* View Details button */}
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           onClick={() => {
-                             if (resource.url) {
-                               window.open(resource.url, '_blank');
-                             }
-                           }}
-                           className="text-xs h-7"
-                         >
-                           <Globe size={12} className="mr-1" />
-                           View
-                         </Button>
-
-                         {/* Phone button */}
-                         {resource.phone && (
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => {
-                               if (resource.phone) {
-                                 window.open(`tel:${resource.phone}`, '_self');
-                               }
-                             }}
-                             className="text-xs h-7"
-                           >
-                             <Phone size={12} className="mr-1" />
-                             Call
-                           </Button>
-                         )}
-                       </div>
-
-                       {/* Favorite button */}
-                       <Button
-                         variant="ghost"
-                         size="sm"
-                         onClick={() => toggleFavorite(resource)}
-                         className={`p-1 h-7 w-7 ${
-                           favorites.has(`${resource.source_id}-${resource.source}`) 
-                             ? "text-yellow hover:text-yellow/80" 
-                             : "text-muted-foreground hover:text-yellow"
-                         }`}
-                       >
-                         <Star 
-                           size={14} 
-                           fill={favorites.has(`${resource.source_id}-${resource.source}`) ? "currentColor" : "none"}
-                         />
-                       </Button>
-                     </div>
+                      {/* Icon row with 3 clickable icons */}
+                      <div className="flex gap-3 mb-1">
+                        {/* Map pin icon for directions */}
+                        {(resource.source_id || (resource.latitude && resource.longitude)) && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              const directionUrl = resource.source_id 
+                                ? `https://www.google.com/maps/dir/?api=1&destination=place_id:${resource.source_id}&origin=My+Location`
+                                : `https://maps.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}`;
+                              window.open(directionUrl, '_blank');
+                            }}
+                          >
+                            <MapPin size={18} className="text-red-500" />
+                          </Button>
+                        )}
+                        
+                        {/* Phone icon for calling */}
+                        {resource.phone && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              window.open(`tel:${resource.phone}`, '_self');
+                            }}
+                          >
+                            <Phone size={18} className="text-green-500" />
+                          </Button>
+                        )}
+                        
+                        {/* Info icon for Google Maps business listing */}
+                        {(resource.url || (resource.name && (resource.address || resource.city))) && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              let mapUrl = resource.url;
+                              
+                              // If no URL or if URL doesn't look like a proper Google Maps business listing, create one
+                              if (!mapUrl || (!mapUrl.includes('maps.google.com') && !mapUrl.includes('maps.app.goo.gl'))) {
+                                const searchQuery = encodeURIComponent(
+                                  `${resource.name}${resource.address ? ` ${resource.address}` : ''}${resource.city ? ` ${resource.city}` : ''}`
+                                );
+                                mapUrl = `https://maps.google.com/maps/search/${searchQuery}`;
+                              }
+                              
+                              window.open(mapUrl, '_blank');
+                            }}
+                          >
+                            <Info size={18} className="text-blue-500" />
+                          </Button>
+                        )}
+                        
+                        {/* Favorite star icon */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleFavorite(resource)}
+                          className={`h-8 w-8 p-0 ${
+                            favorites.has(`${resource.source_id}-${resource.source}`) 
+                              ? "text-yellow hover:text-yellow/80" 
+                              : "text-muted-foreground hover:text-yellow"
+                          }`}
+                        >
+                          <Star 
+                            size={18} 
+                            fill={favorites.has(`${resource.source_id}-${resource.source}`) ? "currentColor" : "none"}
+                          />
+                        </Button>
+                      </div>
                    </CardContent>
                  </Card>
                ))}
