@@ -471,7 +471,7 @@ const PreparednessPage = () => {
         {/* Hazard Selection */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-title mb-3">Select Hazard Type</h2>
-          <p className="text-body leading-relaxed mb-4">
+          <p className="text-body mb-4">
             Start with completing the prep for "All Types" in the "Now" stage. Then add prep for your high-risk scenarios.
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

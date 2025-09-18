@@ -141,4 +141,8 @@ All colors MUST be HSL.
   .card-content-text {
     @apply text-sm text-muted-foreground leading-none;
   }
+  
+  .text-body {
+    @apply text-muted-foreground text-sm leading-relaxed;
+  }
 }
