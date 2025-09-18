@@ -250,17 +250,13 @@ function parseAddress(formattedAddress) {
 
 function categorizePlace(placeTypes, placeName) {
   const categories = [];
-  const lowerName = placeName.toLowerCase();
 
-  // Place type categorization - handle all the types we're searching for
-  if (placeTypes.includes('hospital') || placeTypes.includes('urgent_care') || placeTypes.includes('emergency_room')) {
+  // Exact mapping as specified
+  if (placeTypes.includes('police') || placeTypes.includes('fire_station')) {
+    categories.push('emergency_responder');
+  }
+  if (placeTypes.includes('hospital')) {
     categories.push('emergency_medical');
-  }
-  if (placeTypes.includes('police')) {
-    categories.push('emergency_responder');
-  }
-  if (placeTypes.includes('fire_station')) {
-    categories.push('emergency_responder');
   }
   if (placeTypes.includes('community_center')) {
     categories.push('community_center');
@@ -268,18 +264,8 @@ function categorizePlace(placeTypes, placeName) {
   if (placeTypes.includes('local_government_office')) {
     categories.push('local_government_office');
   }
-  // Enhanced name-based categorization for emergency resources only
-  if (lowerName.includes('medical') || lowerName.includes('clinic') || lowerName.includes('health') || 
-      lowerName.includes('urgent') || lowerName.includes('emergency')) {
-    categories.push('emergency_medical');
-  }
-  if (lowerName.includes('police') || lowerName.includes('sheriff') || lowerName.includes('fire') || 
-      lowerName.includes('ems') || lowerName.includes('rescue')) {
-    categories.push('emergency_responder');
-  }
 
-  // Remove duplicates
-  return [...new Set(categories)];
+  return categories;
 }
 
 function removeDuplicates(resources) {
