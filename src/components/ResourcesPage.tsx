@@ -62,8 +62,6 @@ const ResourcesPage = () => {
     { id: "all", label: "All", color: "bg-[#06c29a]" },
     { id: "emergency", label: "Emergency", color: "bg-raspberry" },
     { id: "medical", label: "Medical", color: "bg-accent" },
-    { id: "food", label: "Food", color: "bg-orange-500" },
-    { id: "shelter", label: "Shelter", color: "bg-coral" },
     { id: "community_center", label: "Community Center", color: "bg-blue-500" },
     { id: "govt_office", label: "Govt Office", color: "bg-purple-500" },
     { id: "favorites", label: "Favorite", color: "bg-yellow" }
@@ -200,12 +198,6 @@ const ResourcesPage = () => {
          }
          if (selectedCategory === "medical") {
            return has('emergency_medical');
-         }
-         if (selectedCategory === "food") {
-           return has('food_assistance');
-         }
-         if (selectedCategory === "shelter") {
-           return has('shelter_assistance');
          }
          if (selectedCategory === "community_center") {
            return has('community_center');
