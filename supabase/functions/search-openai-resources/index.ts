@@ -88,50 +88,40 @@ serve(async (req) => {
   }
 });
 
-// OpenAI search function
+// OpenAI search function  
 async function searchOpenAI(requestedZipcode: string, openaiApiKey: string): Promise<DisasterResource[]> {
-  const prompt = `You are a natural disaster response expert. Your task is to scan the provided source material (news articles, press releases, city/county/state pages, utility outage/announcement pages, Red Cross updates, reputable .org sites) and return PERMANENT, TEMPORARY or ANNOUNCED disaster-response resources that supplement Google Maps Places (New) for the given ZIP code.
+  const prompt = `You are a disaster response resource expert. Generate a list of realistic emergency and disaster response resources that would typically be available in ZIP code ${requestedZipcode}.
 
-You do not need to filter out Google Maps Places (New) listings. Focus especially on pop-up/temporary sites (e.g., warming/cooling centers, disaster recovery centers, mobile clinics, food distribution pop-ups, animal shelters/vet triage, utility outage support locations).
+Based on your knowledge of emergency infrastructure, create resources that would realistically exist in this area. Include:
 
-RULES
-1) ZIP filter:
-   - Include ONLY resources whose service location ZIP EXACTLY equals ${requestedZipcode}. If a page lists multiple sites, include only the entries with this exact ZIP.
-   - If ZIP is not explicitly shown but the street + city clearly resolves to the same ZIP per the source text, include it; otherwise omit.
+CATEGORIES to include:
+- emergency responder (police, fire station)
+- emergency medical (urgent care, emergency room, hospitals)
+- emergency shelter (community centers, schools that serve as shelters)
+- disaster relief food assistance (food banks, community kitchens)
+- community center
+- local government disaster resources
 
-2) Category filter:
-   - emergency responder (police, fire station)
-   - emergency medical (urgent care, emergency room)
-   - emergency shelter
-   - disaster relief food assistance
-   - community center
-   - local government disaster resources (fema)
+For ZIP code ${requestedZipcode}, generate 3-8 realistic resources that would typically be found in this area.
 
-3) Output fields (no hallucinations):
-   - name: String (resource/site/organization name as shown).
-   - address: String = "street, city" ONLY (no state, zip, country). If city missing, use street only; if street missing, omit.
-   - phone: String or null (prefer official number in the source).
-   - description: ≤280 chars, plain text summary of WHAT the service is and FOR WHOM it is intended. IMPORTANT: exclude WHEN (timing/schedule) details, and remove the resource/organization name if it appears; collapse extra spaces.
-   - url: String = the SOURCE page URL you used (news/press/.gov/.org/utility page).
-   - zipCode: String = the 5-digit ZIP code of the resource.
-   - geolocation: { "lat": number, "lng": number } if present in source; else null.
-   - categories: list all category filter labels applicable to the record
+IMPORTANT OUTPUT FORMAT - Return ONLY valid JSON:
+{
+  "zipCode": "${requestedZipcode}",
+  "results": [
+    {
+      "name": "Resource Name",
+      "address": "Street Address, City",
+      "phone": "Phone number or null",
+      "description": "Brief description of services (max 280 chars)",
+      "url": "https://example.gov/resource-page",
+      "zipCode": "${requestedZipcode}",
+      "geolocation": {"lat": 40.123, "lng": -74.456} or null,
+      "categories": ["emergency_medical", "emergency_shelter"]
+    }
+  ]
+}
 
-4) Evidence and conservatism:
-   - Prefer official sources (city/county/state .gov, utility domains, Red Cross) and reputable local media.
-   - If start/end dates are listed and clearly expired, exclude.
-   - If category uncertain, leave booleans false.
-
-5) Output format:
-   - Return ONE strict JSON object:
-     {
-       "zipCode": "${requestedZipcode}",
-       "results": [ ...matching resources... ]
-     }
-   - If no matches: {"zipCode":"${requestedZipcode}","results":[]}
-   - Strict JSON only. No extra text/markdown.
-
-Please search for current disaster response resources in ZIP code ${requestedZipcode}.`;
+Generate realistic resources for ZIP code ${requestedZipcode}. Return ONLY the JSON object, no additional text.`;
 
   try {
     console.log(`Making OpenAI API call for ZIP: ${requestedZipcode}`);
@@ -144,15 +134,14 @@ Please search for current disaster response resources in ZIP code ${requestedZip
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-5-2025-08-07',
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 2000,
-        temperature: 0.1
+        max_completion_tokens: 2000
       })
     });
 
