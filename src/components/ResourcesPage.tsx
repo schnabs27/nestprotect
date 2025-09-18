@@ -190,27 +190,30 @@ const ResourcesPage = () => {
         return favorites.has(resourceKey);
       }
       
-      // Check categories array for specific category matches
-      if (resource.categories) {
-        if (selectedCategory === "emergency") {
-          return resource.categories.emergency_responder === true;
-        }
-        if (selectedCategory === "medical") {
-          return resource.categories.emergency_medical === true;
-        }
-        if (selectedCategory === "food") {
-          return resource.categories.food_assistance === true;
-        }
-        if (selectedCategory === "shelter") {
-          return resource.categories.shelter_assistance === true;
-        }
-        if (selectedCategory === "community_center") {
-          return resource.categories.community_center === true;
-        }
-        if (selectedCategory === "govt_office") {
-          return resource.categories.local_government_office === true;
-        }
-      }
+       // Check categories for specific category matches
+       if (resource.categories) {
+         const cats: any = resource.categories;
+         const has = (key: string) => Array.isArray(cats) ? cats.includes(key) : cats[key] === true;
+ 
+         if (selectedCategory === "emergency") {
+           return has('emergency_responder') || has('medical_emergency') || has('emergency_medical');
+         }
+         if (selectedCategory === "medical") {
+           return has('medical_emergency') || has('emergency_medical');
+         }
+         if (selectedCategory === "food") {
+           return has('food') || has('food_assistance');
+         }
+         if (selectedCategory === "shelter") {
+           return has('shelter') || has('shelter_assistance');
+         }
+         if (selectedCategory === "community_center") {
+           return has('community_center');
+         }
+         if (selectedCategory === "govt_office") {
+           return has('local_government_office');
+         }
+       }
       
       return false;
     })
@@ -456,34 +459,41 @@ const ResourcesPage = () => {
 
                       {/* Category badges */}
                       <div className="flex flex-wrap gap-1 mb-2">
-                        {resource.categories && Object.entries(resource.categories).map(([key, value]) => {
-                          if (value === true) {
-                            // Map internal category names to display names
-                            const categoryDisplayNames = {
-                              'emergency_responder': 'Emergency',
-                              'emergency_medical': 'Medical',
-                              'food_assistance': 'Food',
-                              'shelter_assistance': 'Shelter',
-                              'community_center': 'Community Center',
-                              'local_government_office': 'Govt Office',
-                              'utilities': 'Utilities',
-                              'emergency_veterinarian': 'Veterinarian',
-                              'disaster_recovery_assistance': 'Recovery'
-                            };
-                            
-                            const displayName = categoryDisplayNames[key] || toTitleCase(key.replace(/_/g, ' '));
-                            
-                            return (
-                              <Badge key={key} variant="secondary" className="text-xs py-0 px-2">
-                                {displayName}
-                              </Badge>
-                            );
-                          }
-                          return null;
-                        }).filter(Boolean)}
-                        
-                        {/* Fallback to single category if categories object is empty */}
-                        {resource.category && (!resource.categories || Object.keys(resource.categories).length === 0) && (
+                        {/* When categories is an array of strings */}
+                        {Array.isArray(resource.categories) && resource.categories.length > 0 &&
+                          resource.categories.map((cat: string) => (
+                            <Badge key={cat} variant="secondary" className="text-xs py-0 px-2">
+                              {toTitleCase(cat.replace(/_/g, ' '))}
+                            </Badge>
+                          ))}
+
+                        {/* When categories is an object of boolean flags */}
+                        {!Array.isArray(resource.categories) && resource.categories &&
+                          Object.entries(resource.categories).map(([key, value]) => {
+                            if (value === true) {
+                              const categoryDisplayNames: Record<string, string> = {
+                                emergency_responder: 'Emergency',
+                                emergency_medical: 'Medical',
+                                food_assistance: 'Food',
+                                shelter_assistance: 'Shelter',
+                                community_center: 'Community Center',
+                                local_government_office: 'Govt Office',
+                                utilities: 'Utilities',
+                                emergency_veterinarian: 'Veterinarian',
+                                disaster_recovery_assistance: 'Recovery',
+                              };
+                              const displayName = categoryDisplayNames[key] || toTitleCase(key.replace(/_/g, ' '));
+                              return (
+                                <Badge key={key} variant="secondary" className="text-xs py-0 px-2">
+                                  {displayName}
+                                </Badge>
+                              );
+                            }
+                            return null;
+                          }).filter(Boolean)}
+
+                        {/* Fallback to single category */}
+                        {resource.category && (
                           <Badge variant="secondary" className="text-xs py-0 px-2">
                             {toTitleCase(resource.category)}
                           </Badge>
