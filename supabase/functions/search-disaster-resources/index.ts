@@ -110,7 +110,7 @@ serve(async (req) => {
     const location = geocodeData.results[0].geometry.location;
     console.log(`Location: ${location.lat}, ${location.lng}`);
 
-    // Single comprehensive emergency resource search
+    // Single comprehensive emergency resource search with expanded types
     console.log('Starting comprehensive emergency resource search');
     
     const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
@@ -120,7 +120,12 @@ serve(async (req) => {
         'police',
         'fire_station',
         'community_center',
-        'local_government_office'
+        'local_government_office',
+        'meal_takeaway',
+        'grocery_or_supermarket',
+        'lodging',
+        'church',
+        'school'
       ],
       maxResultCount: 20,
       locationRestriction: {
@@ -129,7 +134,7 @@ serve(async (req) => {
             latitude: location.lat,
             longitude: location.lng
           },
-          radius: 24140.0 // 15 miles
+          radius: 32000.0 // ~20 miles for better coverage
         }
       }
     };
@@ -258,18 +263,45 @@ function categorizePlace(placeTypes, placeName) {
   if (placeTypes.includes('local_government_office')) {
     categories.push('local_government_office');
   }
-
-  // Name-based categorization (case-insensitive word matching)
-  if (lowerName.includes('food') || lowerName.includes('pantry') || lowerName.includes('kitchen')) {
+  if (placeTypes.includes('meal_takeaway') || placeTypes.includes('grocery_or_supermarket')) {
     categories.push('food_assistance');
   }
-  if (lowerName.includes('shelter') || lowerName.includes('housing') || lowerName.includes('refuge')) {
+  if (placeTypes.includes('lodging')) {
     categories.push('shelter_assistance');
   }
-  if (lowerName.includes('medical') || lowerName.includes('clinic') || lowerName.includes('health')) {
+  if (placeTypes.includes('church')) {
+    categories.push('community_center');
+    // Churches often provide food and shelter assistance
+    if (lowerName.includes('food') || lowerName.includes('pantry') || lowerName.includes('kitchen') || lowerName.includes('meal')) {
+      categories.push('food_assistance');
+    }
+    if (lowerName.includes('shelter') || lowerName.includes('housing') || lowerName.includes('refuge')) {
+      categories.push('shelter_assistance');
+    }
+  }
+  if (placeTypes.includes('school')) {
+    categories.push('community_center');
+    // Schools often serve as emergency shelters
+    if (lowerName.includes('emergency') || lowerName.includes('shelter') || lowerName.includes('evacuation')) {
+      categories.push('shelter_assistance');
+    }
+  }
+
+  // Enhanced name-based categorization (case-insensitive word matching)
+  if (lowerName.includes('food') || lowerName.includes('pantry') || lowerName.includes('kitchen') || 
+      lowerName.includes('meal') || lowerName.includes('soup') || lowerName.includes('bank')) {
+    categories.push('food_assistance');
+  }
+  if (lowerName.includes('shelter') || lowerName.includes('housing') || lowerName.includes('refuge') || 
+      lowerName.includes('homeless') || lowerName.includes('temporary') || lowerName.includes('evacuation')) {
+    categories.push('shelter_assistance');
+  }
+  if (lowerName.includes('medical') || lowerName.includes('clinic') || lowerName.includes('health') || 
+      lowerName.includes('urgent') || lowerName.includes('emergency')) {
     categories.push('emergency_medical');
   }
-  if (lowerName.includes('emergency') || lowerName.includes('ems')) {
+  if (lowerName.includes('police') || lowerName.includes('sheriff') || lowerName.includes('fire') || 
+      lowerName.includes('ems') || lowerName.includes('rescue')) {
     categories.push('emergency_responder');
   }
 
