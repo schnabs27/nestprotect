@@ -454,10 +454,14 @@ const ResourcesPage = () => {
                        {!resource.address && resource.city && resource.city}
                      </p>
 
-                     {/* Description (text only) */}
-                     <p className="text-xs text-muted-foreground mb-2">
-                       {toTitleCase(resource.description)}
-                     </p>
+                      {/* Category badges */}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {resource.category && (
+                          <Badge variant="secondary" className="text-xs py-0 px-2">
+                            {toTitleCase(resource.category)}
+                          </Badge>
+                        )}
+                      </div>
 
                      {/* Icon row with 3 clickable icons */}
                      <div className="flex gap-3 mb-1">
@@ -511,24 +515,27 @@ const ResourcesPage = () => {
                           <Info size={18} className="text-blue-500" />
                         </Button>
                       )}
-                    </div>
+                         
+                         {/* Favorite star icon */}
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => toggleFavorite(resource)}
+                           className={`h-8 w-8 p-0 ${
+                             favorites.has(`${resource.source_id}-${resource.source}`) 
+                               ? "text-yellow hover:text-yellow/80" 
+                               : "text-muted-foreground hover:text-yellow"
+                           }`}
+                         >
+                           <Star 
+                             size={18} 
+                             fill={favorites.has(`${resource.source_id}-${resource.source}`) ? "currentColor" : "none"}
+                           />
+                         </Button>
+                       </div>
 
-                     {/* Category row: List categories as comma-separated text */}
-                     <div className="text-xs text-muted-foreground">
-                      {resource.category && (
-                        <>
-                          <span className="font-medium">Category:</span> {resource.category}
-                        </>
-                      )}
-                      {resource.source && (
-                        <>
-                          {resource.category && ' • '}
-                          <span className="font-medium">Source:</span> {resource.source}
-                        </>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                   </CardContent>
+                 </Card>
               ))}
             </div>
           </div>
