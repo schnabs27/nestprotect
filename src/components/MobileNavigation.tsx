@@ -49,7 +49,7 @@ const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => 
               onClick={() => handleTabClick(tab)}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 text-xs transition-smooth",
-                isDuringTab && "bg-orange-50/50",
+                isDuringTab && "bg-orange-50/60 border-l-2 border-r-2 border-orange-500",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
