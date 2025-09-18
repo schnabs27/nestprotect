@@ -90,25 +90,35 @@ serve(async (req) => {
     const mapsApiKey = Deno.env.get('MAPS_API_KEY');
     
     if (!mapsApiKey) {
-      throw new Error('Google Maps API key not configured');
+      console.error('MAPS_API_KEY not found in environment variables');
+      throw new Error('Google Maps API key not configured. Please check server configuration.');
     }
+    
+    console.log('MAPS_API_KEY found, proceeding with geocoding...');
 
     // Geocode ZIP code
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${sanitizedZipCode}&key=${mapsApiKey}`;
+    console.log(`Geocoding URL: ${geocodeUrl}`);
+    
     const geocodeResponse = await fetch(geocodeUrl);
+    console.log(`Geocoding response status: ${geocodeResponse.status}`);
     
     if (!geocodeResponse.ok) {
-      throw new Error('Geocoding failed');
+      const errorText = await geocodeResponse.text();
+      console.error(`Geocoding failed with status ${geocodeResponse.status}: ${errorText}`);
+      throw new Error(`Geocoding failed with status ${geocodeResponse.status}`);
     }
 
     const geocodeData = await geocodeResponse.json();
+    console.log(`Geocoding response data:`, JSON.stringify(geocodeData, null, 2));
     
     if (geocodeData.status !== 'OK' || !geocodeData.results?.[0]) {
-      throw new Error('Invalid ZIP code or geocoding failed');
+      console.error(`Geocoding failed - status: ${geocodeData.status}, results count: ${geocodeData.results?.length || 0}`);
+      throw new Error(`Geocoding failed - status: ${geocodeData.status}. Please check your ZIP code and try again.`);
     }
 
     const location = geocodeData.results[0].geometry.location;
-    console.log(`Location: ${location.lat}, ${location.lng}`);
+    console.log(`Location found: ${location.lat}, ${location.lng}`);
 
     // Single comprehensive emergency resource search
     console.log('Starting comprehensive emergency resource search');
