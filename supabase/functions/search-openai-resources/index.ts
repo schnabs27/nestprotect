@@ -26,21 +26,28 @@ serve(async (req) => {
 
   try {
     const { zipCode } = await req.json();
+    console.log(`Starting search for ZIP code: ${zipCode}`);
+    
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    console.log(`OpenAI API key found: ${openaiApiKey ? 'Yes' : 'No'}`);
 
     if (!openaiApiKey) {
+      console.error('OpenAI API key not configured');
       throw new Error('OpenAI API key not configured');
     }
 
     // Validate ZIP code format
     if (!zipCode || !/^\d{5}(-\d{4})?$/.test(zipCode)) {
+      console.error(`Invalid ZIP code format: ${zipCode}`);
       return new Response(
         JSON.stringify({ error: 'Invalid ZIP code format' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log(`Calling searchOpenAI function for ZIP: ${zipCode}`);
     const results = await searchOpenAI(zipCode, openaiApiKey);
+    console.log(`SearchOpenAI returned ${results.length} results`);
 
     return new Response(
       JSON.stringify({ 
@@ -127,6 +134,9 @@ RULES
 Please search for current disaster response resources in ZIP code ${requestedZipcode}.`;
 
   try {
+    console.log(`Making OpenAI API call for ZIP: ${requestedZipcode}`);
+    console.log(`API key length: ${openaiApiKey.length}`);
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -146,31 +156,47 @@ Please search for current disaster response resources in ZIP code ${requestedZip
       })
     });
 
+    console.log(`OpenAI API response status: ${response.status}`);
+    
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`OpenAI API error: ${response.status} - ${errorText}`);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log(`OpenAI response data:`, JSON.stringify(data, null, 2));
+    
     const content = data.choices[0]?.message?.content;
+    console.log(`OpenAI content: ${content?.substring(0, 500)}...`);
 
     if (!content) {
+      console.log('No content in OpenAI response');
       return [];
     }
 
     // Parse JSON response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.log('No JSON found in OpenAI response');
       return [];
     }
 
+    console.log(`JSON match found: ${jsonMatch[0].substring(0, 200)}...`);
     const parsedResponse = JSON.parse(jsonMatch[0]);
-    return parsedResponse.results.map((result: any) => ({
+    console.log(`Parsed response:`, parsedResponse);
+    
+    const results = parsedResponse.results.map((result: any) => ({
       ...result,
       source: 'openai'
     }));
+    
+    console.log(`Returning ${results.length} results`);
+    return results;
 
   } catch (error) {
     console.error('OpenAI search error:', error);
+    console.error('Error stack:', error.stack);
     return [];
   }
 }
