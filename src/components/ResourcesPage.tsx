@@ -456,7 +456,21 @@ const ResourcesPage = () => {
 
                       {/* Category badges */}
                       <div className="flex flex-wrap gap-1 mb-2">
-                        {resource.category && (
+                        {/* Handle categories array (from newer API responses) */}
+                        {resource.categories && resource.categories.length > 0 && 
+                          Object.entries(resource.categories).map(([key, value]) => {
+                            if (value === true) {
+                              return (
+                                <Badge key={key} variant="secondary" className="text-xs py-0 px-2">
+                                  {toTitleCase(key.replace(/_/g, ' '))}
+                                </Badge>
+                              );
+                            }
+                            return null;
+                          }).filter(Boolean)
+                        }
+                        {/* Handle single category (fallback) */}
+                        {resource.category && (!resource.categories || Object.keys(resource.categories).length === 0) && (
                           <Badge variant="secondary" className="text-xs py-0 px-2">
                             {toTitleCase(resource.category)}
                           </Badge>
