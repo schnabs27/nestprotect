@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Phone, Info, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, MapPin, Phone, Globe, Star, Lock, LogIn, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserLocation } from "@/hooks/useUserLocation";
+import { useAuth } from "@/components/AuthProvider";
 
 interface DisasterResource {
   id: string;
@@ -31,35 +35,72 @@ interface DisasterResource {
 }
 
 const AISearchPage = () => {
+  const navigate = useNavigate();
+  const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
+  const { user, isGuest } = useAuth();
   const [zipCode, setZipCode] = useState("");
+  const [hasUserClearedField, setHasUserClearedField] = useState(false);
   const [resources, setResources] = useState<DisasterResource[]>([]);
   const [filteredResources, setFilteredResources] = useState<DisasterResource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const { toast } = useToast();
 
-  // Available categories for filtering
-  const availableCategories = [
-    'emergency responder',
-    'emergency medical', 
-    'emergency shelter',
-    'disaster relief food assistance',
-    'community center',
-    'local government disaster resources'
+  // Set user's zip code as default when available, but only if user hasn't manually cleared it
+  useEffect(() => {
+    if (userZipCode && !zipCode && !hasUserClearedField) {
+      setZipCode(userZipCode);
+    }
+  }, [userZipCode, zipCode, hasUserClearedField]);
+
+  // Handle input changes and track if user manually clears the field
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setZipCode(value);
+    
+    // If user clears the field completely, mark it as manually cleared
+    if (value === "" && zipCode !== "") {
+      setHasUserClearedField(true);
+    } else if (value !== "" && hasUserClearedField) {
+      // Reset the flag if user starts typing again
+      setHasUserClearedField(false);
+    }
+  };
+
+  // Helper function to convert text to title case
+  const toTitleCase = (str: string) => {
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
+
+  const mainCategories = [
+    { id: "all", label: "All", color: "bg-[#06c29a]" },
+    { id: "emergency", label: "Emergency", color: "bg-raspberry" },
+    { id: "medical", label: "Medical", color: "bg-accent" },
+    { id: "community_center", label: "Community Center", color: "bg-blue-500" },
+    { id: "govt_office", label: "Govt Office", color: "bg-purple-500" }
   ];
 
   useEffect(() => {
-    if (activeFilters.length === 0) {
-      setFilteredResources(resources);
-    } else {
-      const filtered = resources.filter(resource => 
-        activeFilters.some(filter => 
-          resource.category?.toLowerCase().includes(filter.toLowerCase())
-        )
+    const filtered = resources.filter(resource => {
+      if (selectedCategory === "all") return true;
+      
+      // Map AI search categories to our category system
+      const categoryMap: Record<string, string[]> = {
+        emergency: ['emergency responder'],
+        medical: ['emergency medical'],
+        community_center: ['community center'],
+        govt_office: ['local government']
+      };
+      
+      const targetCategories = categoryMap[selectedCategory] || [];
+      return targetCategories.some(cat => 
+        resource.category?.toLowerCase().includes(cat.toLowerCase())
       );
-      setFilteredResources(filtered);
-    }
-  }, [resources, activeFilters]);
+    });
+    setFilteredResources(filtered);
+  }, [resources, selectedCategory]);
 
   const handleSearch = async () => {
     if (!zipCode.trim()) {
@@ -120,197 +161,215 @@ const AISearchPage = () => {
     }
   };
 
-  const handleFilterToggle = (category: string) => {
-    setActiveFilters(prev => 
-      prev.includes(category) 
-        ? prev.filter(f => f !== category)
-        : [...prev, category]
-    );
-  };
-
-  const toTitleCase = (str: string) => {
-    if (!str) return '';
-    return str.replace(/\w\S*/g, (txt) =>
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-background/80">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-title mb-4">AI-Powered Disaster Resources</h1>
-            <p className="text-lg text-muted-foreground">
-              Find disaster response resources using AI intelligence
-            </p>
+    <div className="pb-20 min-h-screen bg-gradient-subtle">
+      {/* Header */}
+      <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold mb-1">AI Disaster Resources</h1>
           </div>
+        </div>
+      </div>
 
-          {/* Search Section */}
-          <Card className="mb-8 shadow-soft">
-            <CardContent className="p-6">
-              <div className="flex gap-4 items-end">
+      <div className="p-4 space-y-6">
+        {/* Authentication Required Notice */}
+        {(!user || isGuest) && (
+          <Card className="shadow-soft border-yellow/30 bg-yellow/10">
+            <CardContent className="p-6 text-center">
+              <Lock className="mx-auto mb-4 text-yellow" size={48} />
+              <h2 className="text-xl font-bold text-title mb-2">Sign In Required</h2>
+              <p className="text-muted-foreground mb-4">
+                Access to AI disaster resources requires a free account to ensure data privacy and prevent misuse.
+              </p>
+              <Button 
+                onClick={() => navigate("/")}
+                className="bg-gradient-primary border-0"
+                size="lg"
+              >
+                <LogIn className="mr-2" size={18} />
+                Sign In to Continue
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Show content only for authenticated users */}
+        {user && !isGuest && (
+          <>
+            {/* Search Section */}
+            <div className="bg-background shadow-soft p-4">
+              <p className="text-muted-foreground mb-4">
+                Search AI-powered disaster resources and emergency assistance.
+              </p>
+              <div className="flex gap-2 mb-4">
                 <div className="flex-1">
-                  <label htmlFor="zipcode" className="block text-sm font-medium text-title mb-2">
-                    ZIP Code
-                  </label>
                   <Input
-                    id="zipcode"
-                    type="text"
-                    placeholder="Enter ZIP code (e.g., 12345)"
+                    placeholder="Enter ZIP code or address"
+                    name="requested_zipcode"
                     value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="text-lg h-12"
+                    onChange={handleZipCodeChange}
+                    className="h-12"
                   />
                 </div>
                 <Button 
-                  onClick={handleSearch} 
-                  disabled={isLoading}
+                  onClick={handleSearch}
                   size="lg"
-                  className="h-12 px-8"
+                  className="bg-gradient-primary border-0 shadow-medium hover:shadow-strong transition-all duration-300"
+                  disabled={isLoading}
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Searching...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-4 h-4 mr-2" />
-                      Search AI Resources
-                    </>
-                  )}
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Filter Section */}
-          {resources.length > 0 && (
-            <Card className="mb-6 shadow-soft">
-              <CardContent className="p-4">
-                <h3 className="text-lg font-semibold text-title mb-3">Filter by Category</h3>
+              {/* Category Filters */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
                 <div className="flex flex-wrap gap-2">
-                  {availableCategories.map((category) => (
-                    <Button
-                      key={category}
-                      variant={activeFilters.includes(category) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleFilterToggle(category)}
-                      className="text-sm"
-                    >
-                      {toTitleCase(category)}
-                    </Button>
-                  ))}
+                  {mainCategories.map((category) => {
+                    const isSelected = selectedCategory === category.id;
+                    
+                    return (
+                      <Badge
+                        key={category.id}
+                        variant="secondary"
+                        className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                          isSelected 
+                            ? `${category.color} text-white ring-2 ring-primary`
+                            : "bg-white text-muted-foreground"
+                        }`}
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        {category.label}
+                      </Badge>
+                    );
+                  })}
                 </div>
-                {activeFilters.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-sm text-muted-foreground">
-                      Showing {filteredResources.length} of {resources.length} resources
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+              </div>
 
-          {/* Results Section */}
-          <div className="space-y-3">
+              {/* Results count */}
+              {resources.length > 0 && (
+                <div className="bg-primary/5 p-3 -mx-4 -mb-4">
+                  <p className="text-xs text-muted-foreground">
+                    Showing {filteredResources.length} of {resources.length} AI-sourced resources
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Loading state */}
             {isLoading && (
-              <div className="text-center py-12">
+              <div className="text-center py-8">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
                 <p className="text-muted-foreground">Searching AI-powered resources...</p>
               </div>
             )}
 
-            {!isLoading && filteredResources.length === 0 && resources.length > 0 && (
-              <Card className="shadow-soft">
-                <CardContent className="p-6 text-center">
-                  <p className="text-muted-foreground">No resources match the selected filters.</p>
-                </CardContent>
-              </Card>
+            {/* Disclaimer */}
+            {resources.length > 0 && (
+              <div className="bg-orange/10 border border-orange/30 p-3 text-xs">
+                <p className="text-xs text-muted-foreground pr-8">
+                  These listings come from AI-powered databases. Please <strong>call to confirm</strong> they're open.
+                </p>
+              </div>
             )}
 
-            {filteredResources.map((resource, index) => (
-              <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
-                <CardContent className="p-2">
-                  {/* Resource name as heading */}
-                  <h3 className="text-base font-semibold text-title mb-1">{resource.name}</h3>
-                  
-                  {/* Address (text only, no icon) */}
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {resource.address && resource.city && `${resource.address}, ${resource.city}`}
-                    {resource.address && !resource.city && resource.address}
-                    {!resource.address && resource.city && resource.city}
-                  </p>
+            {/* Resource Cards */}
+            <div className="space-y-4">
+              {filteredResources.length === 0 && resources.length === 0 && !isLoading && (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Enter an address and press the *search* button for AI disaster resources</p>
+                </div>
+              )}
+              
+              {filteredResources.length === 0 && resources.length > 0 && (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No resources found for the selected category</p>
+                </div>
+              )}
 
-                  {/* Description (text only) */}
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {toTitleCase(resource.description)}
-                  </p>
+              {filteredResources.map((resource, index) => {
+                return (
+                  <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
+                    <CardContent className="p-2">
+                      {/* Resource name as heading */}
+                      <h3 className="text-base font-semibold text-title mb-1">{resource.name}</h3>
+                      
+                      {/* Address (text only, no icon) */}
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {resource.address && resource.city && `${resource.address}, ${resource.city}`}
+                        {resource.address && !resource.city && resource.address}
+                        {!resource.address && resource.city && resource.city}
+                      </p>
 
-                  {/* Icon row with 3 clickable icons */}
-                  <div className="flex gap-3 mb-1">
-                    {/* Map pin icon for directions */}
-                    {(resource.source_id || (resource.latitude && resource.longitude)) && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="p-1 h-8 w-8"
-                        onClick={() => {
-                          const directionsUrl = resource.source_id 
-                            ? `https://www.google.com/maps/dir/?api=1&destination=place_id:${resource.source_id}&origin=My+Location`
-                            : `https://www.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}&origin=My+Location`;
-                          window.open(directionsUrl, '_blank');
-                        }}
-                        title="Get directions"
-                      >
-                        <MapPin className="h-4 w-4 text-blue-600" />
-                      </Button>
-                    )}
+                      {/* Category badges */}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {resource.category && (
+                          <Badge variant="secondary" className="text-xs py-0 px-2">
+                            {toTitleCase(resource.category)}
+                          </Badge>
+                        )}
+                      </div>
 
-                    {/* Phone icon */}
-                    {resource.phone && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="p-1 h-8 w-8"
-                        onClick={() => window.open(`tel:${resource.phone}`, '_self')}
-                        title={`Call ${resource.phone}`}
-                      >
-                        <Phone className="h-4 w-4 text-green-600" />
-                      </Button>
-                    )}
+                      {/* Icon row with 4 clickable icons */}
+                      <div className="flex gap-3 mb-1">
+                        {/* Map pin icon for directions */}
+                        {(resource.source_id || (resource.latitude && resource.longitude)) && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1 h-8 w-8"
+                            onClick={() => {
+                              const directionsUrl = resource.source_id 
+                                ? `https://www.google.com/maps/dir/?api=1&destination=place_id:${resource.source_id}&origin=My+Location`
+                                : `https://www.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}&origin=My+Location`;
+                              window.open(directionsUrl, '_blank');
+                            }}
+                            title="Get directions"
+                          >
+                            <MapPin className="h-4 w-4 text-blue-600" />
+                          </Button>
+                        )}
 
-                    {/* Info icon */}
-                    {resource.website && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="p-1 h-8 w-8"
-                        onClick={() => window.open(resource.website, '_blank')}
-                        title="View more information"
-                      >
-                        <Info className="h-4 w-4 text-purple-600" />
-                      </Button>
-                    )}
-                  </div>
+                        {/* Phone icon */}
+                        {resource.phone && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1 h-8 w-8"
+                            onClick={() => window.open(`tel:${resource.phone}`, '_self')}
+                            title={`Call ${resource.phone}`}
+                          >
+                            <Phone className="h-4 w-4 text-green-600" />
+                          </Button>
+                        )}
 
-                  {/* Category row: List categories as comma-separated text */}
-                  <div className="text-xs text-muted-foreground">
-                    {resource.category && (
-                      <>
-                        <span className="font-medium">Category:</span> {resource.category}
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+                        {/* Website icon */}
+                        {resource.website && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1 h-8 w-8"
+                            onClick={() => window.open(resource.website, '_blank')}
+                            title="Visit website"
+                          >
+                            <Globe className="h-4 w-4 text-purple-600" />
+                          </Button>
+                        )}
+
+                      </div>
+
+                      {/* Description (text only) */}
+                      <p className="text-xs text-muted-foreground">
+                        {toTitleCase(resource.description)}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
