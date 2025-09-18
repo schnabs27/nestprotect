@@ -456,20 +456,33 @@ const ResourcesPage = () => {
 
                       {/* Category badges */}
                       <div className="flex flex-wrap gap-1 mb-2">
-                        {/* Handle categories array (from newer API responses) */}
-                        {resource.categories && resource.categories.length > 0 && 
-                          Object.entries(resource.categories).map(([key, value]) => {
-                            if (value === true) {
-                              return (
-                                <Badge key={key} variant="secondary" className="text-xs py-0 px-2">
-                                  {toTitleCase(key.replace(/_/g, ' '))}
-                                </Badge>
-                              );
-                            }
-                            return null;
-                          }).filter(Boolean)
-                        }
-                        {/* Handle single category (fallback) */}
+                        {resource.categories && Object.entries(resource.categories).map(([key, value]) => {
+                          if (value === true) {
+                            // Map internal category names to display names
+                            const categoryDisplayNames = {
+                              'emergency_responder': 'Emergency',
+                              'emergency_medical': 'Medical',
+                              'food_assistance': 'Food',
+                              'shelter_assistance': 'Shelter',
+                              'community_center': 'Community Center',
+                              'local_government_office': 'Govt Office',
+                              'utilities': 'Utilities',
+                              'emergency_veterinarian': 'Veterinarian',
+                              'disaster_recovery_assistance': 'Recovery'
+                            };
+                            
+                            const displayName = categoryDisplayNames[key] || toTitleCase(key.replace(/_/g, ' '));
+                            
+                            return (
+                              <Badge key={key} variant="secondary" className="text-xs py-0 px-2">
+                                {displayName}
+                              </Badge>
+                            );
+                          }
+                          return null;
+                        }).filter(Boolean)}
+                        
+                        {/* Fallback to single category if categories object is empty */}
                         {resource.category && (!resource.categories || Object.keys(resource.categories).length === 0) && (
                           <Badge variant="secondary" className="text-xs py-0 px-2">
                             {toTitleCase(resource.category)}
