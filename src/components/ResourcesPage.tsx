@@ -453,11 +453,25 @@ const ResourcesPage = () => {
                       <div className="flex flex-wrap gap-1 mb-2">
                         {/* When categories is an array of strings */}
                         {Array.isArray(resource.categories) && resource.categories.length > 0 &&
-                          resource.categories.map((cat: string) => (
-                            <Badge key={cat} variant="secondary" className="text-xs py-0 px-2">
-                              {toTitleCase(cat.replace(/_/g, ' '))}
-                            </Badge>
-                          ))}
+                          resource.categories.map((cat: string) => {
+                            const categoryDisplayNames: Record<string, string> = {
+                              emergency_responder: 'Emergency',
+                              emergency_medical: 'Medical',
+                              food_assistance: 'Food',
+                              shelter_assistance: 'Shelter',
+                              community_center: 'Community Center',
+                              local_government_office: 'Govt Office',
+                              utilities: 'Utilities',
+                              emergency_veterinarian: 'Veterinarian',
+                              disaster_recovery_assistance: 'Recovery',
+                            };
+                            const displayName = categoryDisplayNames[cat] || toTitleCase(cat.replace(/_/g, ' '));
+                            return (
+                              <Badge key={cat} variant="secondary" className="text-xs py-0 px-2">
+                                {displayName}
+                              </Badge>
+                            );
+                          })}
 
                         {/* When categories is an object of boolean flags */}
                         {!Array.isArray(resource.categories) && resource.categories &&
