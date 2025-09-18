@@ -131,7 +131,7 @@ const RecoveryIndexPage = () => {
                     <h4 className="font-medium text-title">FEMA Resources</h4>
                     <p className="text-sm text-muted-foreground">Check if you're eligible for government disaster support</p>
                     <Button
-                      variant="outline"
+                      variant="outline-success"
                       onClick={() => window.open("https://www.fema.gov/disaster/recover", "_blank")}
                       className="w-full"
                     >
@@ -149,7 +149,7 @@ const RecoveryIndexPage = () => {
                     <h4 className="font-medium text-title">Red Cross</h4>
                     <p className="text-sm text-muted-foreground">Search Red Cross disaster relief resources and assistance</p>
                     <Button
-                      variant="outline"
+                      variant="outline-success"
                       onClick={() => window.open("https://www.redcross.org/get-help/disaster-relief-and-recovery-services", "_blank")}
                       className="w-full"
                     >
@@ -167,7 +167,7 @@ const RecoveryIndexPage = () => {
                     <h4 className="font-medium text-title">United Way (211)</h4>
                     <p className="text-sm text-muted-foreground">Search United Way relief resources and community support</p>
                     <Button
-                      variant="outline"
+                      variant="outline-success"
                       onClick={() => window.open("https://www.211.org", "_blank")}
                       className="w-full"
                     >
