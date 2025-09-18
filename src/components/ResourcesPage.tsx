@@ -196,16 +196,16 @@ const ResourcesPage = () => {
          const has = (key: string) => Array.isArray(cats) ? cats.includes(key) : cats[key] === true;
  
          if (selectedCategory === "emergency") {
-           return has('emergency_responder') || has('medical_emergency') || has('emergency_medical');
+           return has('emergency_responder') || has('emergency_medical');
          }
          if (selectedCategory === "medical") {
-           return has('medical_emergency') || has('emergency_medical');
+           return has('emergency_medical');
          }
          if (selectedCategory === "food") {
-           return has('food') || has('food_assistance');
+           return has('food_assistance');
          }
          if (selectedCategory === "shelter") {
-           return has('shelter') || has('shelter_assistance');
+           return has('shelter_assistance');
          }
          if (selectedCategory === "community_center") {
            return has('community_center');

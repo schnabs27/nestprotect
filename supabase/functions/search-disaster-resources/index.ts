@@ -242,11 +242,14 @@ function categorizePlace(placeTypes, placeName) {
   const categories = [];
   const lowerName = placeName.toLowerCase();
 
-  // Place type categorization
-  if (placeTypes.includes('urgent_care') || placeTypes.includes('emergency_room')) {
-    categories.push('medical_emergency');
+  // Place type categorization - handle all the types we're searching for
+  if (placeTypes.includes('hospital') || placeTypes.includes('urgent_care') || placeTypes.includes('emergency_room')) {
+    categories.push('emergency_medical');
   }
-  if (placeTypes.includes('police') || placeTypes.includes('fire_station')) {
+  if (placeTypes.includes('police')) {
+    categories.push('emergency_responder');
+  }
+  if (placeTypes.includes('fire_station')) {
     categories.push('emergency_responder');
   }
   if (placeTypes.includes('community_center')) {
@@ -257,14 +260,21 @@ function categorizePlace(placeTypes, placeName) {
   }
 
   // Name-based categorization (case-insensitive word matching)
-  if (lowerName.includes('food')) {
-    categories.push('food');
+  if (lowerName.includes('food') || lowerName.includes('pantry') || lowerName.includes('kitchen')) {
+    categories.push('food_assistance');
   }
-  if (lowerName.includes('shelter')) {
-    categories.push('shelter');
+  if (lowerName.includes('shelter') || lowerName.includes('housing') || lowerName.includes('refuge')) {
+    categories.push('shelter_assistance');
+  }
+  if (lowerName.includes('medical') || lowerName.includes('clinic') || lowerName.includes('health')) {
+    categories.push('emergency_medical');
+  }
+  if (lowerName.includes('emergency') || lowerName.includes('ems')) {
+    categories.push('emergency_responder');
   }
 
-  return categories;
+  // Remove duplicates
+  return [...new Set(categories)];
 }
 
 function removeDuplicates(resources) {
