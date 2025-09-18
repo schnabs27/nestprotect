@@ -95,22 +95,21 @@ const RecoveryIndexPage = () => {
             </CardContent>
           </Card>
 
-          {/* Long-Term Resources */}
-          <Card className="shadow-soft opacity-75">
+          {/* Recovery Resources */}
+          <Card className="shadow-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-muted-foreground text-center">Long-Term Resources</CardTitle>
+              <CardTitle className="text-lg text-title text-center">Recovery Resources</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground leading-none mb-4">
-                  Resources for home cleanup, contractors, temporary housing, storage, and moving rentals.
+                  Quick search for businesses to help clean, fix, move, and store your nest.
                 </p>
                 <Button 
-                  disabled
-                  variant="secondary"
-                  className="w-full"
+                  onClick={() => navigate("/googlerecovery")} 
+                  className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  Coming Soon
+                  Quick Search: Recovery Resources
                 </Button>
               </div>
             </CardContent>
