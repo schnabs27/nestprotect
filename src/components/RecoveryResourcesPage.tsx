@@ -442,14 +442,14 @@ const RecoveryResourcesPage = () => {
                        {resource.description || "Recovery service"}
                      </p>
 
-                     {/* Category badges */}
-                     <div className="flex flex-wrap gap-1 mb-2">
-                       {resource.categories && resource.categories.map((cat: string) => (
-                         <Badge key={cat} variant="secondary" className="text-xs py-0 px-2 capitalize">
-                           {cat.replace('_', ' ')}
-                         </Badge>
-                       ))}
-                     </div>
+                      {/* Category badges */}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {resource.categories && resource.categories.map((cat: string) => (
+                          <Badge key={cat} variant="secondary" className="text-xs py-0 px-2">
+                            {toTitleCase(cat.replace('_', ' '))}
+                          </Badge>
+                        ))}
+                      </div>
 
                       {/* Icon row with 3 clickable icons */}
                       <div className="flex gap-3 mb-1">
