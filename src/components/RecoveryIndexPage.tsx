@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MobileNavigation from "@/components/MobileNavigation";
 import ZipCodeHeader from "@/components/ZipCodeHeader";
 import { ExternalLink, Heart, Users } from "lucide-react";
-import nestProtectRecovery from "@/assets/nestprotect-recovery.png";
+import nestorRecovery from "@/assets/nestor-recovery.png";
 
 const RecoveryIndexPage = () => {
   const { user, isGuest } = useAuth();
@@ -20,8 +20,8 @@ const RecoveryIndexPage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestProtectRecovery}
-              alt="NestProtect Recovery - Your disaster recovery guide"
+              src={nestorRecovery}
+              alt="Nestor with binoculars - Your disaster recovery guide"
               className="w-32 h-32 object-contain"
             />
           </div>
