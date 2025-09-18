@@ -114,69 +114,90 @@ serve(async (req) => {
 
     // Recovery services search
     console.log('Starting recovery services search');
-    
+
     const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
-    const requestBody = {
-      includedTypes: [
-        'contractor',
-        'roofing_contractor', 
-        'painter',
-        'plumber',
-        'electrician',
-        'storage',
-        'moving_company',
-        'car_rental',
-        'hardware_store',
-        'home_goods_store'
-      ],
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: {
-            latitude: location.lat,
-            longitude: location.lng
-          },
-          radius: 24140.0 // 15 miles
-        }
+
+    // Valid, supported types for Places API v1
+    const VALID_TYPES = [
+      'roofing_contractor',
+      'painter',
+      'plumber',
+      'electrician',
+      'moving_company',
+      'hardware_store',
+      'home_goods_store',
+      'car_rental',
+      'self_storage',
+    ];
+
+    // Helper to chunk array (API may limit number of types per request)
+    function chunkArray(arr: string[], size: number) {
+      const chunks: string[][] = [];
+      for (let i = 0; i < arr.length; i += size) {
+        chunks.push(arr.slice(i, i + size));
       }
-    };
-
-    console.log('Places API request:', JSON.stringify(requestBody, null, 2));
-
-    const placesResponse = await fetch(placesUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': mapsApiKey,
-        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber,places.googleMapsUri'
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    console.log(`Places API response status: ${placesResponse.status}`);
-    
-    if (!placesResponse.ok) {
-      const errorText = await placesResponse.text();
-      console.error('Places API error response:', errorText);
+      return chunks;
     }
 
-    if (placesResponse.ok) {
+    const typeChunks = chunkArray(VALID_TYPES, 5);
+
+    for (const types of typeChunks) {
+      const requestBody = {
+        includedTypes: types,
+        maxResultCount: 20,
+        locationRestriction: {
+          circle: {
+            center: {
+              latitude: location.lat,
+              longitude: location.lng,
+            },
+            radius: 40000.0, // ~25 miles
+          },
+        },
+      };
+
+      console.log('Places API request (types):', JSON.stringify(types));
+
+      const placesResponse = await fetch(placesUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': mapsApiKey,
+          'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.types,places.id,places.businessStatus,places.nationalPhoneNumber,places.googleMapsUri',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log(`Places API response status: ${placesResponse.status} for types: ${types.join(',')}`);
+
+      if (!placesResponse.ok) {
+        const errorText = await placesResponse.text();
+        console.error('Places API error response:', errorText);
+        continue;
+      }
+
       const placesData = await placesResponse.json();
-      if (placesData.places?.length > 0) {
-        console.log(`Found ${placesData.places.length} recovery services`);
-        
+      const count = placesData.places?.length || 0;
+      console.log(`Found ${count} places for types: ${types.join(',')}`);
+
+      if (count > 0) {
         for (const place of placesData.places) {
           const address = parseAddress(place.formattedAddress || '');
           const placeName = place.displayName?.text || 'Unknown Place';
           const placeTypes = place.types || [];
 
-          // Categorize based on place types
           const categories = categorizePlace(placeTypes);
 
           results.push({
             name: placeName,
             categories: categories,
-            description: categories.join(', ') || placeTypes.filter(t => t !== 'point_of_interest' && t !== 'establishment').slice(0, 2).join(', ').replace(/_/g, ' '),
+            description:
+              categories.join(', ') ||
+              placeTypes
+                .filter((t: string) => t !== 'point_of_interest' && t !== 'establishment')
+                .slice(0, 2)
+                .join(', ')
+                .replace(/_/g, ' '),
             phone: place.nationalPhoneNumber || '',
             url: place.googleMapsUri || `https://maps.google.com/maps/place/?q=place_id:${place.id}`,
             address: address,
@@ -185,12 +206,10 @@ serve(async (req) => {
             longitude: place.location.longitude,
             source: 'Google Maps Recovery',
             source_id: place.id || '',
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           });
         }
       }
-    } else {
-      console.log(`Places API error: ${placesResponse.status}`);
     }
 
     // Remove duplicates and store in database
@@ -267,7 +286,10 @@ function categorizePlace(placeTypes) {
   if (placeTypes.includes('hardware_store') || placeTypes.includes('home_goods_store')) {
     categories.push('tools');
   }
-
+  if (placeTypes.includes('self_storage')) {
+    categories.push('moving');
+  }
+  
   return categories;
 }
 
