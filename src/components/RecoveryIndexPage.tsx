@@ -42,7 +42,7 @@ const RecoveryIndexPage = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground leading-none mb-4">
                   You prepared this list, now you can follow it to guide your recovery process.
                 </p>
                 <Button 
@@ -62,7 +62,7 @@ const RecoveryIndexPage = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground leading-none mb-4">
                   View Google's comprehensive directory of local disaster resources and services.
                 </p>
                 <Button 
@@ -82,7 +82,7 @@ const RecoveryIndexPage = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground leading-none mb-4">
                   ChatGPT will search for additional local resources that may not appear in standard directories.
                 </p>
                 <Button 
@@ -102,7 +102,7 @@ const RecoveryIndexPage = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground leading-none mb-4">
                   Resources for home cleanup, contractors, temporary housing, storage, and moving rentals.
                 </p>
                 <Button 

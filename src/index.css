@@ -136,3 +136,9 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .card-content-text {
+    @apply text-sm text-muted-foreground leading-none;
+  }
+}
