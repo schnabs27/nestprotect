@@ -437,11 +437,6 @@ const RecoveryResourcesPage = () => {
                        {!resource.address && resource.city && resource.city}
                      </p>
 
-                     {/* Description (text only) */}
-                     <p className="text-sm text-muted-foreground mb-2 leading-none">
-                       {resource.description || "Recovery service"}
-                     </p>
-
                       {/* Category badges */}
                       <div className="flex flex-wrap gap-1 mb-2">
                         {resource.categories && resource.categories.map((cat: string) => (
