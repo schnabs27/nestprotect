@@ -91,8 +91,8 @@ const PerplexitySearchPage = () => {
         </div>
 
         {results && (
-          <div>
-            <h2 className="text-xl font-bold text-foreground mb-4">Search Results</h2>
+          <div className="mt-6">
+            <h2 className="text-xl font-bold px-4 mb-4" style={{ color: '#0080e0' }}>Search Results</h2>
             <div className="space-y-4">
               {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => {
                 const lines = record.trim().split('\n');
