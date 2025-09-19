@@ -50,7 +50,6 @@ const AISearchPage = () => {
     }
   };
 
-
   const handleSearch = async () => {
     if (!zipCode.trim()) {
       toast({
@@ -109,94 +108,53 @@ const AISearchPage = () => {
     }
   };
 
-  // Parse the answer text into sections and resources
+  // Improved parsing function to match PDF format
   const parseResourceSections = (text: string) => {
     const sections = [];
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
-    // Split by section headers (lines that don't start with bullet points)
-    const lines = text.split('\n');
     let currentSection = null;
     let currentResources = [];
     
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      if (!trimmedLine) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       
-      // Check if this is a section header (not a bullet point)
-      if (!trimmedLine.match(/^[-•*]\s/) && !trimmedLine.match(/^\s+[-•*]\s/) && trimmedLine.length > 10 && !trimmedLine.includes(':')) {
+      // Check if this is a section header (doesn't start with bullet point)
+      if (!line.match(/^[•·▪▫*-]\s/) && !line.match(/^\d+\./) && line.length > 3) {
         // Save previous section if it exists
-        if (currentSection) {
+        if (currentSection && currentResources.length > 0) {
           sections.push({
             title: currentSection,
-            resources: currentResources
+            resources: [...currentResources]
           });
         }
         
-        // Start new section - remove ## markdown formatting
-        currentSection = trimmedLine.replace(/^#+\s*/, '').replace(/^\*+|\*+$/g, '').trim();
+        // Start new section - clean up markdown formatting
+        currentSection = line
+          .replace(/^#+\s*/, '') // Remove markdown headers
+          .replace(/\*\*/g, '') // Remove bold formatting
+          .replace(/^\*+|\*+$/g, '') // Remove asterisks
+          .trim();
         currentResources = [];
-      } else if (trimmedLine.match(/^[-•*]\s/) || trimmedLine.match(/^\s+[-•*]\s/)) {
-        // This is a bullet point resource
-        const resourceText = trimmedLine.replace(/^[-•*]\s/, '').replace(/^\s+[-•*]\s/, '').trim();
+      } 
+      // Check if this is a bullet point resource
+      else if (line.match(/^[•·▪▫*-]\s/) || line.match(/^\d+\./)) {
+        const resourceText = line
+          .replace(/^[•·▪▫*-]\s*/, '') // Remove bullet points
+          .replace(/^\d+\.\s*/, '') // Remove numbers
+          .trim();
         
-        if (resourceText.length > 10) {
-          // Parse individual resource
-          // Find the first sentence or clause as the name
-          let name = '';
-          let description = '';
-          
-          // Look for patterns that indicate end of name (like " - " or " – ")
-          const nameEndMatch = resourceText.match(/^([^–\-]+?)(?:\s*[–\-]\s*(.+))?$/);
-          if (nameEndMatch) {
-            name = nameEndMatch[1].trim().replace(/^\*+|\*+$/g, '').trim();
-            description = nameEndMatch[2] ? nameEndMatch[2].trim() : '';
-          } else {
-            // Fall back to first part before comma or semicolon
-            const parts = resourceText.split(/[,;]/);
-            name = parts[0]?.trim().replace(/^\*+|\*+$/g, '').trim() || '';
-            if (parts.length > 1) {
-              description = parts.slice(1).join(', ').trim();
-            }
+        if (resourceText.length > 5) {
+          const resource = parseResourceInfo(resourceText);
+          if (resource.name) {
+            currentResources.push(resource);
           }
-          
-          let location = '';
-          let contact = '';
-          
-          // Extract address and phone patterns from the full text
-          const allParts = resourceText.split(/[,;]|\s{2,}/);
-          for (const part of allParts) {
-            const trimmedPart = part.trim();
-            if (trimmedPart.match(/\d+\s.*(?:St|Ave|Rd|Blvd|Drive|Dr|Way|Lane|Ln)/i) || trimmedPart.includes('TX')) {
-              location = trimmedPart;
-            } else if (trimmedPart.match(/\(?\d{3}\)?\s*[-.]?\s*\d{3}\s*[-.]?\s*\d{4}/) || trimmedPart.startsWith('Phone:')) {
-              contact = trimmedPart.replace('Phone:', '').trim();
-            }
-          }
-          
-          // Clean up description
-          description = description
-            .replace(/^\*+|\*+$/g, '')
-            .replace(/\*\*/g, '')
-            .replace(/^[,\s-]+/, '')
-            .trim();
-          
-          // Filter out meaningless descriptions
-          if (description === '**' || description === '*' || description.length < 10) {
-            description = '';
-          }
-          
-          currentResources.push({
-            name: name,
-            location: location,
-            contact: contact,
-            description: description
-          });
         }
       }
     }
     
     // Don't forget the last section
-    if (currentSection) {
+    if (currentSection && currentResources.length > 0) {
       sections.push({
         title: currentSection,
         resources: currentResources
@@ -204,6 +162,76 @@ const AISearchPage = () => {
     }
     
     return sections;
+  };
+
+  // Helper function to parse individual resource information
+  const parseResourceInfo = (text: string) => {
+    let name = '';
+    let description = '';
+    let location = '';
+    let contact = '';
+    
+    // Remove extra formatting
+    text = text.replace(/\*\*/g, '').replace(/^\*+|\*+$/g, '').trim();
+    
+    // Split by common delimiters but preserve the text structure
+    const parts = text.split(/(?:,|\s{2,}|\s–\s|\s-\s)/);
+    
+    // First part is usually the name
+    if (parts[0]) {
+      name = parts[0].trim();
+    }
+    
+    // Look through all parts for specific information
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i].trim();
+      
+      // Phone number detection (more flexible patterns)
+      if (part.match(/(?:phone:|tel:|call:)?\s*\(?[\d\s\-\.\(\)]{10,}\)?/i) || 
+          part.match(/\d{3}[-.\s]?\d{3}[-.\s]?\d{4}/) ||
+          part.match(/\(\d{3}\)\s*\d{3}[-.\s]?\d{4}/) ||
+          part.match(/1[-.\s]?800[-.\s]?\d{3}[-.\s]?\d{4}/)) {
+        contact = part.replace(/^(phone:|tel:|call:)\s*/i, '').trim();
+      }
+      // Address detection (look for street indicators and TX)
+      else if (part.match(/\d+\s+[A-Za-z\s]+(st|ave|rd|blvd|dr|drive|street|avenue|road|boulevard|way|lane|ln|circle|ct|court)/i) ||
+               part.includes(' TX ') || part.endsWith(' TX') || part.includes(', TX')) {
+        location = part;
+      }
+      // Website detection
+      else if (part.match(/^(www\.|https?:\/\/|\.com|\.org|\.gov)/i)) {
+        if (contact && !contact.includes('http')) {
+          contact += ` | ${part}`;
+        } else if (!contact) {
+          contact = part;
+        }
+      }
+      // Everything else goes to description (except the name)
+      else if (i > 0 && part.length > 3 && 
+               !part.match(/phone:/i) && 
+               !part.match(/\d{3}[-.\s]?\d{3}[-.\s]?\d{4}/)) {
+        if (description) {
+          description += `, ${part}`;
+        } else {
+          description = part;
+        }
+      }
+    }
+    
+    // Clean up description
+    if (description) {
+      description = description
+        .replace(/^[,\s\-–]+/, '')
+        .replace(/[,\s\-–]+$/, '')
+        .trim();
+    }
+    
+    return {
+      name: name || 'Resource',
+      description: description || '',
+      location: location || '',
+      contact: contact || ''
+    };
   };
 
   return (
@@ -279,50 +307,89 @@ const AISearchPage = () => {
             {/* Search Results */}
             {searchResult && (
               <div className="space-y-6">
-                {/* Display sections with resources */}
                 {parseResourceSections(searchResult.answer).map((section, sectionIndex) => (
                   <div key={sectionIndex} className="space-y-4">
-                    <h2 className="text-xl font-bold text-title">{section.title}</h2>
-                    {section.resources.map((resource, resourceIndex) => {
-                      // Find matching source URL for this resource
-                      const sourceUrl = searchResult.search_results?.[resourceIndex % searchResult.search_results.length]?.url || '';
-                      
-                      return (
-                        <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft">
-                          <CardContent className="p-4 space-y-2">
-                            <h3 className="text-base font-semibold text-primary">{resource.name}</h3>
-                            {resource.description && resource.description !== '**' && resource.description.trim() !== '' && (
-                              <p className="text-sm font-normal text-muted-foreground">{resource.description}</p>
-                            )}
-                            {resource.location && (
-                              <p className="text-sm text-muted-foreground">📍 {resource.location}</p>
-                            )}
-                            {resource.contact && (
-                              <p className="text-sm text-muted-foreground">📞 {resource.contact}</p>
-                            )}
-                            {sourceUrl && (
-                              <a 
-                                href={sourceUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-primary hover:text-primary/80 underline block mt-2"
-                              >
-                                View Source
-                              </a>
-                            )}
+                    <h2 className="text-xl font-bold text-title border-b border-gray-200 pb-2">
+                      {section.title}
+                    </h2>
+                    <div className="grid gap-3">
+                      {section.resources.map((resource, resourceIndex) => (
+                        <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft hover:shadow-medium transition-shadow">
+                          <CardContent className="p-4">
+                            <div className="space-y-2">
+                              <h3 className="font-semibold text-primary text-base">
+                                {resource.name}
+                              </h3>
+                              
+                              {resource.description && (
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {resource.description}
+                                </p>
+                              )}
+                              
+                              <div className="flex flex-col gap-1 text-sm">
+                                {resource.location && (
+                                  <div className="flex items-start gap-2 text-gray-700">
+                                    <MapPin size={16} className="mt-0.5 flex-shrink-0 text-primary" />
+                                    <span>{resource.location}</span>
+                                  </div>
+                                )}
+                                
+                                {resource.contact && (
+                                  <div className="flex items-start gap-2 text-gray-700">
+                                    <Phone size={16} className="mt-0.5 flex-shrink-0 text-primary" />
+                                    <span>{resource.contact}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </CardContent>
                         </Card>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 ))}
+                
+                {/* Sources section */}
+                {searchResult.search_results && searchResult.search_results.length > 0 && (
+                  <Card className="shadow-soft mt-6">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-primary mb-3 flex items-center gap-2">
+                        <Globe size={18} />
+                        Sources
+                      </h3>
+                      <div className="space-y-2">
+                        {searchResult.search_results.map((source, index) => (
+                          <div key={index} className="text-sm">
+                            <a 
+                              href={source.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80 underline font-medium"
+                            >
+                              {source.title}
+                            </a>
+                            {source.date && (
+                              <span className="text-gray-500 ml-2">
+                                ({new Date(source.date).toLocaleDateString()})
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 
             {/* Empty state */}
             {!searchResult && !isLoading && (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Enter a ZIP code and press "Search" to find disaster relief resources</p>
+              <div className="text-center py-12">
+                <Search className="mx-auto mb-4 text-gray-400" size={48} />
+                <p className="text-muted-foreground">
+                  Enter a ZIP code and press "Search" to find disaster relief resources
+                </p>
               </div>
             )}
           </>
