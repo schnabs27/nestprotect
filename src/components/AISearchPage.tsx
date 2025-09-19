@@ -141,19 +141,30 @@ const AISearchPage = () => {
         
         if (resourceText.length > 10) {
           // Parse individual resource
-          const parts = resourceText.split(/[,;]|\s{2,}/);
-          let name = parts[0]?.trim() || '';
+          // Find the first sentence or clause as the name
+          let name = '';
+          let description = '';
           
-          // Remove ** markdown formatting from name
-          name = name.replace(/^\*+|\*+$/g, '').trim();
+          // Look for patterns that indicate end of name (like " - " or " – ")
+          const nameEndMatch = resourceText.match(/^([^–\-]+?)(?:\s*[–\-]\s*(.+))?$/);
+          if (nameEndMatch) {
+            name = nameEndMatch[1].trim().replace(/^\*+|\*+$/g, '').trim();
+            description = nameEndMatch[2] ? nameEndMatch[2].trim() : '';
+          } else {
+            // Fall back to first part before comma or semicolon
+            const parts = resourceText.split(/[,;]/);
+            name = parts[0]?.trim().replace(/^\*+|\*+$/g, '').trim() || '';
+            if (parts.length > 1) {
+              description = parts.slice(1).join(', ').trim();
+            }
+          }
           
           let location = '';
           let contact = '';
-          let services = resourceText.replace(/^\*+|\*+$/g, '').trim();
-          let description = '';
           
-          // Extract address and phone patterns
-          for (const part of parts) {
+          // Extract address and phone patterns from the full text
+          const allParts = resourceText.split(/[,;]|\s{2,}/);
+          for (const part of allParts) {
             const trimmedPart = part.trim();
             if (trimmedPart.match(/\d+\s.*(?:St|Ave|Rd|Blvd|Drive|Dr|Way|Lane|Ln)/i) || trimmedPart.includes('TX')) {
               location = trimmedPart;
@@ -162,12 +173,11 @@ const AISearchPage = () => {
             }
           }
           
-          // Extract description (everything after the name, cleaned of markdown)
-          const nameEndIndex = resourceText.indexOf(name) + name.length;
-          description = resourceText.substring(nameEndIndex)
-            .replace(/^[,\s-]+/, '')
+          // Clean up description
+          description = description
             .replace(/^\*+|\*+$/g, '')
             .replace(/\*\*/g, '')
+            .replace(/^[,\s-]+/, '')
             .trim();
           
           // Filter out meaningless descriptions
@@ -179,7 +189,6 @@ const AISearchPage = () => {
             name: name,
             location: location,
             contact: contact,
-            services: services,
             description: description
           });
         }
@@ -283,7 +292,7 @@ const AISearchPage = () => {
                           <CardContent className="p-4 space-y-2">
                             <h3 className="text-base font-semibold text-primary">{resource.name}</h3>
                             {resource.description && resource.description !== '**' && resource.description.trim() !== '' && (
-                              <p className="text-sm text-muted-foreground">{resource.description}</p>
+                              <p className="text-sm font-normal text-muted-foreground">{resource.description}</p>
                             )}
                             {resource.location && (
                               <p className="text-sm text-muted-foreground">📍 {resource.location}</p>
