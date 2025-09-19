@@ -78,23 +78,22 @@ Focus only on factual listings from official sources, press releases, and verifi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar',
+        model: 'llama-3.1-sonar-small-128k-online',
         messages: [
           {
             role: 'system',
-            content: 'Provide only factual listings of disaster relief resources. No commentary or descriptions.'
+            content: 'Provide factual listings of disaster relief resources organized by categories with clear section headers and bullet points.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.1,
-        top_p: 0.7,
-        max_tokens: 800,
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 1000,
         return_images: false,
         return_related_questions: false,
-        search_domain_filter: ["gov", "org", "edu"],
         search_recency_filter: 'month',
         frequency_penalty: 1,
         presence_penalty: 0
