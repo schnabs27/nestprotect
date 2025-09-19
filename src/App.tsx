@@ -12,6 +12,7 @@ import WeatherPage from "./components/WeatherPage";
 import ResourcesPage from "./components/ResourcesPage";
 import RecoveryResourcesPage from "./components/RecoveryResourcesPage";
 import AISearchPage from "./components/AISearchPage";
+import PerplexitySearchPage from "./components/PerplexitySearchPage";
 import RecoveryIndexPage from "./components/RecoveryIndexPage";
 import ProfilePage from "./components/ProfilePage";
 import NotFound from "./pages/NotFound";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/googlesearch" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
             <Route path="/googlerecovery" element={<ProtectedRoute><RecoveryResourcesPage /></ProtectedRoute>} />
             <Route path="/aisearch" element={<ProtectedRoute><AISearchPage /></ProtectedRoute>} />
+            <Route path="/perplexitysearch" element={<ProtectedRoute><PerplexitySearchPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsOfService />} />

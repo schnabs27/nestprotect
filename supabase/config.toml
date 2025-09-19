@@ -34,3 +34,6 @@ verify_jwt = false
 
 [functions.search-recovery-resources]
 verify_jwt = false
+
+[functions.search-perplexity-simple]
+verify_jwt = false
