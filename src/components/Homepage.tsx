@@ -214,7 +214,7 @@ const Homepage = () => {
         <div className="text-center pt-4">
           <Button 
             onClick={() => navigate("/shortcut")}
-            className="w-full bg-gradient-primary hover:opacity-90"
+            className="w-full bg-gradient-phone hover:opacity-90 text-white"
           >
             Add NestProtect to Your Phone
           </Button>

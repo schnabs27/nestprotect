@@ -112,7 +112,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			},
 			backgroundImage: {
-				'gradient-primary': 'var(--gradient-primary)',
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-phone': 'var(--gradient-phone)',
 				'gradient-subtle': 'var(--gradient-subtle)'
 			},
 			boxShadow: {
