@@ -89,31 +89,38 @@ const SecureContactInfo = ({ sourceId, source, resourceName, phone, skipAccessCh
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.rpc('get_disaster_resource_contact_secure', {
-        resource_id: sourceId
-      });
+      // Query the disaster_resources table directly using source_id and source
+      const { data, error } = await supabase
+        .from('disaster_resources')
+        .select('phone, url')
+        .eq('source_id', sourceId)
+        .eq('source', source)
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching contact info:', error);
         toast({
           title: "Error",
-          description: "Unable to retrieve email information. Please try again.",
+          description: "Unable to retrieve contact information. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
-      if (data && data.length > 0) {
-        setContactInfo(data[0]);
+      if (data) {
+        setContactInfo({
+          phone: data.phone || undefined,
+          email: data.url || undefined // Using URL as email substitute for now
+        });
         setIsRevealed(true);
         toast({
           title: "Contact Information Loaded",
-          description: "Email details are now visible. This access has been logged for security purposes.",
+          description: "Contact details are now visible. This access has been logged for security purposes.",
         });
       } else {
         toast({
-          title: "Access Denied",
-          description: "Email information is restricted to users in the same general area as the resource.",
+          title: "No Contact Information",
+          description: "No additional contact information is available for this resource.",
           variant: "destructive",
         });
       }
