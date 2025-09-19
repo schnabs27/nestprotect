@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -96,9 +97,15 @@ const PerplexitySearchPage = () => {
               {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => {
                 const lines = record.trim().split('\n');
                 const nameLineIndex = lines.findIndex(line => line.startsWith('Name:'));
+                const categoryLineIndex = lines.findIndex(line => line.startsWith('Category:'));
+                
                 const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
+                const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
+                
                 const nameValue = nameLine.replace('Name:', '').trim();
-                const otherLines = lines.filter((_, i) => i !== nameLineIndex);
+                const categoryValue = categoryLine.replace('Category:', '').trim();
+                
+                const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex);
                 
                 return (
                   <Card key={index} className="shadow-soft">
@@ -107,6 +114,11 @@ const PerplexitySearchPage = () => {
                         <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
                           {nameValue}
                         </h3>
+                      )}
+                      {categoryValue && (
+                        <Badge variant="secondary" className="bg-gray-100 text-gray-700 mb-2">
+                          {categoryValue}
+                        </Badge>
                       )}
                       <div className="whitespace-pre-wrap text-foreground">
                         {otherLines.join('\n')}
