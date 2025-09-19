@@ -109,6 +109,16 @@ const AISearchPage = () => {
     }
   };
 
+  // Parse the answer text into separate resource entries
+  const parseResourceEntries = (text: string) => {
+    // Split by common separators that indicate new resources
+    const entries = text.split(/(?:\n\n|\d+\.\s|\*\s|•\s|-\s(?=[A-Z]))/g)
+      .filter(entry => entry.trim().length > 50) // Filter out very short entries
+      .map(entry => entry.trim());
+    
+    return entries.length > 1 ? entries : [text]; // Return original if parsing doesn't work well
+  };
+
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -182,11 +192,18 @@ const AISearchPage = () => {
             {/* Search Results */}
             {searchResult && (
               <div className="space-y-6">
-                {/* Main answer with body text formatting */}
-                <div className="prose prose-lg max-w-none">
-                  <p className="text-body leading-relaxed text-muted-foreground">
-                    {searchResult.answer}
-                  </p>
+                {/* Parse and display resources as separate cards */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-title mb-4">Disaster Relief Resources</h3>
+                  {parseResourceEntries(searchResult.answer).map((entry, index) => (
+                    <Card key={index} className="shadow-soft">
+                      <CardContent className="p-4">
+                        <p className="text-body leading-relaxed text-muted-foreground whitespace-pre-line">
+                          {entry}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
 
                 {/* Search results from sources */}
