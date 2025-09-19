@@ -83,7 +83,7 @@ const RecoveryIndexPage = () => {
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground leading-none mb-4">
-                  ChatGPT will quick search disaster resources that may not appear in standard directories.
+                  Perplexity AI will search the news for local disaster resources.
                 </p>
                 <Button 
                   onClick={() => navigate("/aisearch")} 
