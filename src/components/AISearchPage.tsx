@@ -109,14 +109,34 @@ const AISearchPage = () => {
     }
   };
 
-  // Parse the answer text into separate resource entries
+  // Parse the answer text into structured resource sections
   const parseResourceEntries = (text: string) => {
-    // Split by common separators that indicate new resources
-    const entries = text.split(/(?:\n\n|\d+\.\s|\*\s|•\s|-\s(?=[A-Z]))/g)
-      .filter(entry => entry.trim().length > 50) // Filter out very short entries
-      .map(entry => entry.trim());
+    // Remove summary table (content with pipe delimiters that's not helpful)
+    const cleanedText = text.replace(/\|[^\n]*\|[^\n]*\n/g, '').replace(/\|\s*-+\s*\|/g, '');
     
-    return entries.length > 1 ? entries : [text]; // Return original if parsing doesn't work well
+    // Split by section headers (marked with **)
+    const sections = cleanedText.split(/\*\*([^*]+)\*\*/g);
+    
+    const entries = [];
+    
+    for (let i = 1; i < sections.length; i += 2) {
+      const title = sections[i].trim();
+      const content = sections[i + 1]?.trim();
+      
+      if (content && content.length > 50) {
+        entries.push({
+          title: title,
+          content: content
+        });
+      }
+    }
+    
+    // If no sections found, return the cleaned text as a single entry
+    if (entries.length === 0) {
+      return [{ title: "Disaster Relief Resources", content: cleanedText.trim() }];
+    }
+    
+    return entries;
   };
 
   return (
@@ -198,8 +218,9 @@ const AISearchPage = () => {
                   {parseResourceEntries(searchResult.answer).map((entry, index) => (
                     <Card key={index} className="shadow-soft">
                       <CardContent className="p-4">
+                        <h4 className="font-semibold text-title mb-3">{entry.title}</h4>
                         <p className="text-body leading-relaxed text-muted-foreground whitespace-pre-line">
-                          {entry}
+                          {entry.content}
                         </p>
                       </CardContent>
                     </Card>
