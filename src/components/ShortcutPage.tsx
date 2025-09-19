@@ -82,7 +82,7 @@ const ShortcutPage = () => {
           <h1 className="text-2xl font-bold text-title">Ready to add NestProtect to your home?</h1>
           
           {/* Intro Content */}
-          <div className="space-y-4 text-foreground">
+          <div className="space-y-4 text-muted-foreground">
             <p>It's easy to add the NestProtect app to your phone's home screen.</p>
             <p>NestProtect is a web app that uses your phone's web browser. Just follow the instructions to add the NestProtect homepage as a shortcut on your phone.</p>
             <p>Start by selecting your web browser for instructions.</p>
@@ -111,7 +111,7 @@ const ShortcutPage = () => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <CardContent className="pt-0">
-                    <ol className="space-y-2 text-foreground">
+                    <ol className="space-y-2 text-muted-foreground">
                       {browser.steps.map((step, index) => (
                         <li key={index} className="flex">
                           <span className="mr-3 font-medium text-primary">{index + 1}.</span>
@@ -127,7 +127,7 @@ const ShortcutPage = () => {
         </div>
 
         {/* Footer Text */}
-        <div className="text-center text-foreground">
+        <div className="text-center text-muted-foreground">
           <p>Can't find the option? Try bookmarking the page first, then look for options to add bookmarks to your home screen or desktop.</p>
         </div>
       </div>
