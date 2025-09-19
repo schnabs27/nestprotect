@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SelfAssessmentPage from "./components/SelfAssessmentPage";
+import ShortcutPage from "./components/ShortcutPage";
 import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/perplexitysearch" element={<ProtectedRoute><PerplexitySearchPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
+            <Route path="/shortcut" element={<ProtectedRoute><ShortcutPage /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
