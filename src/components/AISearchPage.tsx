@@ -162,9 +162,18 @@ const AISearchPage = () => {
             }
           }
           
-          // Extract description (everything after the name)
+          // Extract description (everything after the name, cleaned of markdown)
           const nameEndIndex = resourceText.indexOf(name) + name.length;
-          description = resourceText.substring(nameEndIndex).replace(/^[,\s-]+/, '').trim();
+          description = resourceText.substring(nameEndIndex)
+            .replace(/^[,\s-]+/, '')
+            .replace(/^\*+|\*+$/g, '')
+            .replace(/\*\*/g, '')
+            .trim();
+          
+          // Filter out meaningless descriptions
+          if (description === '**' || description === '*' || description.length < 10) {
+            description = '';
+          }
           
           currentResources.push({
             name: name,
@@ -273,7 +282,7 @@ const AISearchPage = () => {
                         <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft">
                           <CardContent className="p-4 space-y-2">
                             <h3 className="text-base font-semibold text-primary">{resource.name}</h3>
-                            {resource.description && (
+                            {resource.description && resource.description !== '**' && resource.description.trim() !== '' && (
                               <p className="text-sm text-muted-foreground">{resource.description}</p>
                             )}
                             {resource.location && (
