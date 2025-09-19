@@ -109,34 +109,63 @@ const AISearchPage = () => {
     }
   };
 
-  // Parse the answer text into structured resource sections
+  // Parse the answer text into individual resource entries
   const parseResourceEntries = (text: string) => {
-    // Remove summary table (content with pipe delimiters that's not helpful)
+    // Remove summary table and unwanted content
     const cleanedText = text.replace(/\|[^\n]*\|[^\n]*\n/g, '').replace(/\|\s*-+\s*\|/g, '');
     
-    // Split by section headers (marked with **)
-    const sections = cleanedText.split(/\*\*([^*]+)\*\*/g);
+    // Split by bullet points and numbered lists to get individual resources
+    const resourceLines = cleanedText.split(/(?:\n-\s|\n\*\s|\n\d+\.\s|\n•\s)/g)
+      .filter(line => line.trim().length > 30);
     
-    const entries = [];
+    const resources = [];
     
-    for (let i = 1; i < sections.length; i += 2) {
-      const title = sections[i].trim();
-      const content = sections[i + 1]?.trim();
+    for (const line of resourceLines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
       
-      if (content && content.length > 50) {
-        entries.push({
-          title: title,
-          content: content
-        });
+      // Extract resource information using patterns
+      const nameMatch = trimmedLine.match(/^([^:\n]+?)(?:\s*[:]\s*|\s*\n|$)/);
+      const locationMatch = trimmedLine.match(/(?:Location|Address)[:]\s*([^\n]+)/i);
+      const contactMatch = trimmedLine.match(/(?:Contact|Phone|Website)[:]\s*([^\n]+)/i);
+      const servicesMatch = trimmedLine.match(/(?:Services|Programs)[:]\s*([^\n]+)/i);
+      
+      if (nameMatch) {
+        const name = nameMatch[1].replace(/^\*+|\*+$/g, '').trim(); // Remove asterisks
+        
+        // Extract other details from the rest of the text
+        const restOfText = trimmedLine.substring(nameMatch[0].length);
+        const location = locationMatch ? locationMatch[1].trim() : 
+          restOfText.match(/(?:\n|^)([^:\n]*(?:Ave|St|Road|Rd|Blvd|Drive|Dr|Way|Lane|Ln|TX|Dallas|Houston|Austin)[^:\n]*)/i)?.[1]?.trim();
+        
+        const contact = contactMatch ? contactMatch[1].trim() : 
+          restOfText.match(/(?:\(?\d{3}\)?\s*[-.]?\s*\d{3}\s*[-.]?\s*\d{4}|https?:\/\/[^\s]+|www\.[^\s]+)/)?.[0];
+        
+        const services = servicesMatch ? servicesMatch[1].trim() : 
+          restOfText.replace(/(?:Location|Address|Contact|Phone|Website|Hours)[:][^\n]*/gi, '').trim();
+        
+        if (name && name.length > 3) {
+          resources.push({
+            name: name,
+            location: location || '',
+            contact: contact || '',
+            services: services || ''
+          });
+        }
       }
     }
     
-    // If no sections found, return the cleaned text as a single entry
-    if (entries.length === 0) {
-      return [{ title: "Disaster Relief Resources", content: cleanedText.trim() }];
+    // If no structured resources found, return the original text as fallback
+    if (resources.length === 0) {
+      return [{ 
+        name: "Disaster Relief Resources", 
+        location: "", 
+        contact: "", 
+        services: cleanedText.trim() 
+      }];
     }
     
-    return entries;
+    return resources;
   };
 
   return (
@@ -212,16 +241,22 @@ const AISearchPage = () => {
             {/* Search Results */}
             {searchResult && (
               <div className="space-y-6">
-                {/* Parse and display resources as separate cards */}
+                {/* Display individual resource cards */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-title mb-4">Disaster Relief Resources</h3>
-                  {parseResourceEntries(searchResult.answer).map((entry, index) => (
+                  {parseResourceEntries(searchResult.answer).map((resource, index) => (
                     <Card key={index} className="shadow-soft">
-                      <CardContent className="p-4">
-                        <h4 className="font-semibold text-title mb-3">{entry.title}</h4>
-                        <p className="text-body leading-relaxed text-muted-foreground whitespace-pre-line">
-                          {entry.content}
-                        </p>
+                      <CardContent className="p-4 space-y-2">
+                        <h4 className="font-bold text-primary text-lg">{resource.name}</h4>
+                        {resource.location && (
+                          <p className="text-muted-foreground">{resource.location}</p>
+                        )}
+                        {resource.services && (
+                          <p className="text-muted-foreground">{resource.services}</p>
+                        )}
+                        {resource.contact && (
+                          <p className="text-muted-foreground">{resource.contact}</p>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
