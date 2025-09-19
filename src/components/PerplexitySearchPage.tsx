@@ -45,9 +45,18 @@ const PerplexitySearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Disaster Relief Resources Search</h1>
+    <div className="pb-20 min-h-screen bg-gradient-subtle">
+      {/* Header */}
+      <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold mb-1">AI Disaster Resource Search</h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        <div className="max-w-4xl mx-auto">
         
         <Card className="mb-8">
           <CardHeader>
@@ -94,6 +103,7 @@ const PerplexitySearchPage = () => {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </div>
   );
