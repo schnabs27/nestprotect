@@ -86,7 +86,7 @@ const RecoveryIndexPage = () => {
                   Perplexity AI will search the news for local disaster resources.
                 </p>
                 <Button 
-                  onClick={() => navigate("/aisearch")} 
+                  onClick={() => navigate("/perplexitysearch")} 
                   className="w-full bg-gradient-primary hover:opacity-90"
                 >
                   AI Quick Search: Emergency Resources
