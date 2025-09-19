@@ -209,6 +209,16 @@ const Homepage = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* Add to Phone Button */}
+        <div className="text-center pt-4">
+          <Button 
+            onClick={() => navigate("/shortcut")}
+            className="w-full bg-gradient-primary hover:opacity-90"
+          >
+            Add NestProtect to Your Phone
+          </Button>
+        </div>
       </div>
       <MobileNavigation />
     </div>
