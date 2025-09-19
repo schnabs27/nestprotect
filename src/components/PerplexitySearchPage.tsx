@@ -92,10 +92,16 @@ const PerplexitySearchPage = () => {
         {results && (
           <div>
             <h2 className="text-xl font-bold text-foreground mb-4">Search Results</h2>
-            <div className="prose max-w-none">
-              <div className="whitespace-pre-wrap text-foreground">
-                {results}
-              </div>
+            <div className="space-y-4">
+              {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => (
+                <Card key={index} className="shadow-soft">
+                  <CardContent className="p-4">
+                    <div className="whitespace-pre-wrap text-foreground">
+                      {record.trim()}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
