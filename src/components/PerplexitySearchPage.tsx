@@ -98,14 +98,17 @@ const PerplexitySearchPage = () => {
                 const lines = record.trim().split('\n');
                 const nameLineIndex = lines.findIndex(line => line.startsWith('Name:'));
                 const categoryLineIndex = lines.findIndex(line => line.startsWith('Category:'));
+                const descriptionLineIndex = lines.findIndex(line => line.startsWith('Description:'));
                 
                 const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
                 const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
+                const descriptionLine = descriptionLineIndex !== -1 ? lines[descriptionLineIndex] : '';
                 
                 const nameValue = nameLine.replace('Name:', '').trim();
                 const categoryValue = categoryLine.replace('Category:', '').trim();
+                const descriptionValue = descriptionLine.replace('Description:', '').trim();
                 
-                const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex);
+                const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
                 
                 return (
                   <Card key={index} className="shadow-soft">
@@ -120,9 +123,16 @@ const PerplexitySearchPage = () => {
                           {categoryValue}
                         </Badge>
                       )}
-                      <div className="whitespace-pre-wrap text-foreground">
-                        {otherLines.join('\n')}
-                      </div>
+                      {descriptionValue && (
+                        <p className="text-muted-foreground mb-2">
+                          {descriptionValue}
+                        </p>
+                      )}
+                      {otherLines.length > 0 && (
+                        <div className="whitespace-pre-wrap text-foreground">
+                          {otherLines.join('\n')}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
