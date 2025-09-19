@@ -45,6 +45,14 @@ const ShortcutPage = () => {
       ]
     },
     {
+      id: "desktop",
+      title: "Desktop Browsers",
+      steps: [
+        "Check the address bar for an install icon (usually a + or download symbol)",
+        "Or look in the browser menu for \"Install,\" \"Add to desktop,\" or \"Create shortcut\""
+      ]
+    },
+    {
       id: "other",
       title: "Other Browsers",
       steps: [
@@ -117,17 +125,6 @@ const ShortcutPage = () => {
             </Card>
           ))}
         </div>
-
-        {/* Desktop Instructions */}
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-lg text-title">Desktop browsers:</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-foreground">
-            <p>Check the address bar for an install icon (usually a + or download symbol)</p>
-            <p>Or look in the browser menu for "Install," "Add to desktop," or "Create shortcut"</p>
-          </CardContent>
-        </Card>
 
         {/* Footer Text */}
         <div className="text-center text-foreground">
