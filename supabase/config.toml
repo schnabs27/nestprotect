@@ -29,5 +29,8 @@ verify_jwt = false
 [functions.search-openai-resources]
 verify_jwt = false
 
+[functions.search-perplexity-resources]
+verify_jwt = false
+
 [functions.search-recovery-resources]
 verify_jwt = false

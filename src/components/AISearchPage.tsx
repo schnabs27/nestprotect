@@ -10,28 +10,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { useAuth } from "@/components/AuthProvider";
 
-interface DisasterResource {
-  id: string;
-  name: string;
-  address: string;
-  phone?: string;
-  description: string;
-  website?: string;
-  postal_code: string;
-  latitude?: number;
-  longitude?: number;
-  category: string;
-  source: string;
-  source_id?: string;
-  distance_mi?: number;
-  city?: string;
-  state?: string;
-  hours?: string;
-  created_at: string;
-  updated_at: string;
-  last_verified_at?: string;
-  last_seen_at: string;
-  is_archived: boolean;
+interface PerplexityResult {
+  answer: string;
+  search_results: {
+    title: string;
+    url: string;
+    date: string;
+  }[];
 }
 
 const AISearchPage = () => {
@@ -40,10 +25,8 @@ const AISearchPage = () => {
   const { user, isGuest } = useAuth();
   const [zipCode, setZipCode] = useState("");
   const [hasUserClearedField, setHasUserClearedField] = useState(false);
-  const [resources, setResources] = useState<DisasterResource[]>([]);
-  const [filteredResources, setFilteredResources] = useState<DisasterResource[]>([]);
+  const [searchResult, setSearchResult] = useState<PerplexityResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const { toast } = useToast();
 
   // Set user's zip code as default when available, but only if user hasn't manually cleared it
@@ -67,40 +50,6 @@ const AISearchPage = () => {
     }
   };
 
-  // Helper function to convert text to title case
-  const toTitleCase = (str: string) => {
-    return str.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    );
-  };
-
-  const mainCategories = [
-    { id: "all", label: "All", color: "bg-[#06c29a]" },
-    { id: "emergency", label: "Emergency", color: "bg-raspberry" },
-    { id: "medical", label: "Medical", color: "bg-accent" },
-    { id: "community_center", label: "Community Center", color: "bg-blue-500" },
-    { id: "govt_office", label: "Govt Office", color: "bg-purple-500" }
-  ];
-
-  useEffect(() => {
-    const filtered = resources.filter(resource => {
-      if (selectedCategory === "all") return true;
-      
-      // Map AI search categories to our category system
-      const categoryMap: Record<string, string[]> = {
-        emergency: ['emergency responder'],
-        medical: ['emergency medical'],
-        community_center: ['community center'],
-        govt_office: ['local government']
-      };
-      
-      const targetCategories = categoryMap[selectedCategory] || [];
-      return targetCategories.some(cat => 
-        resource.category?.toLowerCase().includes(cat.toLowerCase())
-      );
-    });
-    setFilteredResources(filtered);
-  }, [resources, selectedCategory]);
 
   const handleSearch = async () => {
     if (!zipCode.trim()) {
@@ -123,12 +72,11 @@ const AISearchPage = () => {
     }
 
     setIsLoading(true);
-    setResources([]);
-    setFilteredResources([]);
+    setSearchResult(null);
     
     try {
-      const { data, error } = await supabase.functions.invoke('search-openai-resources', {
-        body: { zipCode: zipCode.trim() }
+      const { data, error } = await supabase.functions.invoke('search-perplexity-resources', {
+        body: { requested_zipcode: zipCode.trim() }
       });
 
       if (error) {
@@ -136,17 +84,17 @@ const AISearchPage = () => {
         throw error;
       }
 
-      if (data && data.results) {
-        setResources(data.results);
+      if (data) {
+        setSearchResult(data);
         toast({
           title: "Search completed",
-          description: `Found ${data.results.length} AI-sourced resources for ZIP ${zipCode.trim()}`
+          description: `Found disaster relief resources for ZIP ${zipCode.trim()}`
         });
       } else {
-        setResources([]);
+        setSearchResult(null);
         toast({
           title: "No resources found",
-          description: `No AI-sourced disaster resources found for ZIP ${zipCode.trim()}`
+          description: `No disaster relief resources found for ZIP ${zipCode.trim()}`
         });
       }
     } catch (error) {
@@ -200,12 +148,12 @@ const AISearchPage = () => {
             {/* Search Section */}
             <div className="bg-background shadow-soft p-4">
               <p className="text-muted-foreground mb-4">
-                Search AI-powered disaster resources and emergency assistance.
+                Search for publicly announced disaster relief resources in your area.
               </p>
-              <div className="flex gap-2 mb-4">
+              <div className="flex gap-2">
                 <div className="flex-1">
                   <Input
-                    placeholder="Enter ZIP code or address"
+                    placeholder="Enter ZIP code"
                     name="requested_zipcode"
                     value={zipCode}
                     onChange={handleZipCodeChange}
@@ -218,156 +166,61 @@ const AISearchPage = () => {
                   className="bg-gradient-primary border-0 shadow-medium hover:shadow-strong transition-all duration-300"
                   disabled={isLoading}
                 >
-                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : "Search"}
                 </Button>
               </div>
-
-              {/* Category Filters */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-foreground mb-2">Filters</h3>
-                <div className="flex flex-wrap gap-2">
-                  {mainCategories.map((category) => {
-                    const isSelected = selectedCategory === category.id;
-                    
-                    return (
-                      <Badge
-                        key={category.id}
-                        variant="secondary"
-                        className={`cursor-pointer hover:opacity-80 transition-smooth ${
-                          isSelected 
-                            ? `${category.color} text-white ring-2 ring-primary`
-                            : "bg-white text-muted-foreground"
-                        }`}
-                        onClick={() => setSelectedCategory(category.id)}
-                      >
-                        {category.label}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Results count */}
-              {resources.length > 0 && (
-                <div className="bg-primary/5 p-3 -mx-4 -mb-4">
-                  <p className="text-xs text-muted-foreground">
-                    Showing {filteredResources.length} of {resources.length} AI-sourced resources
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Loading state */}
             {isLoading && (
               <div className="text-center py-8">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                <p className="text-muted-foreground">Searching AI-powered resources...</p>
+                <p className="text-muted-foreground">Searching disaster relief resources...</p>
               </div>
             )}
 
-            {/* Disclaimer */}
-            {resources.length > 0 && (
-              <div className="bg-orange/10 border border-orange/30 p-3 text-xs">
-                <p className="text-xs text-muted-foreground pr-8">
-                  These listings come from AI-powered databases. Please <strong>call to confirm</strong> they're open.
-                </p>
+            {/* Search Results */}
+            {searchResult && (
+              <div className="space-y-6">
+                {/* Main answer with body text formatting */}
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-body leading-relaxed text-muted-foreground">
+                    {searchResult.answer}
+                  </p>
+                </div>
+
+                {/* Search results from sources */}
+                {searchResult.search_results && searchResult.search_results.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-title">Sources</h3>
+                    {searchResult.search_results.map((result, index) => (
+                      <div key={index} className="border-l-4 border-primary/30 pl-4 py-2">
+                        <a 
+                          href={result.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80 font-medium underline"
+                        >
+                          {result.title}
+                        </a>
+                        {result.date && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {result.date}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Resource Cards */}
-            <div className="space-y-4">
-              {filteredResources.length === 0 && resources.length === 0 && !isLoading && (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Enter an address and press the *search* button for AI disaster resources</p>
-                </div>
-              )}
-              
-              {filteredResources.length === 0 && resources.length > 0 && (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No resources found for the selected category</p>
-                </div>
-              )}
-
-              {filteredResources.map((resource, index) => {
-                return (
-                  <Card key={`${resource.source_id}-${resource.source}-${index}`} className="shadow-soft hover:shadow-medium transition-smooth">
-                    <CardContent className="p-2">
-                      {/* Resource name as heading */}
-                      <h3 className="text-base font-semibold text-title mb-1">{resource.name}</h3>
-                      
-                      {/* Address (text only, no icon) */}
-                      <p className="text-sm text-muted-foreground mb-1">
-                        {resource.address && resource.city && `${resource.address}, ${resource.city}`}
-                        {resource.address && !resource.city && resource.address}
-                        {!resource.address && resource.city && resource.city}
-                      </p>
-
-                      {/* Category badges */}
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {resource.category && (
-                          <Badge variant="secondary" className="text-xs py-0 px-2">
-                            {toTitleCase(resource.category)}
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Icon row with 4 clickable icons */}
-                      <div className="flex gap-3 mb-1">
-                        {/* Map pin icon for directions */}
-                        {(resource.source_id || (resource.latitude && resource.longitude)) && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="p-1 h-8 w-8"
-                            onClick={() => {
-                              const directionsUrl = resource.source_id 
-                                ? `https://www.google.com/maps/dir/?api=1&destination=place_id:${resource.source_id}&origin=My+Location`
-                                : `https://www.google.com/maps/dir/?api=1&destination=${resource.latitude},${resource.longitude}&origin=My+Location`;
-                              window.open(directionsUrl, '_blank');
-                            }}
-                            title="Get directions"
-                          >
-                            <MapPin className="h-4 w-4 text-blue-600" />
-                          </Button>
-                        )}
-
-                        {/* Phone icon */}
-                        {resource.phone && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="p-1 h-8 w-8"
-                            onClick={() => window.open(`tel:${resource.phone}`, '_self')}
-                            title={`Call ${resource.phone}`}
-                          >
-                            <Phone className="h-4 w-4 text-green-600" />
-                          </Button>
-                        )}
-
-                        {/* Website icon */}
-                        {resource.website && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="p-1 h-8 w-8"
-                            onClick={() => window.open(resource.website, '_blank')}
-                            title="Visit website"
-                          >
-                            <Globe className="h-4 w-4 text-purple-600" />
-                          </Button>
-                        )}
-
-                      </div>
-
-                      {/* Description (text only) */}
-                      <p className="text-xs text-muted-foreground">
-                        {toTitleCase(resource.description)}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            {/* Empty state */}
+            {!searchResult && !isLoading && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Enter a ZIP code and press "Search" to find disaster relief resources</p>
+              </div>
+            )}
           </>
         )}
       </div>
