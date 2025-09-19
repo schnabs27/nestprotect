@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MobileNavigation from "@/components/MobileNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,9 +14,27 @@ interface PerplexityResult {
 }
 
 const PerplexitySearchPage = () => {
+  const [user, setUser] = useState(null);
+  const { zipCode: savedZipCode } = useUserProfile(user);
   const [zipCode, setZipCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<string | null>(null);
+
+  // Get current user and auto-populate zip code
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getCurrentUser();
+  }, []);
+
+  // Auto-populate zip code when user profile loads
+  useEffect(() => {
+    if (savedZipCode && !zipCode) {
+      setZipCode(savedZipCode);
+    }
+  }, [savedZipCode, zipCode]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
