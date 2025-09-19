@@ -132,8 +132,8 @@ const AISearchPage = () => {
           });
         }
         
-        // Start new section
-        currentSection = trimmedLine.replace(/^\*+|\*+$/g, '').trim();
+        // Start new section - remove ## markdown formatting
+        currentSection = trimmedLine.replace(/^#+\s*/, '').replace(/^\*+|\*+$/g, '').trim();
         currentResources = [];
       } else if (trimmedLine.match(/^[-•*]\s/) || trimmedLine.match(/^\s+[-•*]\s/)) {
         // This is a bullet point resource
@@ -142,11 +142,15 @@ const AISearchPage = () => {
         if (resourceText.length > 10) {
           // Parse individual resource
           const parts = resourceText.split(/[,;]|\s{2,}/);
-          const name = parts[0]?.trim() || '';
+          let name = parts[0]?.trim() || '';
+          
+          // Remove ** markdown formatting from name
+          name = name.replace(/^\*+|\*+$/g, '').trim();
           
           let location = '';
           let contact = '';
-          let services = resourceText;
+          let services = resourceText.replace(/^\*+|\*+$/g, '').trim();
+          let description = '';
           
           // Extract address and phone patterns
           for (const part of parts) {
@@ -158,11 +162,16 @@ const AISearchPage = () => {
             }
           }
           
+          // Extract description (everything after the name)
+          const nameEndIndex = resourceText.indexOf(name) + name.length;
+          description = resourceText.substring(nameEndIndex).replace(/^[,\s-]+/, '').trim();
+          
           currentResources.push({
             name: name,
             location: location,
             contact: contact,
-            services: services
+            services: services,
+            description: description
           });
         }
       }
@@ -255,49 +264,40 @@ const AISearchPage = () => {
                 {/* Display sections with resources */}
                 {parseResourceSections(searchResult.answer).map((section, sectionIndex) => (
                   <div key={sectionIndex} className="space-y-4">
-                    <h3 className="text-lg font-semibold text-title">{section.title}</h3>
-                    {section.resources.map((resource, resourceIndex) => (
-                      <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft">
-                        <CardContent className="p-4 space-y-2">
-                          <h4 className="font-bold text-primary text-lg">{resource.name}</h4>
-                          {resource.location && (
-                            <p className="text-muted-foreground">{resource.location}</p>
-                          )}
-                          {resource.contact && (
-                            <p className="text-muted-foreground">{resource.contact}</p>
-                          )}
-                          {resource.services && resource.services !== resource.name && (
-                            <p className="text-muted-foreground text-sm">{resource.services}</p>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
+                    <h2 className="text-xl font-bold text-title">{section.title}</h2>
+                    {section.resources.map((resource, resourceIndex) => {
+                      // Find matching source URL for this resource
+                      const sourceUrl = searchResult.search_results?.[resourceIndex % searchResult.search_results.length]?.url || '';
+                      
+                      return (
+                        <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft">
+                          <CardContent className="p-4 space-y-2">
+                            <h3 className="text-base font-semibold text-primary">{resource.name}</h3>
+                            {resource.description && (
+                              <p className="text-sm text-muted-foreground">{resource.description}</p>
+                            )}
+                            {resource.location && (
+                              <p className="text-sm text-muted-foreground">📍 {resource.location}</p>
+                            )}
+                            {resource.contact && (
+                              <p className="text-sm text-muted-foreground">📞 {resource.contact}</p>
+                            )}
+                            {sourceUrl && (
+                              <a 
+                                href={sourceUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-primary hover:text-primary/80 underline block mt-2"
+                              >
+                                View Source
+                              </a>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 ))}
-
-                {/* Search results from sources */}
-                {searchResult.search_results && searchResult.search_results.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-title">Sources</h3>
-                    {searchResult.search_results.map((result, index) => (
-                      <div key={index} className="border-l-4 border-primary/30 pl-4 py-2">
-                        <a 
-                          href={result.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80 font-medium underline"
-                        >
-                          {result.title}
-                        </a>
-                        {result.date && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {result.date}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
 
