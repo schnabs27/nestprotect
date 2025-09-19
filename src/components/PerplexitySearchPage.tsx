@@ -93,15 +93,28 @@ const PerplexitySearchPage = () => {
           <div>
             <h2 className="text-xl font-bold text-foreground mb-4">Search Results</h2>
             <div className="space-y-4">
-              {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => (
-                <Card key={index} className="shadow-soft">
-                  <CardContent className="p-4">
-                    <div className="whitespace-pre-wrap text-foreground">
-                      {record.trim()}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => {
+                const lines = record.trim().split('\n');
+                const nameLineIndex = lines.findIndex(line => line.startsWith('Name:'));
+                const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
+                const nameValue = nameLine.replace('Name:', '').trim();
+                const otherLines = lines.filter((_, i) => i !== nameLineIndex);
+                
+                return (
+                  <Card key={index} className="shadow-soft">
+                    <CardContent className="p-4">
+                      {nameValue && (
+                        <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
+                          {nameValue}
+                        </h3>
+                      )}
+                      <div className="whitespace-pre-wrap text-foreground">
+                        {otherLines.join('\n')}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         )}
