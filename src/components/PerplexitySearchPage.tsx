@@ -57,37 +57,37 @@ const PerplexitySearchPage = () => {
 
       <div className="p-4 space-y-6">
         <div className="max-w-4xl mx-auto">
-        
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Search by ZIP Code
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSearch} className="flex gap-4">
+        {/* Search Section */}
+        <div className="bg-background shadow-soft p-4">
+          <p className="text-muted-foreground mb-4">
+            Search for disaster relief resources using AI-powered analysis.
+          </p>
+          <div className="flex gap-2 mb-4">
+            <div className="flex-1">
               <Input
                 type="text"
                 placeholder="Enter ZIP code (e.g., 12345)"
                 value={zipCode}
                 onChange={(e) => setZipCode(e.target.value)}
-                className="flex-1"
+                className="h-12"
                 maxLength={10}
               />
-              <Button type="submit" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Searching...
-                  </>
-                ) : (
-                  "Search"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+            <Button 
+              type="submit" 
+              onClick={handleSearch}
+              size="lg"
+              className="bg-gradient-primary border-0 shadow-medium hover:shadow-strong transition-all duration-300"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Search size={20} />
+              )}
+            </Button>
+          </div>
+        </div>
 
         {results && (
           <Card>
