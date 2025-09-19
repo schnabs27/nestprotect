@@ -60,7 +60,7 @@ const PerplexitySearchPage = () => {
         {/* Search Section */}
         <div className="bg-background shadow-soft p-4">
           <p className="text-muted-foreground mb-4">
-            Search for disaster relief resources using AI-powered analysis.
+            Use Perplexity's AI engine to search the news for local disaster relief resources.
           </p>
           <div className="flex gap-2 mb-4">
             <div className="flex-1">
