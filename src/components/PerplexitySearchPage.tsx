@@ -90,18 +90,14 @@ const PerplexitySearchPage = () => {
         </div>
 
         {results && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Search Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose max-w-none">
-                <div className="whitespace-pre-wrap text-foreground">
-                  {results}
-                </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground mb-4">Search Results</h2>
+            <div className="prose max-w-none">
+              <div className="whitespace-pre-wrap text-foreground">
+                {results}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
         </div>
       </div>
