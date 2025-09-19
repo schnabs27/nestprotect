@@ -106,7 +106,7 @@ const PerplexitySearchPage = () => {
                 
                 const nameValue = nameLine.replace('Name:', '').trim();
                 const categoryValue = categoryLine.replace('Category:', '').trim();
-                const descriptionValue = descriptionLine.replace('Description:', '').trim();
+                const descriptionValue = descriptionLine.replace('Description:', '').trim().replace(/\[\d+\]$/, '').trim();
                 
                 const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
                 
