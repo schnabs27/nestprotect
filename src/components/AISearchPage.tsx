@@ -109,63 +109,74 @@ const AISearchPage = () => {
     }
   };
 
-  // Parse the answer text into individual resource entries
-  const parseResourceEntries = (text: string) => {
-    // Remove summary table and unwanted content
-    const cleanedText = text.replace(/\|[^\n]*\|[^\n]*\n/g, '').replace(/\|\s*-+\s*\|/g, '');
+  // Parse the answer text into sections and resources
+  const parseResourceSections = (text: string) => {
+    const sections = [];
     
-    // Split by bullet points and numbered lists to get individual resources
-    const resourceLines = cleanedText.split(/(?:\n-\s|\n\*\s|\n\d+\.\s|\n•\s)/g)
-      .filter(line => line.trim().length > 30);
+    // Split by section headers (lines that don't start with bullet points)
+    const lines = text.split('\n');
+    let currentSection = null;
+    let currentResources = [];
     
-    const resources = [];
-    
-    for (const line of resourceLines) {
+    for (const line of lines) {
       const trimmedLine = line.trim();
       if (!trimmedLine) continue;
       
-      // Extract resource information using patterns
-      const nameMatch = trimmedLine.match(/^([^:\n]+?)(?:\s*[:]\s*|\s*\n|$)/);
-      const locationMatch = trimmedLine.match(/(?:Location|Address)[:]\s*([^\n]+)/i);
-      const contactMatch = trimmedLine.match(/(?:Contact|Phone|Website)[:]\s*([^\n]+)/i);
-      const servicesMatch = trimmedLine.match(/(?:Services|Programs)[:]\s*([^\n]+)/i);
-      
-      if (nameMatch) {
-        const name = nameMatch[1].replace(/^\*+|\*+$/g, '').trim(); // Remove asterisks
+      // Check if this is a section header (not a bullet point)
+      if (!trimmedLine.match(/^[-•*]\s/) && !trimmedLine.match(/^\s+[-•*]\s/) && trimmedLine.length > 10 && !trimmedLine.includes(':')) {
+        // Save previous section if it exists
+        if (currentSection) {
+          sections.push({
+            title: currentSection,
+            resources: currentResources
+          });
+        }
         
-        // Extract other details from the rest of the text
-        const restOfText = trimmedLine.substring(nameMatch[0].length);
-        const location = locationMatch ? locationMatch[1].trim() : 
-          restOfText.match(/(?:\n|^)([^:\n]*(?:Ave|St|Road|Rd|Blvd|Drive|Dr|Way|Lane|Ln|TX|Dallas|Houston|Austin)[^:\n]*)/i)?.[1]?.trim();
+        // Start new section
+        currentSection = trimmedLine.replace(/^\*+|\*+$/g, '').trim();
+        currentResources = [];
+      } else if (trimmedLine.match(/^[-•*]\s/) || trimmedLine.match(/^\s+[-•*]\s/)) {
+        // This is a bullet point resource
+        const resourceText = trimmedLine.replace(/^[-•*]\s/, '').replace(/^\s+[-•*]\s/, '').trim();
         
-        const contact = contactMatch ? contactMatch[1].trim() : 
-          restOfText.match(/(?:\(?\d{3}\)?\s*[-.]?\s*\d{3}\s*[-.]?\s*\d{4}|https?:\/\/[^\s]+|www\.[^\s]+)/)?.[0];
-        
-        const services = servicesMatch ? servicesMatch[1].trim() : 
-          restOfText.replace(/(?:Location|Address|Contact|Phone|Website|Hours)[:][^\n]*/gi, '').trim();
-        
-        if (name && name.length > 3) {
-          resources.push({
+        if (resourceText.length > 10) {
+          // Parse individual resource
+          const parts = resourceText.split(/[,;]|\s{2,}/);
+          const name = parts[0]?.trim() || '';
+          
+          let location = '';
+          let contact = '';
+          let services = resourceText;
+          
+          // Extract address and phone patterns
+          for (const part of parts) {
+            const trimmedPart = part.trim();
+            if (trimmedPart.match(/\d+\s.*(?:St|Ave|Rd|Blvd|Drive|Dr|Way|Lane|Ln)/i) || trimmedPart.includes('TX')) {
+              location = trimmedPart;
+            } else if (trimmedPart.match(/\(?\d{3}\)?\s*[-.]?\s*\d{3}\s*[-.]?\s*\d{4}/) || trimmedPart.startsWith('Phone:')) {
+              contact = trimmedPart.replace('Phone:', '').trim();
+            }
+          }
+          
+          currentResources.push({
             name: name,
-            location: location || '',
-            contact: contact || '',
-            services: services || ''
+            location: location,
+            contact: contact,
+            services: services
           });
         }
       }
     }
     
-    // If no structured resources found, return the original text as fallback
-    if (resources.length === 0) {
-      return [{ 
-        name: "Disaster Relief Resources", 
-        location: "", 
-        contact: "", 
-        services: cleanedText.trim() 
-      }];
+    // Don't forget the last section
+    if (currentSection) {
+      sections.push({
+        title: currentSection,
+        resources: currentResources
+      });
     }
     
-    return resources;
+    return sections;
   };
 
   return (
@@ -241,26 +252,28 @@ const AISearchPage = () => {
             {/* Search Results */}
             {searchResult && (
               <div className="space-y-6">
-                {/* Display individual resource cards */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-title mb-4">Disaster Relief Resources</h3>
-                  {parseResourceEntries(searchResult.answer).map((resource, index) => (
-                    <Card key={index} className="shadow-soft">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-primary text-lg">{resource.name}</h4>
-                        {resource.location && (
-                          <p className="text-muted-foreground">{resource.location}</p>
-                        )}
-                        {resource.services && (
-                          <p className="text-muted-foreground">{resource.services}</p>
-                        )}
-                        {resource.contact && (
-                          <p className="text-muted-foreground">{resource.contact}</p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                {/* Display sections with resources */}
+                {parseResourceSections(searchResult.answer).map((section, sectionIndex) => (
+                  <div key={sectionIndex} className="space-y-4">
+                    <h3 className="text-lg font-semibold text-title">{section.title}</h3>
+                    {section.resources.map((resource, resourceIndex) => (
+                      <Card key={`${sectionIndex}-${resourceIndex}`} className="shadow-soft">
+                        <CardContent className="p-4 space-y-2">
+                          <h4 className="font-bold text-primary text-lg">{resource.name}</h4>
+                          {resource.location && (
+                            <p className="text-muted-foreground">{resource.location}</p>
+                          )}
+                          {resource.contact && (
+                            <p className="text-muted-foreground">{resource.contact}</p>
+                          )}
+                          {resource.services && resource.services !== resource.name && (
+                            <p className="text-muted-foreground text-sm">{resource.services}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ))}
 
                 {/* Search results from sources */}
                 {searchResult.search_results && searchResult.search_results.length > 0 && (

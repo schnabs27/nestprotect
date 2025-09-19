@@ -53,28 +53,19 @@ serve(async (req) => {
 
 // Perplexity search function
 async function searchPerplexity(requestedZipcode: string, perplexityApiKey: string) {
-  const prompt = `Find current disaster relief resources for ZIP code ${requestedZipcode}. List only factual information:
+  const prompt = `List publicly available disaster relief resources (including medical, shelter, food, and recovery assistance) reported in local news articles and official press releases within the past 2 months for the ZIP code ${requestedZipcode}.
 
-**Format each resource as:**
-- Organization/Program Name
-- Location/Address (if available)
-- Contact: Phone/Website
-- Services: Brief list only
-- Hours/Availability (if available)
+Format the response with section headers followed by bullet points. Each bullet point should contain:
+- Organization name, address, phone number
+- Brief service description
 
-**Include only:**
-- FEMA assistance centers
-- Emergency shelters currently open
-- Food distribution sites
-- Financial assistance programs
-- Medical services for disaster victims
+Use these section categories:
+- Medical and Shelter Resources
+- Food Assistance  
+- Recovery and Financial Assistance
+- Legal and Crisis Support Resources
 
-**Exclude:**
-- General descriptions
-- Background information
-- Commentary or analysis
-
-Focus on resources announced in official press releases and news within the past 60 days.`;
+Focus only on factual listings from official sources, press releases, and verified local news reports.`;
 
   try {
     console.log(`Making Perplexity API call for ZIP: ${requestedZipcode}`);
