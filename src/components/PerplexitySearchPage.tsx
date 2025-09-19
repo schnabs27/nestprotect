@@ -94,65 +94,93 @@ const PerplexitySearchPage = () => {
         {results && (
           <div className="mt-6">
             <h2 className="text-xl font-bold px-4 mb-4" style={{ color: '#0080e0' }}>Search Results</h2>
-            <div className="space-y-4">
-              {results.split(/(?=Category:)/).filter(record => record.trim()).map((record, index) => {
+            
+            {(() => {
+              const sections = results.split(/(?=Category:)/).filter(record => record.trim());
+              const structuredRecords = [];
+              const commentary = [];
+              
+              sections.forEach(record => {
                 const lines = record.trim().split('\n');
-                const nameLineIndex = lines.findIndex(line => line.startsWith('Name:'));
-                const categoryLineIndex = lines.findIndex(line => line.startsWith('Category:'));
-                const descriptionLineIndex = lines.findIndex(line => line.startsWith('Description:'));
+                const hasStructuredData = lines.some(line => 
+                  line.startsWith('Name:') || line.startsWith('Category:') || line.startsWith('Description:')
+                );
                 
-                // If this looks like a structured record
-                if (nameLineIndex !== -1 || categoryLineIndex !== -1 || descriptionLineIndex !== -1) {
-                  const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
-                  const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
-                  const descriptionLine = descriptionLineIndex !== -1 ? lines[descriptionLineIndex] : '';
-                  
-                  const nameValue = nameLine.replace('Name:', '').trim().replace(/\*/g, '');
-                  const categoryValue = categoryLine.replace('Category:', '').trim();
-                  const descriptionValue = descriptionLine.replace('Description:', '').trim().replace(/\[[^\]]*\]/g, '').trim();
-                  
-                  const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
-                  
-                  return (
-                    <Card key={index} className="shadow-soft">
-                      <CardContent className="p-4">
-                        {nameValue && (
-                          <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
-                            {nameValue}
-                          </h3>
-                        )}
-                        {categoryValue && (
-                          <Badge variant="secondary" className="bg-gray-100 text-gray-700 mb-2">
-                            {categoryValue}
-                          </Badge>
-                        )}
-                        {descriptionValue && (
-                          <p className="text-muted-foreground mb-2">
-                            {descriptionValue}
-                          </p>
-                        )}
-                        {otherLines.length > 0 && (
-                          <div className="whitespace-pre-wrap text-foreground">
-                            {otherLines.join('\n')}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
+                if (hasStructuredData) {
+                  structuredRecords.push(record);
                 } else {
-                  // Handle commentary or unstructured text
-                  return (
-                    <Card key={index} className="shadow-soft">
-                      <CardContent className="p-4">
-                        <div className="whitespace-pre-wrap text-muted-foreground">
-                          {record.trim()}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
+                  commentary.push(record);
                 }
-              })}
-            </div>
+              });
+              
+              return (
+                <>
+                  {/* Commentary Section */}
+                  {commentary.length > 0 && (
+                    <div className="mb-6">
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div className="text-blue-800 space-y-2">
+                          {commentary.map((text, index) => (
+                            <p key={index} className="whitespace-pre-wrap">
+                              {text.trim()}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Structured Records Section */}
+                  {structuredRecords.length > 0 && (
+                    <div className="space-y-4">
+                      {structuredRecords.map((record, index) => {
+                        const lines = record.trim().split('\n');
+                        const nameLineIndex = lines.findIndex(line => line.startsWith('Name:'));
+                        const categoryLineIndex = lines.findIndex(line => line.startsWith('Category:'));
+                        const descriptionLineIndex = lines.findIndex(line => line.startsWith('Description:'));
+                        
+                        const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
+                        const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
+                        const descriptionLine = descriptionLineIndex !== -1 ? lines[descriptionLineIndex] : '';
+                        
+                        const nameValue = nameLine.replace('Name:', '').trim().replace(/\*/g, '');
+                        const categoryValue = categoryLine.replace('Category:', '').trim();
+                        const descriptionValue = descriptionLine.replace('Description:', '').trim().replace(/\[[^\]]*\]/g, '').trim();
+                        
+                        const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
+                        
+                        return (
+                          <Card key={index} className="shadow-soft">
+                            <CardContent className="p-4">
+                              {nameValue && (
+                                <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
+                                  {nameValue}
+                                </h3>
+                              )}
+                              {categoryValue && (
+                                <Badge variant="secondary" className="bg-gray-100 text-gray-700 mb-2">
+                                  {categoryValue}
+                                </Badge>
+                              )}
+                              {descriptionValue && (
+                                <p className="text-muted-foreground mb-2">
+                                  {descriptionValue}
+                                </p>
+                              )}
+                              {otherLines.length > 0 && (
+                                <div className="whitespace-pre-wrap text-foreground">
+                                  {otherLines.join('\n')}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
         </div>
