@@ -53,7 +53,28 @@ serve(async (req) => {
 
 // Perplexity search function
 async function searchPerplexity(requestedZipcode: string, perplexityApiKey: string) {
-  const prompt = `List publicly announced disaster relief resources—including medical services, emergency shelters, food distribution sites, financial and housing assistance, crisis counseling, animal support, and recovery aid—reported by local news, press releases, government agencies, and community organizations during the past 2 months for residents of ZIP code ${requestedZipcode}. Include specific program names, locations, eligibility details, application deadlines, and relevant contact numbers where available.`;
+  const prompt = `Find current disaster relief resources for ZIP code ${requestedZipcode}. List only factual information:
+
+**Format each resource as:**
+- Organization/Program Name
+- Location/Address (if available)
+- Contact: Phone/Website
+- Services: Brief list only
+- Hours/Availability (if available)
+
+**Include only:**
+- FEMA assistance centers
+- Emergency shelters currently open
+- Food distribution sites
+- Financial assistance programs
+- Medical services for disaster victims
+
+**Exclude:**
+- General descriptions
+- Background information
+- Commentary or analysis
+
+Focus on resources announced in official press releases and news within the past 60 days.`;
 
   try {
     console.log(`Making Perplexity API call for ZIP: ${requestedZipcode}`);
@@ -70,18 +91,19 @@ async function searchPerplexity(requestedZipcode: string, perplexityApiKey: stri
         messages: [
           {
             role: 'system',
-            content: 'Be precise and concise. Provide comprehensive information about disaster relief resources.'
+            content: 'Provide only factual listings of disaster relief resources. No commentary or descriptions.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 1000,
+        temperature: 0.1,
+        top_p: 0.7,
+        max_tokens: 800,
         return_images: false,
         return_related_questions: false,
+        search_domain_filter: ["gov", "org", "edu"],
         search_recency_filter: 'month',
         frequency_penalty: 1,
         presence_penalty: 0
