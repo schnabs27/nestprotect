@@ -101,42 +101,56 @@ const PerplexitySearchPage = () => {
                 const categoryLineIndex = lines.findIndex(line => line.startsWith('Category:'));
                 const descriptionLineIndex = lines.findIndex(line => line.startsWith('Description:'));
                 
-                const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
-                const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
-                const descriptionLine = descriptionLineIndex !== -1 ? lines[descriptionLineIndex] : '';
-                
-                const nameValue = nameLine.replace('Name:', '').trim().replace(/\*/g, '');
-                const categoryValue = categoryLine.replace('Category:', '').trim();
-                const descriptionValue = descriptionLine.replace('Description:', '').trim().replace(/\[[^\]]*\]/g, '').trim();
-                
-                const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
-                
-                return (
-                  <Card key={index} className="shadow-soft">
-                    <CardContent className="p-4">
-                      {nameValue && (
-                        <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
-                          {nameValue}
-                        </h3>
-                      )}
-                      {categoryValue && (
-                        <Badge variant="secondary" className="bg-gray-100 text-gray-700 mb-2">
-                          {categoryValue}
-                        </Badge>
-                      )}
-                      {descriptionValue && (
-                        <p className="text-muted-foreground mb-2">
-                          {descriptionValue}
-                        </p>
-                      )}
-                      {otherLines.length > 0 && (
-                        <div className="whitespace-pre-wrap text-foreground">
-                          {otherLines.join('\n')}
+                // If this looks like a structured record
+                if (nameLineIndex !== -1 || categoryLineIndex !== -1 || descriptionLineIndex !== -1) {
+                  const nameLine = nameLineIndex !== -1 ? lines[nameLineIndex] : '';
+                  const categoryLine = categoryLineIndex !== -1 ? lines[categoryLineIndex] : '';
+                  const descriptionLine = descriptionLineIndex !== -1 ? lines[descriptionLineIndex] : '';
+                  
+                  const nameValue = nameLine.replace('Name:', '').trim().replace(/\*/g, '');
+                  const categoryValue = categoryLine.replace('Category:', '').trim();
+                  const descriptionValue = descriptionLine.replace('Description:', '').trim().replace(/\[[^\]]*\]/g, '').trim();
+                  
+                  const otherLines = lines.filter((_, i) => i !== nameLineIndex && i !== categoryLineIndex && i !== descriptionLineIndex);
+                  
+                  return (
+                    <Card key={index} className="shadow-soft">
+                      <CardContent className="p-4">
+                        {nameValue && (
+                          <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
+                            {nameValue}
+                          </h3>
+                        )}
+                        {categoryValue && (
+                          <Badge variant="secondary" className="bg-gray-100 text-gray-700 mb-2">
+                            {categoryValue}
+                          </Badge>
+                        )}
+                        {descriptionValue && (
+                          <p className="text-muted-foreground mb-2">
+                            {descriptionValue}
+                          </p>
+                        )}
+                        {otherLines.length > 0 && (
+                          <div className="whitespace-pre-wrap text-foreground">
+                            {otherLines.join('\n')}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                } else {
+                  // Handle commentary or unstructured text
+                  return (
+                    <Card key={index} className="shadow-soft">
+                      <CardContent className="p-4">
+                        <div className="whitespace-pre-wrap text-muted-foreground">
+                          {record.trim()}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
+                      </CardContent>
+                    </Card>
+                  );
+                }
               })}
             </div>
           </div>
