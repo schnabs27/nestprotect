@@ -196,72 +196,7 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      get_disaster_resource_contact: {
-        Args: { resource_id: string }
-        Returns: {
-          email: string
-          id: string
-          phone: string
-        }[]
-      }
-      get_disaster_resource_contact_secure: {
-        Args: { resource_id: string }
-        Returns: {
-          email: string
-          id: string
-          phone: string
-        }[]
-      }
-      get_disaster_resources_public: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          address: string
-          category: string
-          city: string
-          created_at: string
-          description: string
-          distance_mi: number
-          hours: string
-          id: string
-          is_archived: boolean
-          last_seen_at: string
-          last_verified_at: string
-          latitude: number
-          longitude: number
-          name: string
-          postal_code: string
-          source: string
-          source_id: string
-          state: string
-          updated_at: string
-          website: string
-        }[]
-      }
       get_public_disaster_resources: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          address: string
-          category: string
-          city: string
-          created_at: string
-          description: string
-          distance_mi: number
-          hours: string
-          id: string
-          is_archived: boolean
-          last_seen_at: string
-          last_verified_at: string
-          latitude: number
-          longitude: number
-          name: string
-          postal_code: string
-          source: string
-          state: string
-          updated_at: string
-          website: string
-        }[]
-      }
-      get_public_disaster_resources_secure: {
         Args: Record<PropertyKey, never>
         Returns: {
           address: string
