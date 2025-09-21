@@ -339,6 +339,17 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         {/* Guest Access */}
         <Card className="border-0 shadow-lg">
           <CardContent className="p-6 text-center">
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                About NestProtect
+              </h3>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a 501(c)(3) non-profit helping people affected by natural disasters.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                My family wasn't prepared when our home was hit by a tornado in October 2019. I hope you'll never experience a natural disaster but if you do, I hope I helped a little. <span className="font-bold">- Leo, High School Student</span>
+              </p>
+            </div>
             <CardDescription className="mb-4">
               Want a preview? (limited functionality)
             </CardDescription>
