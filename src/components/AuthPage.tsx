@@ -36,6 +36,26 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     };
 
     fetchUserCount();
+
+    // Set up real-time subscription for user count updates
+    const channel = supabase
+      .channel('user-count-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles'
+        },
+        () => {
+          fetchUserCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
