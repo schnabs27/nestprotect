@@ -346,7 +346,17 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a 501(c)(3) non-profit helping people affected by natural disasters.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                My family wasn't prepared when our home was hit by a tornado in October 2019. That's why I created Blue Sky Disaster Relief and Nestor, your personal NestProtect guide. I hope you'll never experience a natural disaster but if you do, I hope I helped a little. <span className="font-bold">- Leo, High School Student</span>
+                My family wasn't prepared when our home was hit by a tornado in October 2019. That's why I created Blue Sky Disaster Relief and Nestor, your personal NestProtect guide. I hope you'll never experience a natural disaster but if you do, I hope I helped a little. <span className="font-bold">- Leo</span>
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                <a 
+                  href="https://blueskynow.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  Learn more at https://blueskynow.org/
+                </a>
               </p>
             </div>
             <CardDescription className="mb-4">
