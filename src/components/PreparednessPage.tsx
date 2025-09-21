@@ -8,16 +8,54 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import MobileNavigation from "@/components/MobileNavigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
+import { toast } from "sonner";
 
 const PreparednessPage = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const [activeHazard, setActiveHazard] = useState("all");
   const [activeTab, setActiveTab] = useState("now");
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('prepCheckedItems');
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+
+  // Load user progress from database or localStorage
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (user) {
+        // Load from database for authenticated users
+        try {
+          setLoading(true);
+          const { data, error } = await supabase
+            .from('user_preparedness_progress')
+            .select('task_id, completed')
+            .eq('user_id', user.id)
+            .eq('completed', true);
+
+          if (error) throw error;
+
+          const completedTasks = new Set(data?.map(item => item.task_id) || []);
+          setCheckedItems(completedTasks);
+        } catch (error) {
+          console.error('Error loading progress:', error);
+          toast.error('Failed to load your progress');
+          // Fall back to localStorage
+          const saved = localStorage.getItem('prepCheckedItems');
+          setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Load from localStorage for non-authenticated users
+        const saved = localStorage.getItem('prepCheckedItems');
+        setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
+      }
+    };
+
+    loadProgress();
+  }, [user]);
 
   // Handle navigation state to set initial tab and hazard
   useEffect(() => {
@@ -433,17 +471,52 @@ const PreparednessPage = () => {
     }
   };
 
-  const toggleCheck = (itemId: string) => {
+  const toggleCheck = async (itemId: string) => {
     const newChecked = new Set(checkedItems);
-    if (newChecked.has(itemId)) {
-      newChecked.delete(itemId);
-    } else {
-      newChecked.add(itemId);
-    }
-    setCheckedItems(newChecked);
+    const isCompleted = !checkedItems.has(itemId);
     
-    // Save checked items to localStorage
-    localStorage.setItem('prepCheckedItems', JSON.stringify(Array.from(newChecked)));
+    if (isCompleted) {
+      newChecked.add(itemId);
+    } else {
+      newChecked.delete(itemId);
+    }
+    
+    setCheckedItems(newChecked);
+
+    if (user) {
+      // Save to database for authenticated users
+      try {
+        if (isCompleted) {
+          const { error } = await supabase
+            .from('user_preparedness_progress')
+            .upsert({
+              user_id: user.id,
+              task_id: itemId,
+              completed: true
+            }, {
+              onConflict: 'user_id,task_id'
+            });
+
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from('user_preparedness_progress')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('task_id', itemId);
+
+          if (error) throw error;
+        }
+      } catch (error) {
+        console.error('Error saving progress:', error);
+        toast.error('Failed to save progress');
+        // Revert the change on error
+        setCheckedItems(checkedItems);
+      }
+    } else {
+      // Save to localStorage for non-authenticated users
+      localStorage.setItem('prepCheckedItems', JSON.stringify(Array.from(newChecked)));
+    }
   };
 
   const toggleOpen = (itemId: string) => {

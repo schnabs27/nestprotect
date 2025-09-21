@@ -122,6 +122,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preparedness_progress: {
+        Row: {
+          completed: boolean
+          created_at: string
+          id: string
+          task_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          task_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          task_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_resource_prefs: {
         Row: {
           created_at: string
