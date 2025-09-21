@@ -126,28 +126,37 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             <p className="text-gray-700 text-center leading-tight">
               Natural disasters like storms, floods, and wildfires happen. Most of us aren't prepared. My family wasn't prepared when our home was hit by a tornado in October 2019. That's why I made this free app for you. Tools include:
             </p>
-            <div className="space-y-3 text-sm">
-              <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50 text-center">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <Sun className="w-5 h-5 text-yellow-600" />
-                  <span className="font-bold text-gray-900 text-base">BEFORE</span>
-                </div>
-                <p className="text-gray-700">Interactive checklists and guides to prepare</p>
-              </div>
-              <div className="border-2 border-orange-300 rounded-lg p-3 bg-orange-50/50 text-center">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <AlertTriangle className="w-5 h-5 text-orange-600" />
-                  <span className="font-bold text-gray-900 text-base">DURING</span>
-                </div>
-                <p className="text-gray-700">Real-time weather, fire, and traffic conditions</p>
-              </div>
-              <div className="border-2 border-red-300 rounded-lg p-3 bg-red-50/50 text-center">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <Home className="w-5 h-5 text-red-600" />
-                  <span className="font-bold text-gray-900 text-base">AFTER</span>
-                </div>
-                <p className="text-gray-700">AI-driven resource search, plus tips for easier recovery</p>
-              </div>
+            <div className="w-full">
+              <table className="w-full">
+                <tbody>
+                  <tr className="border-b border-gray-300">
+                    <td className="text-right pr-4 py-3">
+                      <span className="text-lg font-bold text-gray-900">BEFORE</span>
+                    </td>
+                    <td className="text-left pl-4 py-3">
+                      <span className="text-gray-700">
+                        <span className="font-bold" style={{ color: '#0080e0' }}>Are you prepared? Take Nestor's quiz.</span> Then prepare even more with task checklists.
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-300">
+                    <td className="text-right pr-4 py-3">
+                      <span className="text-lg font-bold text-gray-900">DURING</span>
+                    </td>
+                    <td className="text-left pl-4 py-3">
+                      <span className="text-gray-700">Get real-time weather and traffic conditions plus guidance to act quickly.</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="text-right pr-4 py-3">
+                      <span className="text-lg font-bold text-gray-900">AFTER</span>
+                    </td>
+                    <td className="text-left pl-4 py-3">
+                      <span className="text-gray-700">Use easy search and AI tools to find resources to help you recover.</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <p className="text-gray-600 text-center text-sm pt-2">
               NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a 501(c)(3) non-profit helping people affected by natural disasters.
