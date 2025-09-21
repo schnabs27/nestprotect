@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
 import ContactForm from "@/components/ContactForm";
 import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
+import settingsBird from "@/assets/settings-bird.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -106,21 +107,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="pb-20 min-h-screen bg-gradient-subtle">
-      {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-primary-foreground/20 rounded-full flex items-center justify-center">
-            <User size={24} className="text-primary-foreground" />
+    <div className="pb-20 min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6 space-y-4">
+        {/* Page Header with Bird Image */}
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-32 h-32 flex items-center justify-center">
+            <img 
+              src={settingsBird} 
+              alt="Settings bird mascot"
+              className="w-32 h-32 object-contain"
+            />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Profile</h1>
-            <p className="text-primary-foreground/90 text-sm">Manage your NestProtect settings</p>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-title">Account Settings</h1>
           </div>
         </div>
-      </div>
 
-      <div className="p-4">
+      
         {/* About NestProtect */}
         <Card className="mb-6 shadow-soft border-accent/30">
           <CardHeader>
