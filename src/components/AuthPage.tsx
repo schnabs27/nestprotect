@@ -238,11 +238,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </Alert>
             )}
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-700">
-                <strong>Note:</strong> After creating your account, you'll receive an email verification link. You must click this link before you can sign in.
-              </p>
-            </div>
           </CardContent>
         </Card>
 
