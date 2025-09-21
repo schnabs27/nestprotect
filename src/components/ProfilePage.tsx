@@ -221,10 +221,7 @@ const ProfilePage = () => {
         {/* About NestProtect */}
         <Card className="mb-6 shadow-soft border-accent/30">
           <CardHeader>
-            <CardTitle className="text-title flex items-center gap-2">
-              <Heart className="text-coral" size={20} />
-              About NestProtect
-            </CardTitle>
+            <CardTitle className="text-title">About NestProtect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="bg-muted/30 p-4 rounded-lg">
