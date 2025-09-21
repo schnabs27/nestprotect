@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, Home } from "lucide-react";
+import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, Home, Copy } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
@@ -318,7 +318,17 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Help us reach 200 homes!
             </h3>
             <p className="text-white mb-4 leading-relaxed">
-              September is Disaster Preparedness Month. Help NestProtect surpass 200 users! Sign up and share with your friends.
+              September is Disaster Preparedness Month. Help NestProtect reach 200 users! Please sign up and share this with your friends:{" "}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('https://nestprotect.app/');
+                  toast.success('URL copied to clipboard!');
+                }}
+                className="text-white underline hover:text-gray-200 transition-colors inline-flex items-center gap-1"
+              >
+                https://nestprotect.app/
+                <Copy className="w-3 h-3" />
+              </button>
             </p>
             <p className="text-lg font-bold text-white">
               NestProtect Users: {userCount}
