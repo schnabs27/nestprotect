@@ -21,6 +21,22 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [zipCode, setZipCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userCount, setUserCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        setUserCount(count || 0);
+      } catch (err) {
+        console.error('Error fetching user count:', err);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,6 +284,26 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             </Button>
 
           </CardContent>
+        </Card>
+
+        {/* User Goal Card */}
+        <Card className="border-0 shadow-lg overflow-hidden">
+          <div 
+            className="p-6 text-center"
+            style={{ 
+              background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)' 
+            }}
+          >
+            <h3 className="text-xl font-bold text-white mb-3">
+              Help us reach 200 homes!
+            </h3>
+            <p className="text-white mb-4 leading-relaxed">
+              September is Disaster Preparedness Month. Help NestProtect surpass 200 users! Sign up and share with your friends.
+            </p>
+            <p className="text-lg font-bold text-white">
+              NestProtect Users: {userCount}
+            </p>
+          </div>
         </Card>
 
         {/* Guest Access */}
