@@ -9,11 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import MobileNavigation from "@/components/MobileNavigation";
 
 const Homepage = () => {
   const [completionDate, setCompletionDate] = useState<Date>();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -27,6 +29,34 @@ const Homepage = () => {
     }
   }, [user]);
 
+  // Fetch preparedness progress for authenticated users
+  useEffect(() => {
+    const fetchPrepProgress = async () => {
+      if (!user) {
+        setPrepProgress({ completed: 0, total: 10 });
+        return;
+      }
+
+      try {
+        const allNowToplineItems = ['know-risk', 'household-plan', 'emergency-kit', 'go-bags', 'important-documents', 'shelter-plan', 'communication-plan', 'financial-prep', 'special-needs', 'practice-plan'];
+        
+        const { data: progressData } = await supabase
+          .from('user_preparedness_progress')
+          .select('task_id, completed')
+          .eq('user_id', user.id)
+          .in('task_id', allNowToplineItems);
+
+        const completedTasks = progressData?.filter(item => item.completed).length || 0;
+        setPrepProgress({ completed: completedTasks, total: allNowToplineItems.length });
+      } catch (error) {
+        console.error('Error fetching prep progress:', error);
+        setPrepProgress({ completed: 0, total: 10 });
+      }
+    };
+
+    fetchPrepProgress();
+  }, [user]);
+
   const handleDisclaimerAccept = () => {
     if (user) {
       sessionStorage.setItem(`disclaimer-seen-${user.id}`, 'true');
@@ -34,11 +64,6 @@ const Homepage = () => {
     setShowDisclaimer(false);
   };
 
-  // Get checked items from localStorage and calculate progress
-  const checkedItems = JSON.parse(localStorage.getItem('prepCheckedItems') || '[]');
-  const allNowToplineItems = ['know-risk', 'household-plan', 'emergency-kit', 'go-bags', 'important-documents', 'shelter-plan', 'communication-plan', 'financial-prep', 'special-needs', 'practice-plan'];
-  const prepCompletedItems = allNowToplineItems.filter(item => checkedItems.includes(item)).length;
-  const prepTotalItems = allNowToplineItems.length;
   const assessmentTrueItems = parseInt(localStorage.getItem('selfAssessmentScore') || '0'); // Get from localStorage
   const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
 
@@ -126,7 +151,7 @@ const Homepage = () => {
             <CardContent className="space-y-3">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">
-                  {prepCompletedItems}/{prepTotalItems}
+                  {prepProgress.completed}/{prepProgress.total}
                 </div>
                 <p className="text-sm text-muted-foreground">Prep tasks completed "Now" for all types of disaster</p>
               </div>
