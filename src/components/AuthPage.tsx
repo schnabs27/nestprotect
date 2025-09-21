@@ -244,12 +244,14 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </Alert>
             )}
 
-          </CardContent>
-        </Card>
+            {/* Divider */}
+            <div className="flex items-center my-4">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-3 text-sm text-gray-500">or</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
 
-        {/* Google Sign In */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 text-center">
+            {/* Google Sign In */}
             <Button
               onClick={handleGoogleSignIn}
               disabled={loading}
@@ -264,6 +266,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </svg>
               Continue with Google
             </Button>
+
           </CardContent>
         </Card>
 
