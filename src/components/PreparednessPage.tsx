@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown } from "lucide-react";
+import nestorPreparedness from '@/assets/nestor-preparedness.png';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -459,15 +460,21 @@ const PreparednessPage = () => {
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
-      {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground p-6 pt-12">
-        <h1 className="text-2xl font-bold mb-2">Emergency Preparedness</h1>
-        <p className="text-primary-foreground/90 text-sm">
-          Stay ready for natural disasters
-        </p>
-      </div>
+      <div className="container mx-auto px-4 py-6 space-y-4">
+        {/* Header Section */}
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-32 h-32 flex items-center justify-center">
+            <img 
+              src={nestorPreparedness}
+              alt="Nestor with checklist - Your preparedness guide"
+              className="w-32 h-32 object-contain"
+            />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-title">Prepare for an emergency.</h1>
+          </div>
+        </div>
 
-      <div className="p-4">
         {/* Hazard Selection */}
         <div className="mb-6">
           <p className="text-body mb-4">
