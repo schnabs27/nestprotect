@@ -124,6 +124,100 @@ const ProfilePage = () => {
         </div>
 
       
+        {/* Account Details */}
+        <Card className="mb-6 shadow-soft">
+          <CardHeader>
+            <CardTitle className="text-title">Account Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Personal Information Section */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-foreground">Personal Information</h3>
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={userInfo.name}
+                  onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
+                  placeholder="Your name"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="zipcode">ZIP Code</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="zipcode"
+                    value={userInfo.zipCode}
+                    onChange={(e) => setUserInfo({...userInfo, zipCode: e.target.value})}
+                    placeholder="Your ZIP code"
+                    maxLength={5}
+                    pattern="[0-9]{5}"
+                    disabled={isGuest}
+                  />
+                  <Button 
+                    onClick={handleZipCodeUpdate}
+                    disabled={isGuest || profileLoading}
+                    size="sm"
+                  >
+                    Save
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Used for local weather and disaster relief searches
+                </p>
+              </div>
+            </div>
+
+            {/* Account Status Section */}
+            <div className="space-y-4 pt-4 border-t border-border">
+              <h3 className="font-medium text-foreground">Account Status</h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-medium">
+                    {user ? `Signed in as: ${user.email}` : "Guest User"}
+                  </span>
+                  <p className="text-xs text-muted-foreground">
+                    {user ? "Full access to all features" : "Limited access - some features may be restricted"}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Google Auth Integration */}
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleGoogleAuth}
+                  variant="outline"
+                  className="w-full justify-start"
+                >
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  {isGuest ? "Sign Up with Google" : "Link Google Account"}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  {isGuest 
+                    ? "Create a new account to save your data permanently" 
+                    : "Connect your Google account for easier sign-in"
+                  }
+                </p>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleSignOut}
+                className="w-full justify-start text-destructive hover:text-destructive"
+              >
+                <LogOut size={16} className="mr-2" />
+                {user ? "Sign Out" : "Exit Guest Mode"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* About NestProtect */}
         <Card className="mb-6 shadow-soft border-accent/30">
           <CardHeader>
@@ -157,50 +251,6 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* User Settings */}
-        <Card className="mb-6 shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-title">Personal Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={userInfo.name}
-                onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
-                placeholder="Your name"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="zipcode">ZIP Code</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="zipcode"
-                  value={userInfo.zipCode}
-                  onChange={(e) => setUserInfo({...userInfo, zipCode: e.target.value})}
-                  placeholder="Your ZIP code"
-                  maxLength={5}
-                  pattern="[0-9]{5}"
-                  disabled={isGuest}
-                />
-                <Button 
-                  onClick={handleZipCodeUpdate}
-                  disabled={isGuest || profileLoading}
-                  size="sm"
-                >
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Used for local weather and disaster relief searches
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-
         {/* App Information */}
         <Card className="mb-6 shadow-soft">
           <CardHeader>
@@ -215,58 +265,6 @@ const ProfilePage = () => {
               <span className="text-sm">Last Updated</span>
               <span className="text-sm text-muted-foreground">September 2025</span>
             </div>
-          </CardContent>
-        </Card>
-
-
-        {/* Authentication Status */}
-        <Card className="mb-6 shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-title">Account Status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-sm font-medium">
-                  {user ? `Signed in as: ${user.email}` : "Guest User"}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {user ? "Full access to all features" : "Limited access - some features may be restricted"}
-                </p>
-              </div>
-            </div>
-            
-            {/* Google Auth Integration */}
-            <div className="space-y-2">
-              <Button 
-                onClick={handleGoogleAuth}
-                variant="outline"
-                className="w-full justify-start"
-              >
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                {isGuest ? "Sign Up with Google" : "Link Google Account"}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                {isGuest 
-                  ? "Create a new account to save your data permanently" 
-                  : "Connect your Google account for easier sign-in"
-                }
-              </p>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              onClick={handleSignOut}
-              className="w-full justify-start text-destructive hover:text-destructive"
-            >
-              <LogOut size={16} className="mr-2" />
-              {user ? "Sign Out" : "Exit Guest Mode"}
-            </Button>
           </CardContent>
         </Card>
 
