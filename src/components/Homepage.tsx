@@ -97,27 +97,6 @@ const Homepage = () => {
 
         {/* Scoreboards */}
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Prep Scoreboard */}
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">Emergency Prep Progress</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">
-                  {prepCompletedItems}/{prepTotalItems}
-                </div>
-                <p className="text-sm text-muted-foreground">Prep tasks completed "Now" for all types of disaster</p>
-              </div>
-              <Button 
-                onClick={() => navigate("/preparedness")}
-                className="w-full bg-gradient-primary hover:opacity-90"
-              >
-                Continue Emergency Prep
-              </Button>
-            </CardContent>
-          </Card>
-
           {/* Self-Assessment Scoreboard */}
           <Card className="shadow-soft bg-purple-600 border-purple-600">
             <CardHeader className="pb-3">
@@ -135,6 +114,27 @@ const Homepage = () => {
                 className="w-full bg-white hover:bg-gray-100 text-black"
               >
                 Take Self-Assessment
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Prep Scoreboard */}
+          <Card className="shadow-soft">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-title text-center">Emergency Prep Progress</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary">
+                  {prepCompletedItems}/{prepTotalItems}
+                </div>
+                <p className="text-sm text-muted-foreground">Prep tasks completed "Now" for all types of disaster</p>
+              </div>
+              <Button 
+                onClick={() => navigate("/preparedness")}
+                className="w-full bg-gradient-primary hover:opacity-90"
+              >
+                Continue Emergency Prep
               </Button>
             </CardContent>
           </Card>
