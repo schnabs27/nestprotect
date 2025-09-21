@@ -16,6 +16,7 @@ const Homepage = () => {
   const [completionDate, setCompletionDate] = useState<Date>();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
+  const [assessmentScore, setAssessmentScore] = useState(0);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -57,6 +58,41 @@ const Homepage = () => {
     fetchPrepProgress();
   }, [user]);
 
+  // Fetch assessment score for authenticated users
+  useEffect(() => {
+    const fetchAssessmentScore = async () => {
+      if (!user) {
+        // For non-authenticated users, use localStorage as fallback
+        const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+        setAssessmentScore(score);
+        return;
+      }
+
+      try {
+        const { data: assessmentData } = await supabase
+          .from('user_assessments')
+          .select('score')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (assessmentData) {
+          setAssessmentScore(assessmentData.score);
+        } else {
+          // Fallback to localStorage if no database record
+          const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+          setAssessmentScore(score);
+        }
+      } catch (error) {
+        console.error('Error fetching assessment score:', error);
+        // Fallback to localStorage
+        const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+        setAssessmentScore(score);
+      }
+    };
+
+    fetchAssessmentScore();
+  }, [user]);
+
   const handleDisclaimerAccept = () => {
     if (user) {
       sessionStorage.setItem(`disclaimer-seen-${user.id}`, 'true');
@@ -64,7 +100,6 @@ const Homepage = () => {
     setShowDisclaimer(false);
   };
 
-  const assessmentTrueItems = parseInt(localStorage.getItem('selfAssessmentScore') || '0'); // Get from localStorage
   const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
 
   const getDaysUntilDate = () => {
@@ -130,7 +165,7 @@ const Homepage = () => {
             <CardContent className="space-y-3">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">
-                  {assessmentTrueItems}/{assessmentTotalItems}
+                  {assessmentScore}/{assessmentTotalItems}
                 </div>
                 <p className="text-sm text-purple-100">Statements marked true</p>
               </div>

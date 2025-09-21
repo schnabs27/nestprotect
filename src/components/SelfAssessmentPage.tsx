@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 import MobileNavigation from "@/components/MobileNavigation";
 
 interface AssessmentState {
@@ -23,11 +25,13 @@ const statements = [
 
 const SelfAssessmentPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [assessment, setAssessment] = useState<AssessmentState>({
     currentStep: 0,
     answers: [],
     isComplete: false
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAnswer = (answer: boolean) => {
     const newAnswers = [...assessment.answers, answer];
@@ -44,9 +48,55 @@ const SelfAssessmentPage = () => {
         answers: newAnswers,
         isComplete: true
       });
-      // Store the score in localStorage
+      // Store the score in localStorage for compatibility
       const score = newAnswers.filter(answer => answer).length;
       localStorage.setItem('selfAssessmentScore', score.toString());
+    }
+  };
+
+  const saveAssessmentToDatabase = async () => {
+    if (!user || !assessment.isComplete) return;
+
+    setIsSaving(true);
+    try {
+      const score = assessment.answers.filter(answer => answer).length;
+      
+      // Check if user already has an assessment
+      const { data: existingAssessment } = await supabase
+        .from('user_assessments')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existingAssessment) {
+        // Update existing assessment
+        await supabase
+          .from('user_assessments')
+          .update({
+            score,
+            assessment_data: {
+              answers: assessment.answers,
+              statements: statements
+            }
+          })
+          .eq('user_id', user.id);
+      } else {
+        // Create new assessment
+        await supabase
+          .from('user_assessments')
+          .insert({
+            user_id: user.id,
+            score,
+            assessment_data: {
+              answers: assessment.answers,
+              statements: statements
+            }
+          });
+      }
+    } catch (error) {
+      console.error('Error saving assessment:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -197,6 +247,17 @@ const SelfAssessmentPage = () => {
                   <p className="text-sm font-medium text-primary mb-3">
                     {isAllTrue ? "Great job - basics are done!" : "Almost there - keep prepping!"}
                   </p>
+                  {user && (
+                    <Button 
+                      onClick={saveAssessmentToDatabase}
+                      disabled={isSaving}
+                      size="sm"
+                      className="w-full mb-2"
+                      variant="outline"
+                    >
+                      {isSaving ? "Saving..." : "Save Assessment"}
+                    </Button>
+                  )}
                   <Button 
                     onClick={() => navigate("/")} 
                     size="sm"

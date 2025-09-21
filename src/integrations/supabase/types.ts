@@ -122,6 +122,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_assessments: {
+        Row: {
+          assessment_data: Json | null
+          created_at: string
+          id: string
+          score: number
+          total_questions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessment_data?: Json | null
+          created_at?: string
+          id?: string
+          score: number
+          total_questions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessment_data?: Json | null
+          created_at?: string
+          id?: string
+          score?: number
+          total_questions?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preparedness_progress: {
         Row: {
           completed: boolean
