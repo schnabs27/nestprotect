@@ -31,9 +31,8 @@ const SelfAssessmentPage = () => {
     answers: [],
     isComplete: false
   });
-  const [isSaving, setIsSaving] = useState(false);
 
-  const handleAnswer = (answer: boolean) => {
+  const handleAnswer = async (answer: boolean) => {
     const newAnswers = [...assessment.answers, answer];
     
     if (assessment.currentStep < statements.length - 1) {
@@ -48,55 +47,34 @@ const SelfAssessmentPage = () => {
         answers: newAnswers,
         isComplete: true
       });
-      // Store the score in localStorage for compatibility
-      const score = newAnswers.filter(answer => answer).length;
-      localStorage.setItem('selfAssessmentScore', score.toString());
-    }
-  };
-
-  const saveAssessmentToDatabase = async () => {
-    if (!user || !assessment.isComplete) return;
-
-    setIsSaving(true);
-    try {
-      const score = assessment.answers.filter(answer => answer).length;
       
-      // Check if user already has an assessment
-      const { data: existingAssessment } = await supabase
-        .from('user_assessments')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (existingAssessment) {
-        // Update existing assessment
-        await supabase
-          .from('user_assessments')
-          .update({
-            score,
-            assessment_data: {
-              answers: assessment.answers,
-              statements: statements
-            }
-          })
-          .eq('user_id', user.id);
-      } else {
-        // Create new assessment
-        await supabase
-          .from('user_assessments')
-          .insert({
-            user_id: user.id,
-            score,
-            assessment_data: {
-              answers: assessment.answers,
-              statements: statements
-            }
-          });
+      // Calculate score
+      const score = newAnswers.filter(answer => answer).length;
+      
+      // Store the score in localStorage (for all users)
+      localStorage.setItem('selfAssessmentScore', score.toString());
+      
+      // Save to database if user is authenticated
+      if (user) {
+        try {
+          await supabase
+            .from('user_assessments')
+            .upsert({
+              user_id: user.id,
+              score: score,
+              total_questions: statements.length,
+              assessment_data: {
+                answers: newAnswers,
+                statements: statements,
+                completed_at: new Date().toISOString()
+              }
+            }, {
+              onConflict: 'user_id'
+            });
+        } catch (error) {
+          console.error('Error saving assessment to database:', error);
+        }
       }
-    } catch (error) {
-      console.error('Error saving assessment:', error);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -244,20 +222,14 @@ const SelfAssessmentPage = () => {
                   <p className="text-sm text-foreground mb-2">
                     You marked {scoreTrue} of {statements.length} as true.
                   </p>
+                  {user && (
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Your score has been saved to your account.
+                    </p>
+                  )}
                   <p className="text-sm font-medium text-primary mb-3">
                     {isAllTrue ? "Great job - basics are done!" : "Almost there - keep prepping!"}
                   </p>
-                  {user && (
-                    <Button 
-                      onClick={saveAssessmentToDatabase}
-                      disabled={isSaving}
-                      size="sm"
-                      className="w-full mb-2"
-                      variant="outline"
-                    >
-                      {isSaving ? "Saving..." : "Save Assessment"}
-                    </Button>
-                  )}
                   <Button 
                     onClick={() => navigate("/")} 
                     size="sm"
