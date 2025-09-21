@@ -158,9 +158,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 </tbody>
               </table>
             </div>
-            <p className="text-gray-600 text-center text-sm pt-2">
-              NestProtect is a free and privacy-focused app by Blue Sky Disaster Relief, a 501(c)(3) non-profit helping people affected by natural disasters.
-            </p>
           </CardContent>
         </Card>
 
