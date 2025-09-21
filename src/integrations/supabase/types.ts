@@ -277,6 +277,10 @@ export type Database = {
           website: string
         }[]
       }
+      get_user_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

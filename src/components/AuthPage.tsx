@@ -26,10 +26,9 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   useEffect(() => {
     const fetchUserCount = async () => {
       try {
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-        setUserCount(count || 0);
+        const { data, error } = await supabase.rpc('get_user_count');
+        if (error) throw error;
+        setUserCount(data || 0);
       } catch (err) {
         console.error('Error fetching user count:', err);
       }
