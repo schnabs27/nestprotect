@@ -134,12 +134,12 @@ const ProfilePage = () => {
             <div className="space-y-4">
               <h3 className="font-medium text-foreground">Personal Information</h3>
               <div>
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <Input
-                  id="name"
+                  id="email"
                   value={userInfo.name}
                   onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
-                  placeholder="Your name"
+                  placeholder="Your email address"
                 />
               </div>
               
@@ -169,9 +169,8 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Account Status Section */}
-            <div className="space-y-4 pt-4 border-t border-border">
-              <h3 className="font-medium text-foreground">Account Status</h3>
+            {/* Account Management Section */}
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-sm font-medium">
@@ -182,6 +181,18 @@ const ProfilePage = () => {
                   </p>
                 </div>
               </div>
+              
+              {/* Change Password */}
+              <Button 
+                variant="outline"
+                className="w-full justify-start"
+                disabled={isGuest}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Change Password
+              </Button>
               
               {/* Google Auth Integration */}
               <div className="space-y-2">
