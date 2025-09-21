@@ -73,6 +73,45 @@ const ProfilePage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user || isGuest) {
+      toast.error("Cannot delete guest account");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data."
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      // First delete the user's profile data
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) {
+        console.error("Error deleting profile:", profileError);
+      }
+
+      // Then delete the auth user account
+      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (authError) {
+        toast.error("Failed to delete account: " + authError.message);
+        return;
+      }
+
+      toast.success("Account deleted successfully");
+      navigate("/auth");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("An unexpected error occurred while deleting your account");
+    }
+  };
+
   const handleGoogleAuth = async () => {
     try {
       if (isGuest) {
@@ -132,7 +171,6 @@ const ProfilePage = () => {
           <CardContent className="space-y-6">
             {/* Personal Information Section */}
             <div className="space-y-4">
-              <h3 className="font-medium text-foreground">Personal Information</h3>
               <div>
                 <Label htmlFor="email">Email Address</Label>
                 <Input
@@ -171,16 +209,6 @@ const ProfilePage = () => {
 
             {/* Account Management Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-sm font-medium">
-                    {user ? `Signed in as: ${user.email}` : "Guest User"}
-                  </span>
-                  <p className="text-xs text-muted-foreground">
-                    {user ? "Full access to all features" : "Limited access - some features may be restricted"}
-                  </p>
-                </div>
-              </div>
               
               {/* Change Password */}
               <Button 
@@ -224,6 +252,18 @@ const ProfilePage = () => {
               >
                 <LogOut size={16} className="mr-2" />
                 {user ? "Sign Out" : "Exit Guest Mode"}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleDeleteAccount}
+                disabled={isGuest}
+                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Account
               </Button>
             </div>
           </CardContent>
