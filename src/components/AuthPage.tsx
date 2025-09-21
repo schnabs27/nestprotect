@@ -135,7 +135,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                     </td>
                     <td className="text-left pl-4 py-3">
                       <span className="text-gray-700">
-                        <span className="font-bold" style={{ color: '#0080e0' }}>Are you prepared? Take Nestor's quiz.</span> Then prepare even more with task checklists.
+                        <span className="font-bold" style={{ color: '#0080e0' }}>Are you prepared? Take Nestor's quiz.</span> Then prep more with checklists.
                       </span>
                     </td>
                   </tr>
