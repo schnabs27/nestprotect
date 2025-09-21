@@ -114,6 +114,7 @@ export default {
 			backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-phone': 'var(--gradient-phone)',
+        'gradient-purple': 'var(--gradient-purple)',
 				'gradient-subtle': 'var(--gradient-subtle)'
 			},
 			boxShadow: {

@@ -98,7 +98,7 @@ const Homepage = () => {
         {/* Scoreboards */}
         <div className="grid gap-4 md:grid-cols-2">
           {/* Self-Assessment Scoreboard */}
-          <Card className="shadow-soft bg-purple-600 border-purple-600">
+          <Card className="shadow-soft bg-gradient-purple border-purple-600">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-white text-center">Self-Assessment</CardTitle>
             </CardHeader>
