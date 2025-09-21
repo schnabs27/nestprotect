@@ -124,7 +124,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         <Card className="border-0 shadow-lg">
           <CardContent className="space-y-4 pt-6">
             <p className="text-gray-700 text-center leading-tight">
-              Natural disasters like storms, floods, and wildfires happen. Most of us aren't prepared. My family wasn't prepared when our home was hit by a tornado in October 2019. That's why I made this free app for you. Tools include:
+              Natural disasters like storms, floods, and wildfires happen. Most of us aren't prepared.
             </p>
             <div className="w-full">
               <table className="w-full">
