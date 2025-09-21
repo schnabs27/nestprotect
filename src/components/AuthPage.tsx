@@ -124,7 +124,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         <Card className="border-0 shadow-lg">
           <CardContent className="space-y-4 pt-6">
             <p className="text-gray-700 text-center leading-tight">
-              Hi, I'm Nestor! Natural disasters happen, and I want to help you weather the storm with these tools:
+              Natural disasters like storms, floods, and wildfires happen. Most of us aren't prepared. My family wasn't prepared when our home was hit by a tornado in October 2019. That's why I made this free app for you. Tools include:
             </p>
             <div className="space-y-3 text-sm">
               <div className="border-2 border-yellow-300 rounded-lg p-3 bg-yellow-50/50 text-center">
