@@ -22,6 +22,7 @@ import WeatherMap from './WeatherMap';
 import GovernmentAlerts from './GovernmentAlerts';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import nestorRecovery from '@/assets/nestor-recovery.png';
 
 interface WeatherData {
   current: {
@@ -173,18 +174,35 @@ const WeatherPage = () => {
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
-      {/* Header */}
-      <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">During Emergency</h1>
+      {/* Location Header */}
+      <div className="bg-background">
+        <div className="flex items-center justify-between p-4 pt-8">
           <div className="flex items-center gap-2">
-            <MapPin className="h-3 w-3" />
-            <p className="text-sm text-primary-foreground/90">{zipCode}</p>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{zipCode}</p>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="container mx-auto px-4 py-6 space-y-4">
+        {/* Header Section */}
+        <div className="text-center space-y-4">
+          <div className="w-full h-px bg-border"></div>
+          <div className="mx-auto w-32 h-32 flex items-center justify-center">
+            <img 
+              src={nestorRecovery}
+              alt="Nestor with binoculars - Your disaster guide"
+              className="w-32 h-32 object-contain"
+            />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-primary">Stay aware, act fast.</h1>
+            <p className="text-muted-foreground">
+              Worried about a disaster? Better safe than sorry. Time to enact your emergency plan. When in doubt, call 911 to share your status and receive instructions.
+            </p>
+          </div>
+        </div>
+
         {error && (
           <Alert>
             <AlertTriangle className="h-4 w-4" />
