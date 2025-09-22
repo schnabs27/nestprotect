@@ -237,6 +237,16 @@ const Homepage = () => {
                     />
                   </PopoverContent>
                 </Popover>
+                <div className="mt-2">
+                  <a 
+                    href="https://calendar.google.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:text-primary/80 underline"
+                  >
+                    Create a reminder (Google Calendar)
+                  </a>
+                </div>
               </div>
               
               {daysRemaining !== null && (
