@@ -466,7 +466,6 @@ const PreparednessPage = () => {
         { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] },
         { id: "storm-after-2", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
         { id: "storm-after-3", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
-        { id: "storm-after-4", title: "Photograph/document damage before cleanup", notes: "Evidence for insurance claims", links: [] },
         { id: "storm-after-5", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] }
       ]
     }
