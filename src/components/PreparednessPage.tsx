@@ -740,6 +740,15 @@ const PreparednessPage = () => {
           ))}
         </Tabs>
 
+        {/* Additional guidance message */}
+        {activeTab === "after" && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Continue your progress: review additional tasks by type and stage.
+            </p>
+          </div>
+        )}
+
       </div>
       <MobileNavigation />
     </div>
