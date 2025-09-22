@@ -142,7 +142,7 @@ const About = () => {
                   </li>
                   <li className="flex">
                     <span className="text-primary mr-1">•</span>
-                    <span className="flex-1">Your preparedness data - Stored in your Google Drive</span>
+                    <span className="flex-1">Your assessment score, checklist progress, and deadline - saved for your future reference</span>
                   </li>
                   <li className="flex">
                     <span className="text-primary mr-1">•</span>
