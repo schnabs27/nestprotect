@@ -318,11 +318,19 @@ const ProfilePage = () => {
 
         {/* Links */}
         <div className="space-y-3">
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => navigate('/privacy-policy')}
+          >
             <ExternalLink size={16} className="mr-2" />
             Privacy Policy
           </Button>
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => navigate('/terms-of-service')}
+          >
             <ExternalLink size={16} className="mr-2" />
             Terms of Service
           </Button>
