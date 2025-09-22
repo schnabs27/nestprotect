@@ -237,7 +237,7 @@ const Homepage = () => {
                     />
                   </PopoverContent>
                 </Popover>
-                <div className="mt-2">
+                <div className="mt-2 text-center">
                   <a 
                     href="https://calendar.google.com/" 
                     target="_blank" 
