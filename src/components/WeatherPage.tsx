@@ -175,11 +175,14 @@ const WeatherPage = () => {
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
       {/* Location Header */}
-      <div className="bg-background">
-        <div className="flex items-center justify-between p-4 pt-8">
+      <div className="bg-background border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{zipCode}</p>
+            <MapPin size={16} className="text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">Location:</span>
+          </div>
+          <div className="flex items-center gap-1 text-sm text-primary">
+            <span className="font-mono">{zipCode || "78028"}</span>
           </div>
         </div>
       </div>
