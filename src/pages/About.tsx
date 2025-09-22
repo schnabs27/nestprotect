@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import nestorHelloCircle from "@/assets/nestor-hello-circle.png";
 
 const About = () => {
   const navigate = useNavigate();
@@ -19,46 +20,44 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-            <h1 className="text-2xl font-bold text-primary">About NestProtect</h1>
-          </div>
+      <div className="container mx-auto px-4 py-6 space-y-4">
+        {/* Header with back button and Nestor */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Hero Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-3xl text-center text-primary">
-              NestProtect - Disaster Preparedness
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg text-center text-muted-foreground mb-6">
+        
+        {/* Nestor Introduction */}
+        <div className="text-center space-y-4 mb-8">
+          <div className="mx-auto w-32 h-32 flex items-center justify-center">
+            <img 
+              src={nestorHelloCircle} 
+              alt="Nestor - Your disaster preparedness guide"
+              className="w-32 h-32 object-contain"
+            />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-title">NestProtect - Disaster Preparedness</h1>
+            <p className="text-muted-foreground font-bold">
               Free disaster preparedness and recovery app by Blue Sky Disaster Relief, a 501(c)(3) non-profit helping people affected by natural disasters.
             </p>
-            <p className="text-center text-muted-foreground">
+            <p className="text-muted-foreground">
               Created by a high school student whose family survived a tornado, NestProtect's mascot Nestor guides you through steps to lower risk to your safety and property.
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Photo Gallery */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl">App Screenshots</CardTitle>
+            <CardTitle className="text-2xl text-title">App Screenshots</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -97,7 +96,7 @@ const About = () => {
         {/* Key Features */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl">Key Features</CardTitle>
+            <CardTitle className="text-2xl text-title">Key Features</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -130,7 +129,7 @@ const About = () => {
         {/* Privacy First */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl text-primary">Privacy-First</CardTitle>
+            <CardTitle className="text-2xl text-title">Privacy-First</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-6">
@@ -163,7 +162,7 @@ const About = () => {
         {/* Always Free */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-2xl text-primary">Always Free</CardTitle>
+            <CardTitle className="text-2xl text-title">Always Free</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg text-center text-muted-foreground">
@@ -174,7 +173,7 @@ const About = () => {
             </p>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   );
 };
