@@ -190,7 +190,6 @@ const WeatherPage = () => {
       <div className="container mx-auto px-4 py-6 space-y-4">
         {/* Header Section */}
         <div className="text-center space-y-4">
-          <div className="w-full h-px bg-border"></div>
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
               src={nestorDuring}
