@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import nestorHelloCircle from "@/assets/nestor-hello-circle.png";
+import MobileNavigation from "@/components/MobileNavigation";
 
 const About = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
         {/* Header with back button and Nestor */}
         <div className="flex items-center gap-4 mb-6">
@@ -195,6 +196,7 @@ const About = () => {
           </CardContent>
         </Card>
       </div>
+      <MobileNavigation />
     </div>
   );
 };
