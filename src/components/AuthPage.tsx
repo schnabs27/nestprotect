@@ -335,7 +335,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           </div>
         </Card>
 
-        {/* Guest Access */}
+        {/* About NestProtect */}
         <Card className="border-0 shadow-lg">
           <CardContent className="p-6 text-center">
             <div className="mb-6">
@@ -359,19 +359,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 </a>
               </p>
             </div>
-            <CardDescription className="mb-4">
-              Want a preview? (limited functionality)
-            </CardDescription>
-            <Button
-              variant="outline"
-              onClick={() => {
-                onGuestAccess();
-                navigate("/");
-              }}
-              className="w-full"
-            >
-              Continue as Guest
-            </Button>
           </CardContent>
         </Card>
 
