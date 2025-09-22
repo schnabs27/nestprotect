@@ -436,8 +436,10 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             <div className="mt-4">
               <Button 
                 onClick={() => navigate("/about")}
-                variant="outline"
-                className="w-full"
+                className="w-full text-white font-medium"
+                style={{
+                  background: 'linear-gradient(135deg, #0080e0 0%, #00d2bc 100%)'
+                }}
               >
                 View Details and Screenshots
               </Button>
