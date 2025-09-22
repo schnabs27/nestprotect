@@ -135,19 +135,40 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold text-primary mb-2">What we collect:</h3>
-                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>Email address - Login and security only</li>
-                  <li>Your preparedness data - Stored in your Google Drive</li>
-                  <li>ZIP code - Local weather and alerts only</li>
+                <ul className="space-y-1 text-muted-foreground">
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">Email address - Login and security only</span>
+                  </li>
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">Your preparedness data - Stored in your Google Drive</span>
+                  </li>
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">ZIP code - Local weather and alerts only</span>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold text-primary mb-2">What we don't do:</h3>
-                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>No marketing data collection</li>
-                  <li>No third-party data sharing</li>
-                  <li>No cookies</li>
-                  <li>No special permissions required</li>
+                <ul className="space-y-1 text-muted-foreground">
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">No marketing data collection</span>
+                  </li>
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">No third-party data sharing</span>
+                  </li>
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">No cookies</span>
+                  </li>
+                  <li className="flex">
+                    <span className="text-primary mr-1">•</span>
+                    <span className="flex-1">No special permissions required</span>
+                  </li>
                 </ul>
               </div>
             </div>
