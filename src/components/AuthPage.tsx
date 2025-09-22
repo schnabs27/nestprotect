@@ -317,7 +317,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Help us reach 200 homes!
             </h3>
             <p className="text-white mb-4 leading-relaxed">
-              September is Disaster Preparedness Month. Help NestProtect reach 200 users! Please sign up and share this with your friends:{" "}
+              September is Disaster Preparedness Month. Help NestProtect reach 200 registered users! Please <span className="font-bold">sign up</span> and share this with your friends:{" "}
               <button
                 onClick={() => {
                   navigator.clipboard.writeText('https://nestprotect.app/');
@@ -330,7 +330,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </button>
             </p>
             <p className="text-lg font-bold text-white">
-              NestProtect Users: {userCount}
+              Registered Users: {userCount}
             </p>
           </div>
         </Card>
