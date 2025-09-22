@@ -18,6 +18,7 @@ import ProfilePage from "./components/ProfilePage";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import About from "./pages/About";
 import SelfAssessmentPage from "./components/SelfAssessmentPage";
 import ShortcutPage from "./components/ShortcutPage";
 import Auth from "./pages/Auth";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/shortcut" element={<ProtectedRoute><ShortcutPage /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/about" element={<About />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
