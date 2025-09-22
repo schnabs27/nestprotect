@@ -239,7 +239,9 @@ const PreparednessPage = () => {
         { id: "all-after-5", title: "Watch for hazards", notes: "power lines, gas leaks, unstable structures", links: [] },
         { id: "all-after-6", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
         { id: "all-after-7", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
-        { id: "all-after-8", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] }
+        { id: "all-after-8", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] },
+        { id: "all-after-9", title: "Apply fencing and \"Do Not Enter\" signage", notes: "Discourage visitors who may hurt themselves or further damage your property", links: [] },
+        { id: "all-after-10", title: "Be confident, ask questions", notes: "Strangers may show up and insist you use their services - but they are not in charge. Remember you have the right to make researched, thoughtful decisions for your best interest.", links: [] }
       ]
     },
     wildfire: {
