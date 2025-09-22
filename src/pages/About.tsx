@@ -174,7 +174,7 @@ const About = () => {
             </div>
             <div className="mt-6">
               <p className="text-muted-foreground">
-                Personal data stays in your Google Drive. Web app platform with a Postgres database provides only aggregate activity tracking (such as page visits). All personal data stays in your Google or related tools, under your control.
+                Web app platform with a Postgres database provides only aggregate activity tracking (such as page visits). All personal data stays in your Google or related tools, under your control.
               </p>
             </div>
           </CardContent>
