@@ -466,7 +466,10 @@ const PreparednessPage = () => {
         { id: "storm-during-4", title: "Do not leave until officials confirm storm has passed", notes: "Eye of hurricane can be deceiving", links: [] }
       ],
       after: [
-        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] }
+        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] },
+        { id: "storm-after-2", title: "Protect yourself from hazards", notes: "Shattered glass, broken wood, exposed nails, insulation, and large debris are frequent after strong winds", links: [] },
+        { id: "storm-after-3", title: "Cover belongings to minimize further damage", notes: "Post-storm secondary rain is common", links: [] },
+        { id: "storm-after-4", title: "If you smell gas, leave immediately", notes: "Contact the police or utilities company about a possible gas line rupture", links: [] }
       ]
     }
   };
