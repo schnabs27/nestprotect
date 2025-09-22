@@ -236,7 +236,10 @@ const PreparednessPage = () => {
         { id: "all-after-2", title: "Wear protective gear when cleaning debris", notes: "boots, gloves, masks", links: [] },
         { id: "all-after-3", title: "Document damage before cleanup or repairs", notes: "Take photos/videos for insurance", links: [] },
         { id: "all-after-4", title: "Contact insurance promptly; apply for FEMA assistance if eligible", notes: "Start recovery process quickly", links: ["fema.gov/assistance"] },
-        { id: "all-after-5", title: "Watch for hazards", notes: "power lines, gas leaks, unstable structures", links: [] }
+        { id: "all-after-5", title: "Watch for hazards", notes: "power lines, gas leaks, unstable structures", links: [] },
+        { id: "all-after-6", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
+        { id: "all-after-7", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
+        { id: "all-after-8", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] }
       ]
     },
     wildfire: {
@@ -463,10 +466,7 @@ const PreparednessPage = () => {
         { id: "storm-during-4", title: "Do not leave until officials confirm storm has passed", notes: "Eye of hurricane can be deceiving", links: [] }
       ],
       after: [
-        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] },
-        { id: "storm-after-2", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
-        { id: "storm-after-3", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
-        { id: "storm-after-5", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] }
+        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] }
       ]
     }
   };
