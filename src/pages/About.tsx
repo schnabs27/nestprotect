@@ -194,6 +194,16 @@ const About = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* Go to Login Button */}
+        <div className="text-center mb-8">
+          <Button 
+            onClick={() => navigate("/auth")}
+            className="px-8 py-3"
+          >
+            Go to Login
+          </Button>
+        </div>
       </div>
     </div>
   );
