@@ -242,6 +242,9 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Your email is used for account security, not marketing.
+                    </p>
                   </div>
                   <div>
                     <Input
