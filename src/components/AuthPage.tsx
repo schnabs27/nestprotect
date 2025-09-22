@@ -263,7 +263,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                       pattern="[0-9]{5}"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      This will be the default starting point for all location-based content in the app
+                      Helps for your weather, alerts, and local resource search
                     </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
