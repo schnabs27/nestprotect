@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MobileNavigation from "@/components/MobileNavigation";
 import ContactForm from "@/components/ContactForm";
+import ReviewForm from "@/components/ReviewForm";
 import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
 import settingsBird from "@/assets/settings-bird.png";
 import { Button } from "@/components/ui/button";
@@ -340,10 +341,12 @@ const ProfilePage = () => {
               Contact Support
             </Button>
           </ContactForm>
-          <Button variant="outline" className="w-full justify-start">
-            <Heart size={16} className="mr-2 text-coral" />
-            Leave a Review
-          </Button>
+          <ReviewForm>
+            <Button variant="outline" className="w-full justify-start">
+              <Heart size={16} className="mr-2 text-coral" />
+              Leave a Review
+            </Button>
+          </ReviewForm>
         </div>
       </div>
       <MobileNavigation />
