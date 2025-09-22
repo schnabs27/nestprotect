@@ -232,6 +232,7 @@ const PreparednessPage = () => {
       ],
       after: [
         { id: "all-after-1", title: "Return home only when officials say it's safe", notes: "Wait for all-clear from authorities", links: [] },
+        { id: "all-after-1b", title: "Board up new openings to your home caused by the disaster", notes: "Easy access may tempt looters", links: [] },
         { id: "all-after-2", title: "Wear protective gear when cleaning debris", notes: "boots, gloves, masks", links: [] },
         { id: "all-after-3", title: "Document damage before cleanup or repairs", notes: "Take photos/videos for insurance", links: [] },
         { id: "all-after-4", title: "Contact insurance promptly; apply for FEMA assistance if eligible", notes: "Start recovery process quickly", links: ["fema.gov/assistance"] },
