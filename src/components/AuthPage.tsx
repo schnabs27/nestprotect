@@ -142,6 +142,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   };
 
   const generatePassword = () => {
+    // Generate secure 12-character password
     const lowercase = 'abcdefghijklmnopqrstuvwxyz';
     const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const digits = '0123456789';
