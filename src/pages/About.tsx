@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -8,7 +8,7 @@ import nestorHelloCircle from "@/assets/nestor-hello-circle.png";
 
 const About = () => {
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
   const galleryImages = [
     { src: "/gallery/1_Home.png", alt: "Home Dashboard", title: "Home - Dashboard to keep track of progress" },
@@ -17,6 +17,20 @@ const About = () => {
     { src: "/gallery/4_During.png", alt: "During Disaster Monitoring", title: "During - Weather, wildfire, and traffic conditions" },
     { src: "/gallery/5_After.png", alt: "After Disaster Recovery", title: "After - Quick search of local and national help" }
   ];
+
+  const goToPrevious = () => {
+    if (selectedImageIndex !== null && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (selectedImageIndex !== null && selectedImageIndex < galleryImages.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
+  };
+
+  const currentImage = selectedImageIndex !== null ? galleryImages[selectedImageIndex] : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,34 +76,90 @@ const About = () => {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {galleryImages.map((image, index) => (
-                <Dialog key={index}>
-                  <DialogTrigger asChild>
-                    <div className="cursor-pointer group">
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="w-full h-40 object-cover rounded-lg border-2 border-border group-hover:border-primary transition-colors"
-                      />
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        {image.title}
-                      </p>
-                    </div>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="max-w-full max-h-[70vh] object-contain rounded-lg"
-                      />
-                      <p className="text-sm text-muted-foreground mt-4 text-center">
-                        {image.title}
-                      </p>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <div 
+                  key={index}
+                  className="cursor-pointer group"
+                  onClick={() => setSelectedImageIndex(index)}
+                >
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-40 object-cover rounded-lg border-2 border-border group-hover:border-primary transition-colors"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    {image.title}
+                  </p>
+                </div>
               ))}
             </div>
+
+            {/* Single Dialog for all images with navigation */}
+            <Dialog open={selectedImageIndex !== null} onOpenChange={() => setSelectedImageIndex(null)}>
+              <DialogContent className="max-w-4xl">
+                {currentImage && (
+                  <div className="relative flex flex-col items-center">
+                    {/* Navigation buttons */}
+                    <div className="absolute inset-y-0 left-4 flex items-center z-10">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={goToPrevious}
+                        disabled={selectedImageIndex === 0}
+                        className="rounded-full bg-background/80 hover:bg-background/90 shadow-lg"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </Button>
+                    </div>
+                    
+                    <div className="absolute inset-y-0 right-4 flex items-center z-10">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={goToNext}
+                        disabled={selectedImageIndex === galleryImages.length - 1}
+                        className="rounded-full bg-background/80 hover:bg-background/90 shadow-lg"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </Button>
+                    </div>
+
+                    {/* Image */}
+                    <img
+                      src={currentImage.src}
+                      alt={currentImage.alt}
+                      className="max-w-full max-h-[70vh] object-contain rounded-lg"
+                    />
+                    
+                    {/* Title and navigation dots */}
+                    <div className="mt-4 text-center space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        {currentImage.title}
+                      </p>
+                      
+                      {/* Navigation dots */}
+                      <div className="flex justify-center space-x-2">
+                        {galleryImages.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedImageIndex(index)}
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              index === selectedImageIndex 
+                                ? 'bg-primary' 
+                                : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Image counter */}
+                      <p className="text-xs text-muted-foreground">
+                        {selectedImageIndex !== null ? selectedImageIndex + 1 : 0} of {galleryImages.length}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
 
