@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, Home, Copy } from "lucide-react";
+import ContactForm from "@/components/ContactForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
@@ -301,6 +302,15 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </svg>
               Continue with Google
             </Button>
+
+            {/* Having trouble link */}
+            <div className="text-center mt-4">
+              <ContactForm>
+                <button className="text-sm text-gray-600 hover:text-gray-800 underline">
+                  Having trouble?
+                </button>
+              </ContactForm>
+            </div>
 
           </CardContent>
         </Card>
