@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MobileNavigation from "@/components/MobileNavigation";
+import ZipCodeHeader from "@/components/ZipCodeHeader";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { 
   CheckSquare, 
@@ -174,18 +175,7 @@ const WeatherPage = () => {
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
-      {/* Location Header */}
-      <div className="bg-background border-b border-border px-4 py-3">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <div className="flex items-center gap-2">
-            <MapPin size={16} className="text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Location:</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm text-primary">
-            <span className="font-mono">{zipCode || "78028"}</span>
-          </div>
-        </div>
-      </div>
+      <ZipCodeHeader />
 
       <div className="container mx-auto px-4 py-6 space-y-4">
         {/* Header Section */}
