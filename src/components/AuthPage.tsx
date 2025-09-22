@@ -23,6 +23,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userCount, setUserCount] = useState<number>(0);
+  const [suggestedPassword, setSuggestedPassword] = useState<string>("");
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -140,6 +141,43 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     }
   };
 
+  const generatePassword = () => {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    
+    const allChars = lowercase + uppercase + digits + symbols;
+    
+    // Ensure at least one character from each category
+    let password = '';
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += digits[Math.floor(Math.random() * digits.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+    
+    // Fill remaining 8 characters randomly
+    for (let i = 4; i < 12; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    const shuffled = password.split('').sort(() => Math.random() - 0.5).join('');
+    setSuggestedPassword(shuffled);
+  };
+
+  const copyAndUsePassword = async () => {
+    if (suggestedPassword) {
+      setPassword(suggestedPassword);
+      try {
+        await navigator.clipboard.writeText(suggestedPassword);
+        toast.success('Password copied to clipboard and filled in!');
+      } catch (err) {
+        toast.success('Password filled in!');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -249,12 +287,44 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                   <div>
                     <Input
                       type="password"
-                      placeholder="Password (min 6 characters)"
+                      placeholder="New Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={12}
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Minimum 12 characters. {" "}
+                      <button
+                        type="button"
+                        onClick={generatePassword}
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Suggest password.
+                      </button>
+                    </p>
+                    {suggestedPassword && (
+                      <div className="mt-2 p-2 bg-gray-50 rounded border">
+                        <p className="text-xs text-gray-600 mb-1">Suggested password:</p>
+                        <div className="flex items-center gap-2">
+                          <code 
+                            className="text-sm font-mono bg-white px-2 py-1 rounded border flex-1 cursor-pointer hover:bg-gray-100"
+                            onClick={copyAndUsePassword}
+                          >
+                            {suggestedPassword}
+                          </code>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={copyAndUsePassword}
+                            className="text-xs px-2 py-1 h-auto"
+                          >
+                            Use This
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <Input
