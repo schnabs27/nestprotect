@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { CalendarIcon, Home, Calendar, AlertTriangle } from "lucide-react";
+import { CalendarIcon, Home, Calendar, AlertTriangle, Info } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -188,7 +189,19 @@ const Homepage = () => {
                 <div className="text-3xl font-bold text-primary">
                   {prepProgress.completed}/{prepProgress.total}
                 </div>
-                <p className="text-sm text-muted-foreground">Prep tasks completed "Now" for all types of disaster</p>
+                <div className="flex items-center justify-center gap-1">
+                  <p className="text-sm text-muted-foreground">Basic prep tasks completed</p>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Tasks listed in the "do these now" stage for all types of disaster.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
               <Button 
                 onClick={() => navigate("/preparedness")}
