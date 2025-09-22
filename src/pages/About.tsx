@@ -186,7 +186,7 @@ const About = () => {
             <CardTitle className="text-2xl text-title">Always Free</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg text-center text-muted-foreground">
+            <p className="text-body text-center">
               No premium features, completely free forever for all users and ages.
             </p>
             <p className="text-center text-muted-foreground mt-4">
