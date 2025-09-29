@@ -511,25 +511,28 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-gray-500">
+        <p className="text-center text-xs text-white">
           By using NestProtect, you agree to our{" "}
           <a 
             href="/terms" 
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-blue-300 hover:text-blue-100 underline"
           >
             terms of service
           </a>{" "}
           and{" "}
           <a 
             href="/privacy" 
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-blue-300 hover:text-blue-100 underline"
           >
             privacy policy
           </a>
           .
         </p>
-        <p className="text-center text-xs text-gray-400 mt-2">
+        <p className="text-center text-xs text-white mt-2">
           © 2025 www.blueskynow.org
+        </p>
+        <p className="text-center text-xs text-white opacity-75 mt-1">
+          NestProtect is a trademark of Blue Sky Disaster Relief.
         </p>
       </div>
     </div>
