@@ -274,7 +274,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
 
         {/* Authentication Tabs */}
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-6 text-center">
             <Tabs defaultValue="signin" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -432,8 +432,8 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box'
-        }}>
-          <CardContent className="p-6">
+         }}>
+          <CardContent className="p-6 text-center">
             <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
               Are you at risk?
             </h3>
