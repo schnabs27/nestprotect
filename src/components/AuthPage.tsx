@@ -189,7 +189,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             src={bannerImage} 
             alt="NestProtect - Nestor wasn't prepared. Now he wants to help you protect your nest." 
             className="w-full h-[164px] object-cover"
-            style={{ objectPosition: '15% center' }}
           />
         </div>
 
