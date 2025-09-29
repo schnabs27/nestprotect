@@ -191,8 +191,8 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             className="w-40 h-40 object-contain mx-auto"
           />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">NestProtect™</h1>
-            <p className="text-gray-600 mt-2">Your personal natural disaster guide</p>
+            <h1 className="text-3xl font-bold text-white">NestProtect™</h1>
+            <p className="text-white mt-2">Your personal natural disaster guide</p>
           </div>
         </div>
 
