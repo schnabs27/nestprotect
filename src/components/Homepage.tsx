@@ -16,6 +16,7 @@ const Homepage = () => {
   const [completionDate, setCompletionDate] = useState<Date>();
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
+  const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -239,6 +240,26 @@ const Homepage = () => {
             Add NestProtect to Your Phone
           </Button>
         </div>
+
+        {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3">
+              <p className="text-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+              <div className="text-center">
+                <Button 
+                  onClick={() => setShowEducationalDisclaimer(false)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  I understand
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
       <MobileNavigation />
     </div>
