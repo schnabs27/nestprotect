@@ -244,7 +244,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Are you at risk?
             </h3>
             <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
-              FEMA predicts risk for 18 types of disaster across more than 3,000 counties. Enter your zip code to see your risk.
+              FEMA predicts disaster by county. Are you ready?
             </p>
             
             <div className="space-y-4">
