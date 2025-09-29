@@ -231,6 +231,71 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           </div>
         </div>
 
+        {/* Risk Assessment Card */}
+        <Card className="border-0 shadow-lg overflow-hidden" style={{
+          background: 'white',
+          border: '2px solid transparent',
+          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box'
+         }}>
+          <CardContent className="p-6 text-center">
+            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
+              Are you at risk?
+            </h3>
+            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
+              FEMA predicts risk for 18 types of disaster across more than 3,000 counties. Enter your zip code to see your risk.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Zipcode"
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  maxLength={5}
+                  pattern="[0-9]{5}"
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleRiskCheck}
+                  disabled={loading || zipCode.length !== 5}
+                  style={{
+                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+                    color: 'white'
+                  }}
+                >
+                  What's my risk?
+                </Button>
+              </div>
+              
+              {riskData && (
+                <div className="mt-4 space-y-2">
+                  <div>
+                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      {riskData.risk_rating || 'Not available'}
+                    </span>
+                  </div>
+                  {riskData.high_risks && (
+                    <div>
+                      <span style={{ color: '#4b5563' }}>High Risks: </span>
+                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                        {riskData.high_risks}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <p className="text-xs mt-4" style={{ color: '#4b5563' }}>
+              Log in to see more!
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Value Proposition */}
         <Card className="border-0 shadow-lg">
           <CardContent className="space-y-4 pt-6">
@@ -422,71 +487,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               </ContactForm>
             </div>
 
-          </CardContent>
-        </Card>
-
-        {/* Risk Assessment Card */}
-        <Card className="border-0 shadow-lg overflow-hidden" style={{
-          background: 'white',
-          border: '2px solid transparent',
-          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box'
-         }}>
-          <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
-              Are you at risk?
-            </h3>
-            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
-              FEMA predicts risk for 18 types of disaster across more than 3,000 counties. Enter your zip code to see your risk.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Zipcode"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  maxLength={5}
-                  pattern="[0-9]{5}"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleRiskCheck}
-                  disabled={loading || zipCode.length !== 5}
-                  style={{
-                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-                    color: 'white'
-                  }}
-                >
-                  What's my risk?
-                </Button>
-              </div>
-              
-              {riskData && (
-                <div className="mt-4 space-y-2">
-                  <div>
-                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
-                    <span style={{ color: '#7f1baf' }} className="font-semibold">
-                      {riskData.risk_rating || 'Not available'}
-                    </span>
-                  </div>
-                  {riskData.high_risks && (
-                    <div>
-                      <span style={{ color: '#4b5563' }}>High Risks: </span>
-                      <span style={{ color: '#7f1baf' }} className="font-semibold">
-                        {riskData.high_risks}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            <p className="text-xs mt-4" style={{ color: '#4b5563' }}>
-              Log in to see more!
-            </p>
           </CardContent>
         </Card>
 
