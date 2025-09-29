@@ -188,7 +188,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           <img 
             src={nestprotectLogo} 
             alt="NestProtect Logo" 
-            className="w-20 h-20 object-contain mx-auto"
+            className="w-40 h-40 object-contain mx-auto"
           />
           <div>
             <h1 className="text-3xl font-bold text-gray-900">NestProtect™</h1>
