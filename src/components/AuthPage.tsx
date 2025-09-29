@@ -515,14 +515,14 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           By using NestProtect, you agree to our{" "}
           <a 
             href="/terms" 
-            className="text-blue-300 hover:text-blue-100 underline"
+            className="text-white hover:text-gray-200 underline"
           >
             terms of service
           </a>{" "}
           and{" "}
           <a 
             href="/privacy" 
-            className="text-blue-300 hover:text-blue-100 underline"
+            className="text-white hover:text-gray-200 underline"
           >
             privacy policy
           </a>
