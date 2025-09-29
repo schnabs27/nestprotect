@@ -180,7 +180,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(to bottom, #0080e0, #00d2bc)' }}>
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Branding */}
         <div className="text-center space-y-4">
