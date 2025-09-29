@@ -223,9 +223,9 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           <img 
             src={nestprotectLogo} 
             alt="NestProtect Logo" 
-            className="w-60 h-60 object-contain mx-auto"
+            className="w-90 h-90 object-contain mx-auto"
           />
-          <div>
+          <div className="px-8">
             <h1 className="text-3xl font-bold text-white">NestProtect</h1>
             <p className="text-white mt-2">Natural disasters like storms, floods, and wildfires happen. Let Nestor help you protect your nest.</p>
           </div>
