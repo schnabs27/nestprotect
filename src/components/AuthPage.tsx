@@ -219,7 +219,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(to bottom, #0080e0, #00d2bc)' }}>
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Branding */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-0.5">
           <img 
             src={nestprotectLogo} 
             alt="NestProtect Logo" 
