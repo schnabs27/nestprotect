@@ -181,10 +181,13 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     }
   };
 
+  // Risk assessment function
+
   const handleRiskCheck = async () => {
     if (zipCode.length !== 5) return;
     
     setLoading(true);
+    setError(null);
     try {
       const { data, error } = await (supabase as any)
         .from('zips_with_risks')
@@ -198,6 +201,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         setRiskData(null);
       } else if (data) {
         setRiskData(data);
+        toast.success('Risk data found!');
       } else {
         toast.error('No risk data found for this zip code');
         setRiskData(null);
