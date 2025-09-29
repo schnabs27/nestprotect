@@ -289,10 +289,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 </div>
               )}
             </div>
-            
-            <p className="text-xs mt-4" style={{ color: '#4b5563' }}>
-              Log in to see more!
-            </p>
           </CardContent>
         </Card>
 
