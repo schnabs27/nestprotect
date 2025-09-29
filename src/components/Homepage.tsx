@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { CalendarIcon, Home, Calendar, AlertTriangle, Info } from "lucide-react";
+import { CalendarIcon, Home, Calendar, Info } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -15,21 +14,10 @@ import MobileNavigation from "@/components/MobileNavigation";
 
 const Homepage = () => {
   const [completionDate, setCompletionDate] = useState<Date>();
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  // Show disclaimer dialog when user signs in
-  useEffect(() => {
-    if (user) {
-      const hasSeenDisclaimer = sessionStorage.getItem(`disclaimer-seen-${user.id}`);
-      if (!hasSeenDisclaimer) {
-        setShowDisclaimer(true);
-      }
-    }
-  }, [user]);
 
   // Fetch preparedness progress for authenticated users
   useEffect(() => {
@@ -94,13 +82,6 @@ const Homepage = () => {
     fetchAssessmentScore();
   }, [user]);
 
-  const handleDisclaimerAccept = () => {
-    if (user) {
-      sessionStorage.setItem(`disclaimer-seen-${user.id}`, 'true');
-    }
-    setShowDisclaimer(false);
-  };
-
   const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
 
   const getDaysUntilDate = () => {
@@ -113,31 +94,6 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Disclaimer Dialog */}
-      <Dialog open={showDisclaimer} onOpenChange={() => {}}>
-        <DialogContent className="max-w-md bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-400 shadow-2xl">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-amber-500 rounded-full">
-              <AlertTriangle className="w-6 h-6 text-white" />
-            </div>
-            <DialogTitle className="text-center text-xl font-bold text-amber-900">
-              Disclaimer
-            </DialogTitle>
-            <DialogDescription className="text-center text-amber-800 leading-relaxed">
-              This app provides educational disaster preparedness information only and is not a comprehensive expert resource. For more comprehensive support, please conduct your own resource searches, contact local emergency responders and consult your insurance company for complete guidance tailored to your specific situation and location.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center pt-4">
-            <Button 
-              onClick={handleDisclaimerAccept}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3"
-            >
-              I understand
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <div className="container mx-auto px-4 py-6 space-y-4">
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
@@ -271,25 +227,6 @@ const Homepage = () => {
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-
-
-        {/* About NestProtect */}
-        <Card className="shadow-soft">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-title text-center">About NestProtect</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>
-              Leo, a high school student, created Blue Sky Disaster Relief and the NestProtect app 
-              to give people free disaster relief resources. They're the tools his family needed 
-              when their home was hit by a tornado. So please use and share!
-            </p>
-            <p>
-              The NestProtect app is focused on data privacy. Recommendations include Google tools 
-              because they are free and offer privacy, but please use the tools you prefer.
-            </p>
           </CardContent>
         </Card>
 
