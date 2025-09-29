@@ -227,7 +227,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           />
           <div>
             <h1 className="text-3xl font-bold text-white">NestProtect</h1>
-            <p className="text-white mt-2">Let Nestor help you protect your nest.</p>
+            <p className="text-white mt-2">Natural disasters like storms, floods, and wildfires happen. Let Nestor help you protect your nest.</p>
           </div>
         </div>
 
