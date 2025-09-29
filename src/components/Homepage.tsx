@@ -244,19 +244,17 @@ const Homepage = () => {
         {/* Educational Disclaimer */}
         {showEducationalDisclaimer && (
           <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3">
-              <p className="text-foreground text-sm leading-relaxed">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
               </p>
-              <div className="text-center">
-                <Button 
-                  onClick={() => setShowEducationalDisclaimer(false)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  I understand
-                </Button>
-              </div>
+              <Button 
+                onClick={() => setShowEducationalDisclaimer(false)}
+                variant="outline"
+                className="w-full"
+              >
+                I understand
+              </Button>
             </CardContent>
           </Card>
         )}
