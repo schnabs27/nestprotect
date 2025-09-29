@@ -300,7 +300,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         <Card className="border-0 shadow-lg">
           <CardContent className="space-y-4 pt-6">
             <p className="text-gray-700 text-center leading-tight">
-              Natural disasters like storms, floods, and wildfires happen. Most of us aren't prepared.
+              Nestor learned the hard way that natural disasters can change everything FAST. Now you can use Nestor's guides and tools to be better prepared.
             </p>
             <div className="w-full">
               <table className="w-full">
