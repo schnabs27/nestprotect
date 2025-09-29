@@ -25,6 +25,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [error, setError] = useState<string | null>(null);
   const [userCount, setUserCount] = useState<number>(0);
   const [suggestedPassword, setSuggestedPassword] = useState<string>("");
+  const [riskData, setRiskData] = useState<{RISK_RATNG?: string, HIGH_RISKS?: string} | null>(null);
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -177,6 +178,36 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
       } catch (err) {
         toast.success('Password filled in!');
       }
+    }
+  };
+
+  const handleRiskCheck = async () => {
+    if (zipCode.length !== 5) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('zips_with_risks')
+        .select('RISK_RATNG, HIGH_RISKS')
+        .eq('ZIPCODE', parseInt(zipCode))
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching risk data:', error);
+        toast.error('Unable to find risk data for this zip code');
+        setRiskData(null);
+      } else if (data) {
+        setRiskData(data);
+      } else {
+        toast.error('No risk data found for this zip code');
+        setRiskData(null);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error('An error occurred while fetching risk data');
+      setRiskData(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -390,34 +421,69 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
           </CardContent>
         </Card>
 
-        {/* User Goal Card */}
-        <Card className="border-0 shadow-lg overflow-hidden">
-          <div 
-            className="p-6 text-center"
-            style={{ 
-              background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)' 
-            }}
-          >
-            <h3 className="text-xl font-bold text-white mb-3">
-              Help us reach 200 homes!
+        {/* Risk Assessment Card */}
+        <Card className="border-0 shadow-lg overflow-hidden" style={{
+          background: 'white',
+          border: '2px solid transparent',
+          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box'
+        }}>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
+              Are you at risk?
             </h3>
-            <p className="text-white mb-4 leading-relaxed">
-              September is Disaster Preparedness Month. Help NestProtect reach 200 registered users! <span className="font-bold">Please sign up.</span> Then share this with your friends:{" "}
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText('https://nestprotect.app/');
-                  toast.success('URL copied to clipboard!');
-                }}
-                className="text-white underline hover:text-gray-200 transition-colors inline-flex items-center gap-1"
-              >
-                https://nestprotect.app/
-                <Copy className="w-3 h-3" />
-              </button>
+            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
+              FEMA predicts risk for 18 types of disaster across more than 3,000 counties. Enter your zip code to see your risk.
             </p>
-            <p className="text-lg font-bold text-white">
-              Registered Users: {userCount}
+            
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Zipcode"
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  maxLength={5}
+                  pattern="[0-9]{5}"
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleRiskCheck}
+                  disabled={loading || zipCode.length !== 5}
+                  style={{
+                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+                    color: 'white'
+                  }}
+                >
+                  What's my risk?
+                </Button>
+              </div>
+              
+              {riskData && (
+                <div className="mt-4 space-y-2">
+                  <div>
+                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      {riskData.RISK_RATNG || 'Not available'}
+                    </span>
+                  </div>
+                  {riskData.HIGH_RISKS && (
+                    <div>
+                      <span style={{ color: '#4b5563' }}>High Risks: </span>
+                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                        {riskData.HIGH_RISKS}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <p className="text-xs mt-4" style={{ color: '#4b5563' }}>
+              Log in to see more!
             </p>
-          </div>
+          </CardContent>
         </Card>
 
         {/* About NestProtect */}
