@@ -9,7 +9,6 @@ import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, H
 import ContactForm from "@/components/ContactForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import bannerImage from "@/assets/nestprotect-login-banner.png";
 
 interface AuthPageProps {
   onAuthSuccess: () => void;
@@ -183,14 +182,17 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Banner Image */}
-        <div className="w-full">
+        {/* Logo and Branding */}
+        <div className="text-center space-y-4">
           <img 
-            src={bannerImage} 
-            alt="NestProtect - Nestor wasn't prepared. Now he wants to help you protect your nest." 
-            className="w-full h-[164px] object-cover"
-            style={{ objectPosition: '15% center' }}
+            src="/lovable-uploads/0de7c778-50fa-452d-b71f-bc6781f7befd.png" 
+            alt="NestProtect Logo" 
+            className="w-20 h-20 object-contain mx-auto"
           />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">NestProtect™</h1>
+            <p className="text-gray-600 mt-2">Your personal natural disaster guide</p>
+          </div>
         </div>
 
         {/* Value Proposition */}
