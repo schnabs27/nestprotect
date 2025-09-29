@@ -278,7 +278,7 @@ const Homepage = () => {
         {/* About NestProtect */}
         <Card className="shadow-soft">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-title text-center">About NestProtect™</CardTitle>
+            <CardTitle className="text-lg text-title text-center">About NestProtect</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>
