@@ -81,8 +81,9 @@ serve(async (req) => {
           }
         });
       }
-    } catch (error) {
-      console.log('Cache lookup failed, proceeding with Google search:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('Cache lookup failed, proceeding with Google search:', errorMessage);
     }
 
     // Google Maps search
@@ -179,7 +180,7 @@ serve(async (req) => {
           results.push({
             name: placeName,
             categories: categories,
-            description: placeTypes.filter(t => t !== 'point_of_interest' && t !== 'establishment').slice(0, 2).join(', ').replace(/_/g, ' ') || categories.join(', '),
+            description: placeTypes.filter((t: string) => t !== 'point_of_interest' && t !== 'establishment').slice(0, 2).join(', ').replace(/_/g, ' ') || categories.join(', '),
             phone: place.nationalPhoneNumber || '',
             url: place.googleMapsUri || `https://maps.google.com/maps/place/?q=place_id:${place.id}`,
             address: address,
@@ -226,10 +227,11 @@ serve(async (req) => {
       }
     });
 
-  } catch (error) {
-    console.error('Search error:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Search error:', errorMessage);
     return new Response(JSON.stringify({
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: {
@@ -241,14 +243,14 @@ serve(async (req) => {
 });
 
 // Helper functions
-function parseAddress(formattedAddress) {
+function parseAddress(formattedAddress: string): string {
   const parts = formattedAddress.split(',');
   if (parts.length < 2) return formattedAddress;
   // Return street address + city only
   return `${parts[0].trim()}, ${parts[1].trim()}`;
 }
 
-function categorizePlace(placeTypes, placeName) {
+function categorizePlace(placeTypes: string[], placeName: string): string[] {
   const categories = [];
 
   // Exact mapping as specified
@@ -268,7 +270,7 @@ function categorizePlace(placeTypes, placeName) {
   return categories;
 }
 
-function removeDuplicates(resources) {
+function removeDuplicates(resources: any[]): any[] {
   const unique = [];
   const seen = new Set();
 

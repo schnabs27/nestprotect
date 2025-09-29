@@ -79,10 +79,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in search-openai-resources function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -185,7 +186,8 @@ Generate realistic resources for ZIP code ${requestedZipcode}. Return ONLY the J
 
   } catch (error) {
     console.error('OpenAI search error:', error);
-    console.error('Error stack:', error.stack);
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    console.error('Error stack:', errorStack);
     return [];
   }
 }

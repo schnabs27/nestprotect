@@ -83,8 +83,9 @@ serve(async (req) => {
           }
         });
       }
-    } catch (error) {
-      console.log('Cache lookup failed, proceeding with Google search:', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('Cache lookup failed, proceeding with Google search:', errorMessage);
     }
 
     // Google Maps search
@@ -242,10 +243,11 @@ serve(async (req) => {
       }
     });
 
-  } catch (error) {
-    console.error('Search error:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Search error:', errorMessage);
     return new Response(JSON.stringify({
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: {
@@ -257,14 +259,14 @@ serve(async (req) => {
 });
 
 // Helper functions
-function parseAddress(formattedAddress) {
+function parseAddress(formattedAddress: string): string {
   const parts = formattedAddress.split(',');
   if (parts.length < 2) return formattedAddress;
   // Return street address + city only
   return `${parts[0].trim()}, ${parts[1].trim()}`;
 }
 
-function categorizePlace(placeTypes) {
+function categorizePlace(placeTypes: string[]): string[] {
   const categories = [];
 
   // Recovery service categorization based on place types
@@ -293,7 +295,7 @@ function categorizePlace(placeTypes) {
   return categories;
 }
 
-function removeDuplicates(resources) {
+function removeDuplicates(resources: any[]): any[] {
   const unique = [];
   const seen = new Set();
 

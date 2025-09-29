@@ -240,15 +240,16 @@ export type Database = {
         Row: {
           AVLN_RISKR: string | null
           CFLD_RISKR: string | null
-          COUNT_HIGH_RISKS: string | null
-          COUNTY: string | null
+          city: string | null
+          count_high_risks: string | null
+          county: string | null
           COUNTY_ID: number | null
           COUNTY_ORIG: string | null
           CWAV_RISKR: string | null
           DRGT_RISKR: string | null
           ERQK_RISKR: string | null
           HAIL_RISKR: string | null
-          HIGH_RISKS: string | null
+          high_risks: string | null
           HRCN_RISKR: string | null
           HWAV_RISKR: string | null
           ISTM_RISKR: string | null
@@ -257,31 +258,31 @@ export type Database = {
           NRI_ID: string | null
           OID_: number | null
           RFLD_RISKR: string | null
-          RISK_RATNG: string | null
+          risk_rating: string | null
+          state: string | null
           STATE: string | null
           SWND_RISKR: string | null
           TOT_RATIO: number | null
           TRND_RISKR: string | null
           TSUN_RISKR: string | null
-          USPS_ZIP_PREF_CITY: string | null
-          USPS_ZIP_PREF_STATE: string | null
           VLCN_RISKR: string | null
           WFIR_RISKR: string | null
           WNTW_RISKR: string | null
-          ZIPCODE: number
+          zipcode: number
         }
         Insert: {
           AVLN_RISKR?: string | null
           CFLD_RISKR?: string | null
-          COUNT_HIGH_RISKS?: string | null
-          COUNTY?: string | null
+          city?: string | null
+          count_high_risks?: string | null
+          county?: string | null
           COUNTY_ID?: number | null
           COUNTY_ORIG?: string | null
           CWAV_RISKR?: string | null
           DRGT_RISKR?: string | null
           ERQK_RISKR?: string | null
           HAIL_RISKR?: string | null
-          HIGH_RISKS?: string | null
+          high_risks?: string | null
           HRCN_RISKR?: string | null
           HWAV_RISKR?: string | null
           ISTM_RISKR?: string | null
@@ -290,31 +291,31 @@ export type Database = {
           NRI_ID?: string | null
           OID_?: number | null
           RFLD_RISKR?: string | null
-          RISK_RATNG?: string | null
+          risk_rating?: string | null
+          state?: string | null
           STATE?: string | null
           SWND_RISKR?: string | null
           TOT_RATIO?: number | null
           TRND_RISKR?: string | null
           TSUN_RISKR?: string | null
-          USPS_ZIP_PREF_CITY?: string | null
-          USPS_ZIP_PREF_STATE?: string | null
           VLCN_RISKR?: string | null
           WFIR_RISKR?: string | null
           WNTW_RISKR?: string | null
-          ZIPCODE: number
+          zipcode: number
         }
         Update: {
           AVLN_RISKR?: string | null
           CFLD_RISKR?: string | null
-          COUNT_HIGH_RISKS?: string | null
-          COUNTY?: string | null
+          city?: string | null
+          count_high_risks?: string | null
+          county?: string | null
           COUNTY_ID?: number | null
           COUNTY_ORIG?: string | null
           CWAV_RISKR?: string | null
           DRGT_RISKR?: string | null
           ERQK_RISKR?: string | null
           HAIL_RISKR?: string | null
-          HIGH_RISKS?: string | null
+          high_risks?: string | null
           HRCN_RISKR?: string | null
           HWAV_RISKR?: string | null
           ISTM_RISKR?: string | null
@@ -323,18 +324,17 @@ export type Database = {
           NRI_ID?: string | null
           OID_?: number | null
           RFLD_RISKR?: string | null
-          RISK_RATNG?: string | null
+          risk_rating?: string | null
+          state?: string | null
           STATE?: string | null
           SWND_RISKR?: string | null
           TOT_RATIO?: number | null
           TRND_RISKR?: string | null
           TSUN_RISKR?: string | null
-          USPS_ZIP_PREF_CITY?: string | null
-          USPS_ZIP_PREF_STATE?: string | null
           VLCN_RISKR?: string | null
           WFIR_RISKR?: string | null
           WNTW_RISKR?: string | null
-          ZIPCODE?: number
+          zipcode?: number
         }
         Relationships: []
       }

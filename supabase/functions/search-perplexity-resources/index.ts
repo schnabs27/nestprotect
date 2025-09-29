@@ -42,10 +42,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in search-perplexity-resources function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -136,7 +137,8 @@ Focus only on factual listings from official sources, press releases, and verifi
 
   } catch (error) {
     console.error('Perplexity search error:', error);
-    console.error('Error stack:', error.stack);
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    console.error('Error stack:', errorStack);
     return {
       answer: 'Unable to search for disaster relief resources at this time. Please try again later.',
       search_results: []

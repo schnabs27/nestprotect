@@ -25,7 +25,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [error, setError] = useState<string | null>(null);
   const [userCount, setUserCount] = useState<number>(0);
   const [suggestedPassword, setSuggestedPassword] = useState<string>("");
-  const [riskData, setRiskData] = useState<{RISK_RATNG?: string, HIGH_RISKS?: string} | null>(null);
+  const [riskData, setRiskData] = useState<{risk_rating?: string, high_risks?: string} | null>(null);
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -191,8 +191,8 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     try {
       const { data, error } = await supabase
         .from('zips_with_risks')
-        .select('"RISK_RATNG", "HIGH_RISKS"')
-        .eq('"ZIPCODE"', parseInt(zipCode))
+        .select('risk_rating, high_risks')
+        .eq('zipcode', parseInt(zipCode))
         .maybeSingle();
 
       if (error) {
@@ -469,14 +469,14 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                   <div>
                     <span style={{ color: '#4b5563' }}>Risk Rating: </span>
                     <span style={{ color: '#7f1baf' }} className="font-semibold">
-                      {riskData.RISK_RATNG || 'Not available'}
+                      {riskData.risk_rating || 'Not available'}
                     </span>
                   </div>
-                  {riskData.HIGH_RISKS && (
+                  {riskData.high_risks && (
                     <div>
                       <span style={{ color: '#4b5563' }}>High Risks: </span>
                       <span style={{ color: '#7f1baf' }} className="font-semibold">
-                        {riskData.HIGH_RISKS}
+                        {riskData.high_risks}
                       </span>
                     </div>
                   )}
