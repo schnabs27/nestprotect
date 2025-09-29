@@ -189,10 +189,10 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('zips_with_risks')
-        .select('RISK_RATNG, HIGH_RISKS')
-        .eq('ZIPCODE', parseInt(zipCode))
+        .select('"RISK_RATNG", "HIGH_RISKS"')
+        .eq('"ZIPCODE"', parseInt(zipCode))
         .maybeSingle();
 
       if (error) {

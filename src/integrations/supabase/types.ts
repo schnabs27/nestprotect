@@ -236,6 +236,108 @@ export type Database = {
         }
         Relationships: []
       }
+      zips_with_risks: {
+        Row: {
+          AVLN_RISKR: string | null
+          CFLD_RISKR: string | null
+          COUNT_HIGH_RISKS: string | null
+          COUNTY: string | null
+          COUNTY_ID: number | null
+          COUNTY_ORIG: string | null
+          CWAV_RISKR: string | null
+          DRGT_RISKR: string | null
+          ERQK_RISKR: string | null
+          HAIL_RISKR: string | null
+          HIGH_RISKS: string | null
+          HRCN_RISKR: string | null
+          HWAV_RISKR: string | null
+          ISTM_RISKR: string | null
+          LNDS_RISKR: string | null
+          LTNG_RISKR: string | null
+          NRI_ID: string | null
+          OID_: number | null
+          RFLD_RISKR: string | null
+          RISK_RATNG: string | null
+          STATE: string | null
+          SWND_RISKR: string | null
+          TOT_RATIO: number | null
+          TRND_RISKR: string | null
+          TSUN_RISKR: string | null
+          USPS_ZIP_PREF_CITY: string | null
+          USPS_ZIP_PREF_STATE: string | null
+          VLCN_RISKR: string | null
+          WFIR_RISKR: string | null
+          WNTW_RISKR: string | null
+          ZIPCODE: number
+        }
+        Insert: {
+          AVLN_RISKR?: string | null
+          CFLD_RISKR?: string | null
+          COUNT_HIGH_RISKS?: string | null
+          COUNTY?: string | null
+          COUNTY_ID?: number | null
+          COUNTY_ORIG?: string | null
+          CWAV_RISKR?: string | null
+          DRGT_RISKR?: string | null
+          ERQK_RISKR?: string | null
+          HAIL_RISKR?: string | null
+          HIGH_RISKS?: string | null
+          HRCN_RISKR?: string | null
+          HWAV_RISKR?: string | null
+          ISTM_RISKR?: string | null
+          LNDS_RISKR?: string | null
+          LTNG_RISKR?: string | null
+          NRI_ID?: string | null
+          OID_?: number | null
+          RFLD_RISKR?: string | null
+          RISK_RATNG?: string | null
+          STATE?: string | null
+          SWND_RISKR?: string | null
+          TOT_RATIO?: number | null
+          TRND_RISKR?: string | null
+          TSUN_RISKR?: string | null
+          USPS_ZIP_PREF_CITY?: string | null
+          USPS_ZIP_PREF_STATE?: string | null
+          VLCN_RISKR?: string | null
+          WFIR_RISKR?: string | null
+          WNTW_RISKR?: string | null
+          ZIPCODE: number
+        }
+        Update: {
+          AVLN_RISKR?: string | null
+          CFLD_RISKR?: string | null
+          COUNT_HIGH_RISKS?: string | null
+          COUNTY?: string | null
+          COUNTY_ID?: number | null
+          COUNTY_ORIG?: string | null
+          CWAV_RISKR?: string | null
+          DRGT_RISKR?: string | null
+          ERQK_RISKR?: string | null
+          HAIL_RISKR?: string | null
+          HIGH_RISKS?: string | null
+          HRCN_RISKR?: string | null
+          HWAV_RISKR?: string | null
+          ISTM_RISKR?: string | null
+          LNDS_RISKR?: string | null
+          LTNG_RISKR?: string | null
+          NRI_ID?: string | null
+          OID_?: number | null
+          RFLD_RISKR?: string | null
+          RISK_RATNG?: string | null
+          STATE?: string | null
+          SWND_RISKR?: string | null
+          TOT_RATIO?: number | null
+          TRND_RISKR?: string | null
+          TSUN_RISKR?: string | null
+          USPS_ZIP_PREF_CITY?: string | null
+          USPS_ZIP_PREF_STATE?: string | null
+          VLCN_RISKR?: string | null
+          WFIR_RISKR?: string | null
+          WNTW_RISKR?: string | null
+          ZIPCODE?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
