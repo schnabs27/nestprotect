@@ -100,7 +100,7 @@ const Homepage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src="/lovable-uploads/564fda98-1db0-44eb-97de-a693f9254dea.png" 
+              src="/images/564fda98-1db0-44eb-97de-a693f9254dea.png" 
               alt="Nestor - Your disaster preparedness guide"
               className="w-32 h-32 object-contain"
             />

@@ -1,0 +1,189 @@
+# NestProtect - Project Documentation
+
+## Overview
+NestProtect is a disaster preparedness web application that helps users prepare for, respond to, and recover from natural disasters.
+
+## Tech Stack
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI Framework**: Shadcn/UI + Tailwind CSS
+- **Backend**: Supabase (Database + Auth + Edge Functions)
+- **Routing**: React Router v6
+- **State Management**: React Query (TanStack Query)
+
+## Project Structure
+
+```
+nestprotect/
+├── src/
+│   ├── components/          # All React components
+│   ├── pages/              # Route-level pages
+│   ├── hooks/              # Custom React hooks
+│   ├── integrations/       # Third-party integrations (Supabase)
+│   ├── lib/                # Utility functions
+│   └── utils/              # Helper utilities
+├── supabase/
+│   ├── functions/          # Edge functions (API endpoints)
+│   └── migrations/         # Database schema changes
+└── public/                 # Static assets
+```
+
+## Core Components
+
+### Navigation & Layout
+- **AppRouter.tsx** - Main routing logic, handles auth state
+- **MobileNavigation.tsx** - Bottom tab navigation (Before/During/After/Settings)
+- **ZipCodeHeader.tsx** - Global header showing user's zip code
+
+### Main Pages (The 3 Disaster Phases)
+1. **PreparednessPage.tsx** (`/preparedness`) - "Before" disaster prep
+2. **WeatherPage.tsx** (`/during`) - "During" disaster monitoring
+3. **RecoveryIndexPage.tsx** (`/after`) - "After" disaster recovery hub
+
+### Search Pages
+- **ResourcesPage.tsx** (`/googlesearch`) - Google Places search for immediate disaster needs (shelters, food banks)
+- **RecoveryResourcesPage.tsx** (`/googlerecovery`) - Google Places search for recovery services (contractors, plumbers)
+- **PerplexitySearchPage.tsx** (`/perplexitysearch`) - AI search for local disaster relief from news/press releases
+
+### User Features
+- **Homepage.tsx** - Dashboard with progress tracking
+- **ProfilePage.tsx** (`/settings`) - User settings and profile
+- **SelfAssessmentPage.tsx** (`/self-assessment`) - Disaster readiness quiz
+- **DocumentsPage.tsx** - Important document storage
+- **InventoryPage.tsx** - Emergency supplies inventory
+
+### Shared Components
+- **ResourceMap.tsx** - Google Maps integration for showing search results
+- **WeatherMap.tsx** - Weather data visualization
+- **SecureContactInfo.tsx** - Emergency contact management
+- **GovernmentAlerts.tsx** - Weather/disaster alerts display
+
+### Auth
+- **AuthProvider.tsx** - Authentication context (handles user state + guest mode)
+- **AuthPage.tsx** - Login/signup page
+- **ProtectedRoute.tsx** - Route wrapper requiring authentication
+
+## Supabase Edge Functions
+
+All edge functions are deployed to Supabase cloud and called from the frontend:
+
+1. **get-weather-data** - Fetches weather from OpenWeather API
+2. **get-fire-data** - Fetches wildfire data from NASA FIRMS
+3. **get-maps-api-key** - Securely provides Google Maps API key
+4. **search-disaster-resources** - Google Places search for emergency services
+5. **search-recovery-resources** - Google Places search for recovery services
+6. **search-perplexity-resources** - AI-powered search for local relief info
+7. **search-perplexity-simple** - Simplified Perplexity search
+
+## API Keys & Secrets
+
+Stored in Supabase secrets (not in code):
+- `OPENWEATHER_API_KEY` - Weather data
+- `NASAFIRMS_API_KEY` - Fire/wildfire data
+- `MAPS_API_KEY` - Google Maps
+- `PERPLEXITY_API_KEY` - AI search
+- Supabase keys for auth/database
+
+## User Flow
+
+### First-Time User
+1. Lands on Homepage/Auth page
+2. Can use as guest OR sign up
+3. Takes self-assessment to gauge readiness
+4. Sets emergency prep completion goal
+5. Works through preparedness tasks
+
+### Main Navigation (Bottom Tabs)
+- **Before** → PreparednessPage (checklists, planning)
+- **During** → WeatherPage (real-time weather, alerts, fire data)
+- **After** → RecoveryIndexPage (hub with links to search pages)
+- **Settings** → ProfilePage (account, preferences)
+
+### Search Flow (From "After" page)
+1. User goes to `/after`
+2. Chooses search type:
+   - Google Search (Immediate) → `/googlesearch`
+   - Google Search (Recovery) → `/googlerecovery`
+   - AI Search → `/perplexitysearch`
+3. Enters zip code
+4. Results show in list + map view
+5. Can favorite results (saved to Supabase if authenticated)
+
+## Design System
+
+All styles defined in `src/index.css`:
+
+### Colors
+- **Primary**: Blue gradient (#0162e8 → #07deb4)
+- **Accent**: Purple (#770bda)
+- **Secondary colors**: Coral, Yellow, Raspberry
+
+### Component Patterns
+- Cards with soft shadows
+- Gradient buttons for CTAs
+- Badge colors match categories
+- Responsive mobile-first design
+
+## Key Features
+
+### Authentication
+- Email/password via Supabase Auth
+- Guest mode (limited features)
+- Protected routes require login
+
+### Data Storage
+- User profiles in Supabase
+- Preparedness progress tracking
+- Favorite locations
+- Assessment scores
+- Document uploads
+
+### Real-Time Data
+- Weather conditions and alerts
+- Wildfire tracking (10-mile radius)
+- Government emergency alerts
+
+## Development Commands
+
+```bash
+npm install --legacy-peer-deps  # Install dependencies
+npm run dev                      # Start dev server (localhost:8080)
+npm run build                    # Build for production
+npm run preview                  # Preview production build
+
+supabase login                   # Login to Supabase CLI
+supabase link                    # Link to project
+supabase functions deploy <name> # Deploy edge function
+```
+
+## Environment Variables
+
+### Local (.env file)
+```
+VITE_SUPABASE_URL=https://[project-ref].supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=[anon-key]
+VITE_SUPABASE_PROJECT_ID=[project-id]
+```
+
+### Supabase Secrets (set via CLI)
+All API keys stored server-side for security
+
+## Common Tasks
+
+### Adding a New Page
+1. Create component in `src/components/` or `src/pages/`
+2. Add route in `src/App.tsx`
+3. Optionally wrap with `<ProtectedRoute>` if auth required
+
+### Deploying Edge Function
+```bash
+supabase functions deploy function-name
+```
+
+### Updating Styles
+Edit `src/index.css` design system variables
+
+## Notes
+- PreparednessPage (758 lines) and ResourcesPage/RecoveryResourcesPage (500+ lines) are intentionally kept as single files for easier understanding
+- Code duplication between ResourcesPage and RecoveryResourcesPage is acceptable - they serve different purposes and staying separate makes them easier to maintain
+- All components use TypeScript for type safety
+- Tailwind classes used throughout for styling

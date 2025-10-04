@@ -12,6 +12,35 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
+/**
+ * PREPAREDNESS PAGE - Disaster Prep Checklists
+ * 
+ * PURPOSE:
+ * Displays interactive checklists for preparing for natural disasters.
+ * Users can check off tasks, which are saved to their account or browser.
+ * 
+ * STRUCTURE:
+ * - Hazard filter buttons (All, Wildfire, Flood, Storm)
+ * - Phase tabs (Now, Coming, During, After)
+ * - Expandable checklist sections with critical and additional tasks
+ * 
+ * DATA ORGANIZATION:
+ * The `checklists` object contains all tasks:
+ *   checklists[hazardType][phase] = array of checklist sections
+ *   - hazardType: "all", "wildfire", "flood", "storm"
+ *   - phase: "now", "coming", "during", "after"
+ * 
+ * PROGRESS TRACKING:
+ * - Authenticated users: saved to Supabase database
+ * - Guest users: saved to browser localStorage
+ * - State managed in checkedItems Set (task IDs)
+ * 
+ * KEY FEATURES:
+ * - Auto-detects URLs in task text and makes them clickable
+ * - Collapsible sections (openItems Set tracks expanded state)
+ * - Real-time sync with database on checkbox changes
+ */
+
 const PreparednessPage = () => {
   const location = useLocation();
   const { user } = useAuth();

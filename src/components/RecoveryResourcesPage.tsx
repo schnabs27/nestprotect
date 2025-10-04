@@ -14,6 +14,19 @@ import { useAuth } from "@/components/AuthProvider";
 import ResourceMap from "@/components/ResourceMap";
 import SecureContactInfo from "@/components/SecureContactInfo";
 
+/**
+ * RECOVERY RESOURCES PAGE - Post-Disaster Services Search
+ * Searches Google Places for recovery contractors and services
+ * 
+ * FLOW:
+ * 1. User enters zip code → calls 'search-recovery-resources' edge function
+ * 2. Edge function queries Google Places API with recovery-related categories
+ * 3. Results displayed as list + optional map view
+ * 4. Authenticated users can favorite locations (saved to Supabase)
+ * 
+ * CATEGORIES: Contractor, Painter, Plumber, Electrician, Moving, Tools
+ */
+
 const RecoveryResourcesPage = () => {
   const navigate = useNavigate();
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();

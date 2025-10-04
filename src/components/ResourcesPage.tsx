@@ -14,6 +14,19 @@ import { useAuth } from "@/components/AuthProvider";
 import ResourceMap from "@/components/ResourceMap";
 import SecureContactInfo from "@/components/SecureContactInfo";
 
+/**
+ * RESOURCES PAGE - Immediate Disaster Relief Search
+ * Searches Google Places for emergency services (shelters, food banks, relief centers)
+ * 
+ * FLOW:
+ * 1. User enters zip code → calls 'search-disaster-resources' edge function
+ * 2. Edge function queries Google Places API with disaster-related categories
+ * 3. Results displayed as list + optional map view
+ * 4. Authenticated users can favorite locations (saved to Supabase)
+ * 
+ * CATEGORIES: Emergency, Medical, Community Center, Government Office
+ */
+
 const ResourcesPage = () => {
   const navigate = useNavigate();
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
