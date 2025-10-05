@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import About from "./pages/About";
 import SelfAssessmentPage from "./components/SelfAssessmentPage";
 import ShortcutPage from "./components/ShortcutPage";
+import KidsPage from "./components/KidsPage";
 import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
             <Route path="/shortcut" element={<ProtectedRoute><ShortcutPage /></ProtectedRoute>} />
+            <Route path="/kid" element={<ProtectedRoute><KidsPage /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/about" element={<About />} />
