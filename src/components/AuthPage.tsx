@@ -26,8 +26,6 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   const [userCount, setUserCount] = useState<number>(0);
   const [suggestedPassword, setSuggestedPassword] = useState<string>("");
   const [riskData, setRiskData] = useState<{risk_rating?: string, high_risks?: string} | null>(null);
-const { zipCode, loading: locationLoading } = useUserLocation();
-const [femaUrl, setFemaUrl] = useState<string>("");
 
   useEffect(() => {
     const fetchUserCount = async () => {
