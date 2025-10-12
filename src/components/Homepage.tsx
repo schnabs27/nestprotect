@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { CalendarIcon, Home, Calendar, Info } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -10,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import MobileNavigation from "@/components/MobileNavigation";
 
 const Homepage = () => {
@@ -17,8 +20,13 @@ const Homepage = () => {
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
   const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
+  const [searchZipCode, setSearchZipCode] = useState("");
+  const [riskData, setRiskData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
 
   // Fetch preparedness progress for authenticated users
   useEffect(() => {
@@ -52,7 +60,6 @@ const Homepage = () => {
   useEffect(() => {
     const fetchAssessmentScore = async () => {
       if (!user) {
-        // For non-authenticated users, use localStorage as fallback
         const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
         setAssessmentScore(score);
         return;
@@ -68,13 +75,11 @@ const Homepage = () => {
         if (assessmentData) {
           setAssessmentScore(assessmentData.score);
         } else {
-          // Fallback to localStorage if no database record
           const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
           setAssessmentScore(score);
         }
       } catch (error) {
         console.error('Error fetching assessment score:', error);
-        // Fallback to localStorage
         const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
         setAssessmentScore(score);
       }
@@ -83,7 +88,45 @@ const Homepage = () => {
     fetchAssessmentScore();
   }, [user]);
 
-  const assessmentTotalItems = 8; // Total assessment statements (matches SelfAssessmentPage)
+  // Build FEMA URL when zip code is available and auto-fetch risk data
+  useEffect(() => {
+    if (userZipCode) {
+      setSearchZipCode(userZipCode);
+      // Auto-fetch risk data for user's zip code
+      fetchRiskData(userZipCode);
+    }
+  }, [userZipCode]);
+
+  // Fetch risk data function
+  const fetchRiskData = async (zip: string) => {
+    if (zip.length !== 5) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('zips_with_risks')
+        .select('risk_rating, high_risks')
+        .eq('zipcode', zip)
+        .single();
+
+      if (error) throw error;
+      
+      setRiskData(data);
+    } catch (error) {
+      console.error('Error fetching risk data:', error);
+      setRiskData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle risk check
+  const handleRiskCheck = async () => {
+    if (searchZipCode.length !== 5) return;
+    fetchRiskData(searchZipCode);
+  };
+
+  const assessmentTotalItems = 8;
 
   const getDaysUntilDate = () => {
     if (!completionDate) return null;
@@ -96,6 +139,24 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
+        {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+              <Button 
+                onClick={() => setShowEducationalDisclaimer(false)}
+                variant="outline"
+                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
+              >
+                I understand! Dismiss!
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
@@ -125,7 +186,7 @@ const Homepage = () => {
                 <div className="text-3xl font-bold text-white">
                   {assessmentScore}/{assessmentTotalItems}
                 </div>
-                <p className="text-sm text-purple-100">Statements marked true</p>
+                <p className="text-sm text-purple-100">Keep prepping until you get 8 out of 8!</p>
               </div>
               <Button 
                 onClick={() => navigate("/self-assessment")}
@@ -147,7 +208,7 @@ const Homepage = () => {
                   {prepProgress.completed}/{prepProgress.total}
                 </div>
                 <div className="flex items-center justify-center gap-1">
-                  <p className="text-sm text-muted-foreground">Basic prep tasks completed</p>
+                  <p className="text-sm text-muted-foreground">Do you have the 10 basics done?</p>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
@@ -174,26 +235,26 @@ const Homepage = () => {
         <Card className="shadow-soft">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg text-title text-center">
-              Emergency Prep Goal
+              Prep and Practice!
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-4 items-center">
               <div className="flex-1">
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  I want to complete my emergency prep by:
+                  Make a plan. Don't wait for an emergency!
                 </label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-center text-center font-normal",
                         !completionDate && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {completionDate ? format(completionDate, "PPP") : "Pick a date"}
+                      {completionDate ? format(completionDate, "PPP") : "My deadline to be prepared"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -208,14 +269,41 @@ const Homepage = () => {
                   </PopoverContent>
                 </Popover>
                 <div className="mt-2 text-center">
-                  <a 
-                    href="https://calendar.google.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:text-primary/80 underline"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!completionDate) {
+                        toast({
+                          title: "Please select a date first",
+                          description: "Choose your emergency prep completion date above",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
+                      const startDate = new Date(completionDate);
+                      startDate.setHours(10, 0, 0);
+                      const endDate = new Date(startDate);
+                      endDate.setHours(11, 0, 0);
+                      
+                      const formatGoogleDate = (date: Date) => {
+                        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                      };
+                      
+                      const details = encodeURIComponent(
+                        "You can't schedule your emergencies. But you can prepare for them. Protect your home, loved ones, and valuables before a disaster. Use NestProtect to help: https://nestprotect.app/."
+                      );
+                      
+                      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Complete Disaster Prep')}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}`;
+                      
+                      window.open(googleCalendarUrl, '_blank');
+                    }}
+                    className="w-full bg-black text-white hover:bg-gray-700"
                   >
-                    Create a reminder (Google Calendar)
-                  </a>
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Add to Google Calendar
+                  </Button>
                 </div>
               </div>
               
@@ -228,36 +316,100 @@ const Homepage = () => {
                 </div>
               )}
             </div>
+
+            {daysRemaining !== null && (
+              <div className="flex justify-center pt-4">
+                <img 
+                  src="/images/giffy-countdown.gif" 
+                  alt="Countdown timer animation"
+                  className="object-contain"
+                  style={{ width: '400px', height: '181px' }}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Add to Phone Button */}
-        <div className="text-center pt-4">
-          <Button 
-            onClick={() => navigate("/shortcut")}
-            className="w-full bg-gradient-phone hover:opacity-90 text-white"
-          >
-            Add NestProtect to Your Phone
-          </Button>
-        </div>
+        {/* Risk Assessment Card */}
+        <Card className="border-0 shadow-lg overflow-hidden" style={{
+          background: 'white',
+          border: '2px solid transparent',
+          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box'
+        }}>
+          <CardContent className="p-6 text-center">
+            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
+              Prepare for Your Risks
+            </h3>
+            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
+              FEMA has tracked these risks in your area.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Zipcode"
+                  value={searchZipCode}
+                  onChange={(e) => setSearchZipCode(e.target.value)}
+                  maxLength={5}
+                  pattern="[0-9]{5}"
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleRiskCheck}
+                  disabled={loading || searchZipCode.length !== 5}
+                  style={{
+                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+                    color: 'white'
+                  }}
+                >
+                  Search Risks by Zipcode
+                </Button>
+              </div>
+              
+              {riskData && (
+                <div className="mt-4 space-y-2">
+                  <div>
+                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      {riskData.risk_rating || 'Not available'}
+                    </span>
+                  </div>
+                  {riskData.high_risks && (
+                    <div>
+                      <span style={{ color: '#4b5563' }}>High Risks: </span>
+                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                        {riskData.high_risks}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Educational Disclaimer */}
-        {showEducationalDisclaimer && (
-          <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3 text-center">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
-              </p>
-              <Button 
-                onClick={() => setShowEducationalDisclaimer(false)}
-                variant="outline"
-                className="w-full"
-              >
-                I understand
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        {/* Add to Phone Card */}
+        <Card className="shadow-soft bg-gradient-phone">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-center">
+              <img 
+                src="/images/nestprotect-add-to-phone.png" 
+                alt="Add to Phone image"
+                className="object-contain"
+                style={{ width: '150px', height: '150px' }}
+              />
+            </div>
+            <Button 
+              onClick={() => navigate("/shortcut")}
+              className="w-full bg-white text-black hover:bg-gray-100"
+            >
+              Add NestProtect to Your Phone
+            </Button>
+          </CardContent>
+        </Card>
       </div>
       <MobileNavigation />
     </div>

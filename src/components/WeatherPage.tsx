@@ -353,6 +353,19 @@ const WeatherPage = () => {
           </CardContent>
         </Card>
       </div>
+
+       {/* Google Maps Link */}
+      <div className="container mx-auto px-4 pb-6">
+        <a
+          href="https://www.google.com/maps"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-center text-primary hover:text-primary/80 underline text-sm"
+        >
+          Go to Google Maps
+        </a>
+      </div>
+
       <MobileNavigation />
     </div>
   );

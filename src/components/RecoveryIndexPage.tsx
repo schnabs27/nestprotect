@@ -31,25 +31,23 @@ const RecoveryIndexPage = () => {
               Recovery after a natural disaster can be challenging. These resources can help you navigate the recovery process and find the support you need.
             </p>
           </div>
-        </div>
 
-        {/* Recovery Actions Grid */}
-        <div className="grid gap-4">
-          {/* Recovery Action Plan */}
-          <Card className="shadow-soft bg-purple-600 border-purple-600">
+
+{/* AI Emergency Resources */}
+          <Card className="shadow-soft">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-white text-center">Recovery Action Plan</CardTitle>
+              <CardTitle className="text-lg text-title text-center">Let AI Find Disaster Help</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center">
-                <p className="text-sm text-purple-100 leading-none mb-4">
-                  You prepared this list, now you can follow it to guide your recovery process.
-                </p>
+                <p className="text-sm text-muted-foreground leading-none mb-4">
+                  Organizations may offer help - but it can be hard to find. Nestor will use an AI tool called Perplexity to help track down announcements.             </p>
+              
                 <Button 
-                  onClick={() => navigate("/preparedness")} 
-                  className="w-full bg-white hover:bg-gray-100 text-black"
+                  onClick={() => navigate("/perplexitysearch")} 
+                  className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  View Your Action Plan
+                  AI Search: Emergency Resources
                 </Button>
               </div>
             </CardContent>
@@ -69,27 +67,7 @@ const RecoveryIndexPage = () => {
                   onClick={() => navigate("/googlesearch")} 
                   className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  Quick Search: Emergency Resources
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* More Emergency Resources */}
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">More Emergency Resources</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground leading-none mb-4">
-                  Perplexity AI will search the news for local disaster resources.
-                </p>
-                <Button 
-                  onClick={() => navigate("/perplexitysearch")} 
-                  className="w-full bg-gradient-primary hover:opacity-90"
-                >
-                  AI Quick Search: Emergency Resources
+                  Google Search: Emergency Resources
                 </Button>
               </div>
             </CardContent>
@@ -109,7 +87,7 @@ const RecoveryIndexPage = () => {
                   onClick={() => navigate("/googlerecovery")} 
                   className="w-full bg-gradient-primary hover:opacity-90"
                 >
-                  Quick Search: Recovery Resources
+                  Google Search: Recovery Resources
                 </Button>
               </div>
             </CardContent>
@@ -179,7 +157,27 @@ const RecoveryIndexPage = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+
+                     {/* Recovery Actions Grid */}
+          {/* Recovery Action Plan */}
+          <Card className="shadow-soft bg-purple-600 border-purple-600">
+            <CardHeader className="pb-1">
+              </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <p className="text-sm text-purple-100 leading-none mb-4">
+                  Not sure where to start? Use your checklist!
+                </p>
+                <Button 
+                  onClick={() => navigate("/preparedness")} 
+                  className="w-full bg-white hover:bg-gray-100 text-black"
+                >
+                  Go to Your Recovery Plan
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
       <MobileNavigation activeTab="after" onTabChange={(tab) => navigate(`/${tab}`)} />
     </div>
