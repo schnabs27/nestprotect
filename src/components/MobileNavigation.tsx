@@ -41,7 +41,6 @@ const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => 
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentActiveTab === tab.id;
-          const isActTab = tab.id === "act";
           
           return (
             <button
@@ -49,7 +48,6 @@ const MobileNavigation = ({ activeTab, onTabChange }: MobileNavigationProps) => 
               onClick={() => handleTabClick(tab)}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 text-xs transition-smooth",
-                isActTab && "bg-orange-50/60 border-l-2 border-r-2 border-orange-500",
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
