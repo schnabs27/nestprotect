@@ -106,7 +106,7 @@ const Homepage = () => {
       const { data, error } = await supabase
         .from('zips_with_risks')
         .select('risk_rating, high_risks')
-        .eq('zipcode', zip)
+        .eq('zipcode', parseInt(zip))
         .single();
 
       if (error) throw error;
@@ -411,6 +411,16 @@ const Homepage = () => {
           </CardContent>
         </Card>
       </div>
+
+{/* Settings Link */}
+        <div className="text-center pb-4">
+          <a
+           href="/settings"
+            className="text-primary hover:text-primary/80 underline text-sm"
+          >
+            Go to Account Settings
+          </a>
+        </div>
       <MobileNavigation />
     </div>
   );

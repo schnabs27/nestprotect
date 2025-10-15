@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 import PreparednessPage from "./components/PreparednessPage";
 import WeatherPage from "./components/WeatherPage";
+import ActPage from "./components/ActPage"; 
 import ResourcesPage from "./components/ResourcesPage";
 import RecoveryResourcesPage from "./components/RecoveryResourcesPage";
 import PerplexitySearchPage from "./components/PerplexitySearchPage";
@@ -38,6 +39,7 @@ const App = () => (
             
             <Route path="/preparedness" element={<ProtectedRoute><PreparednessPage /></ProtectedRoute>} />
             <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
+            <Route path="/act" element={<ProtectedRoute><ActPage /></ProtectedRoute>} />
             <Route path="/after" element={<ProtectedRoute><RecoveryIndexPage /></ProtectedRoute>} />
             <Route path="/googlesearch" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
             <Route path="/googlerecovery" element={<ProtectedRoute><RecoveryResourcesPage /></ProtectedRoute>} />
