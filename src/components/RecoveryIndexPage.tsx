@@ -32,7 +32,25 @@ const RecoveryIndexPage = () => {
             </p>
           </div>
 
-
+          {/* Recovery Action Plan */}
+          <Card className="shadow-soft bg-purple-600 border-purple-600">
+            <CardHeader className="pb-1">
+              </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <p className="text-sm text-purple-100 leading-none mb-4">
+                  Use your checklist to bounce back faster.
+                </p>
+                <Button 
+                  onClick={() => navigate("/recovery-checklist")} 
+                  className="w-full bg-white hover:bg-gray-100 text-black"
+                >
+                  Go to Your Recovery Checklist
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
 {/* AI Emergency Resources */}
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
@@ -157,26 +175,6 @@ const RecoveryIndexPage = () => {
             </div>
           </CardContent>
         </Card>
-
-                     {/* Recovery Actions Grid */}
-          {/* Recovery Action Plan */}
-          <Card className="shadow-soft bg-purple-600 border-purple-600">
-            <CardHeader className="pb-1">
-              </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center">
-                <p className="text-sm text-purple-100 leading-none mb-4">
-                  Not sure where to start? Use your checklist!
-                </p>
-                <Button 
-                  onClick={() => navigate("/preparedness")} 
-                  className="w-full bg-white hover:bg-gray-100 text-black"
-                >
-                  Go to Your Recovery Plan
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
       <MobileNavigation activeTab="after" onTabChange={(tab) => navigate(`/${tab}`)} />

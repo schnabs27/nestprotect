@@ -14,6 +14,7 @@ import ResourcesPage from "./components/ResourcesPage";
 import RecoveryResourcesPage from "./components/RecoveryResourcesPage";
 import PerplexitySearchPage from "./components/PerplexitySearchPage";
 import RecoveryIndexPage from "./components/RecoveryIndexPage";
+import RecoveryChecklistPage from "./components/RecoveryChecklistPage";
 import ProfilePage from "./components/ProfilePage";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
             <Route path="/act" element={<ProtectedRoute><ActPage /></ProtectedRoute>} />
             <Route path="/after" element={<ProtectedRoute><RecoveryIndexPage /></ProtectedRoute>} />
+            <Route path="/recovery-checklist" element={<ProtectedRoute><RecoveryChecklistPage /></ProtectedRoute>} />
             <Route path="/googlesearch" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
             <Route path="/googlerecovery" element={<ProtectedRoute><RecoveryResourcesPage /></ProtectedRoute>} />
             <Route path="/perplexitysearch" element={<ProtectedRoute><PerplexitySearchPage /></ProtectedRoute>} />

@@ -20,15 +20,13 @@ import { toast } from "sonner";
  * Users can check off tasks, which are saved to their account or browser.
  * 
  * STRUCTURE:
- * - Hazard filter buttons (All, Wildfire, Flood, Storm)
- * - Phase tabs (Now, Coming, During, After)
+ * - Hazard filter buttons (All, Wildfire, Flood, etc)
  * - Expandable checklist sections with critical and additional tasks
  * 
  * DATA ORGANIZATION:
  * The `checklists` object contains all tasks:
- *   checklists[hazardType][phase] = array of checklist sections
+ *   checklists[hazardType] = array of checklist sections
  *   - hazardType: "all", "wildfire", "flood", "storm"
- *   - phase: "now", "coming", "during", "after"
  * 
  * PROGRESS TRACKING:
  * - Authenticated users: saved to Supabase database
@@ -612,28 +610,11 @@ const PreparednessPage = () => {
           </div>
         </div>
 
-        {/* Checklist Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 text-xs">
-            <TabsTrigger value="now">Now</TabsTrigger>
-            <TabsTrigger value="coming">It's Coming</TabsTrigger>
-            <TabsTrigger value="during">During</TabsTrigger>
-            <TabsTrigger value="after">Recovery</TabsTrigger>
-          </TabsList>
+{/* Now Checklist */}
+        <Card className="shadow-soft">
+          <CardContent className="space-y-4 pt-6">
           
-          {["now", "coming", "during", "after"].map((phase) => (
-            <TabsContent key={phase} value={phase} className="mt-4">
-              <Card className="shadow-soft">
-                <CardHeader>
-                  <CardTitle className="text-title">
-                    {phase === "now" && `Now - ${activeHazard === "all" ? "Basic prep for all disasters" : `Prepare for ${hazards.find(h => h.id === activeHazard)?.label.toLowerCase() || "disaster"}`}`}
-                    {phase === "coming" && "It's Coming - Final preparations"}
-                    {phase === "during" && "During - Stay safe"}
-                    {phase === "after" && "Recovery - After the disaster"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {phase === "now" && (activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood") ? (
+                  {(activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood" || activeHazard === "storm") ? (
                     // Interactive checklist for hazards with detailed structure
                     currentChecklist.now.map((section: any) => (
                       <Collapsible 
@@ -719,64 +700,9 @@ const PreparednessPage = () => {
                         </div>
                       </Collapsible>
                     ))
-                  ) : (
-                    // Original checklist for other tabs/hazards
-                    currentChecklist[phase as keyof typeof currentChecklist]?.map((item: any) => (
-                      <div 
-                        key={item.id}
-                        className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
-                      >
-                        <button
-                          onClick={() => toggleCheck(item.id)}
-                          className="mt-1"
-                        >
-                          {checkedItems.has(item.id) ? (
-                            <CheckCircle2 size={20} className="text-primary" />
-                          ) : (
-                            <Circle size={20} className="text-muted-foreground" />
-                          )}
-                        </button>
-                        
-                        <div className="flex-1">
-                          <h4 className={`font-medium ${checkedItems.has(item.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                            {item.title}
-                          </h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {item.notes}
-                          </p>
-                          {item.links && item.links.length > 0 && (
-                            <div className="mt-2">
-                              {item.links.map((link: string, index: number) => (
-                                <a
-                                  key={index}
-                                  href={`https://${link}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-primary hover:underline mr-3"
-                                >
-                                  {link}
-                                </a>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
+                  ) : null}
                 </CardContent>
               </Card>
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        {/* Additional guidance message */}
-        {activeTab === "now" && (
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              <span className="font-bold">Continue your progress:</span> review additional tasks by type and stage.
-            </p>
-          </div>
-        )}
 
       </div>
       <MobileNavigation />
