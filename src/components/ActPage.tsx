@@ -11,7 +11,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
 interface Task {
-  uuid: string;
+  id: string;
   task: string;
   stage: string;
   avalanche: boolean;
@@ -124,6 +124,8 @@ const ActPage = () => {
   };
 
   const toggleCheck = async (taskUuid: string) => {
+    // Store the previous state for rollback
+    const previousChecked = new Set(checkedItems);
     const newChecked = new Set(checkedItems);
     const isCompleted = !checkedItems.has(taskUuid);
     
@@ -133,6 +135,7 @@ const ActPage = () => {
       newChecked.delete(taskUuid);
     }
     
+    // Optimistically update UI
     setCheckedItems(newChecked);
 
     if (user) {
@@ -161,7 +164,8 @@ const ActPage = () => {
       } catch (error) {
         console.error('Error saving progress:', error);
         toast.error('Failed to save progress');
-        setCheckedItems(checkedItems);
+        // Revert to previous state on error
+        setCheckedItems(previousChecked);
       }
     } else {
       localStorage.setItem('actCheckedItems', JSON.stringify(Array.from(newChecked)));
@@ -263,14 +267,14 @@ const ActPage = () => {
                   ) : (
                     filteredTasks.map((task) => (
                       <div 
-                        key={task.uuid}
+                        key={task.id}
                         className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
                       >
                         <button
-                          onClick={() => toggleCheck(task.uuid)}
+                          onClick={() => toggleCheck(task.id)}
                           className="mt-1"
                         >
-                          {checkedItems.has(task.uuid) ? (
+                          {checkedItems.has(task.id) ? (
                             <CheckCircle2 size={20} className="text-primary" />
                           ) : (
                             <Circle size={20} className="text-muted-foreground" />
@@ -278,7 +282,7 @@ const ActPage = () => {
                         </button>
                         
                         <div className="flex-1">
-                          <h4 className={`font-medium ${checkedItems.has(task.uuid) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                          <h4 className={`font-medium ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                             {task.task}
                           </h4>
                         </div>
