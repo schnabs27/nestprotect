@@ -89,10 +89,10 @@ const ActPage = () => {
       if (user) {
         try {
           const { data, error } = await supabase
-            .from('user_preparedness_progress')
-            .select('task_id, completed')
+            .from('act_task_user_state')
+            .select('task_id, is_checked')
             .eq('user_id', user.id)
-            .eq('completed', true);
+            .eq('is_checked', true);
 
           if (error) throw error;
 
@@ -139,11 +139,11 @@ const ActPage = () => {
       try {
         if (isCompleted) {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('act_task_user_state')
             .upsert({
               user_id: user.id,
               task_id: taskUuid,
-              completed: true
+              is_checked: true
             }, {
               onConflict: 'user_id,task_id'
             });
@@ -151,7 +151,7 @@ const ActPage = () => {
           if (error) throw error;
         } else {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('act_task_user_state')
             .delete()
             .eq('user_id', user.id)
             .eq('task_id', taskUuid);
