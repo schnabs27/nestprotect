@@ -4,10 +4,7 @@ import ZipCodeHeader from "@/components/ZipCodeHeader";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import { 
   CheckSquare, 
-  Cloud, 
-  Flame, 
-  Car, 
-  AlertTriangle, 
+  AlertTriangle,
   Thermometer, 
   Droplets, 
   Wind,
@@ -189,9 +186,6 @@ const WeatherPage = () => {
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-primary">Stay aware, act fast.</h1>
-            <p className="text-muted-foreground">
-              Worried about a disaster? Better safe than sorry. Time to enact your emergency plan. When in doubt, call 911 to share your status and receive instructions.
-            </p>
           </div>
         </div>
 
@@ -202,28 +196,34 @@ const WeatherPage = () => {
           </Alert>
         )}
 
-        {/* Action Plan Button */}
-        <Card className="shadow-soft border-primary/20">
-          <CardContent className="p-4">
-            <Button 
-              className="w-full h-12 text-base font-semibold"
-              size="lg"
-            >
-              <CheckSquare className="mr-2" size={20} />
-              Emergency Action Plan
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Weather Section */}
+{/* Government Alerts */}
+<Card className="shadow-soft">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 pb-1 text-title">
+      Government Alerts
+            <AlertTriangle className="h-6 w-6" />
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    {weatherData ? (
+      <GovernmentAlerts alerts={weatherData.alerts} />
+    ) : (
+      <div className="bg-muted/30 rounded-lg p-3">
+        <p className="text-sm text-muted-foreground">Loading alerts...</p>
+      </div>
+    )}
+  </CardContent>
+</Card>
+                
+    {/* Weather Section */}
         <Card className="shadow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-title">
-              <Cloud size={20} />
               Weather Conditions
             </CardTitle>
           </CardHeader>
           <CardContent>
+            
             {loading && !weatherData ? (
               <div className="text-center py-8">
                 <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
@@ -254,9 +254,6 @@ const WeatherPage = () => {
                   </div>
                 </div>
 
-                {/* Government Alerts */}
-                <GovernmentAlerts alerts={weatherData.alerts} />
-
                 {/* Weather Outlook */}
                 <div className="bg-muted/30 rounded-lg p-3">
                   <h4 className="font-semibold mb-2 text-sm">Weather Outlook</h4>
@@ -285,7 +282,6 @@ const WeatherPage = () => {
         <Card className="shadow-soft">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-title">
-              <Flame size={20} />
               Wildfire Activity
             </CardTitle>
           </CardHeader>
@@ -335,7 +331,6 @@ const WeatherPage = () => {
         <Card className="shadow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-title">
-              <Car size={20} />
               Traffic Conditions
             </CardTitle>
           </CardHeader>

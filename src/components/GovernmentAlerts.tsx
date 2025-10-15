@@ -60,10 +60,6 @@ const GovernmentAlerts: React.FC<GovernmentAlertsProps> = ({ alerts }) => {
 
   return (
     <div className="mb-4">
-      <h4 className="font-semibold mb-2 flex items-center gap-1">
-        <AlertTriangle size={16} className="text-coral" />
-        Government Alerts
-      </h4>
       {alerts.length > 0 ? (
         <div className="space-y-2">
         <div className={`${expanded ? 'max-h-96 overflow-y-auto' : 'max-h-44 overflow-hidden'} transition-all duration-300`}>
