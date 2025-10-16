@@ -75,7 +75,24 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
-       
+        {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+              <Button 
+                onClick={() => setShowEducationalDisclaimer(false)}
+                variant="outline"
+                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
+              >
+                I understand! Dismiss!
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
@@ -88,8 +105,7 @@ const Homepage = () => {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Hi, glad to see you!</h1>
             <p className="text-muted-foreground">
-              I'm Nestor, your personal natural disaster guide. 
-              <br />How can I help you protect your nest today?
+              I'm Nestor, your personal natural disaster guide. How can I help you protect your nest today?
             </p>
           </div>
         </div>
@@ -100,6 +116,7 @@ const Homepage = () => {
             onClick={() => navigate("/preparedness")}
             className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
           >
+            <Shield className="h-6 w-6 flex-shrink-0" />
             <span className="text-base">A disaster is possible. Let's prepare.</span>
           </Button>
 
@@ -107,6 +124,7 @@ const Homepage = () => {
             onClick={() => navigate("/during")}
             className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
           >
+            <Eye className="h-6 w-6 flex-shrink-0" />
             <span className="text-base">A disaster might come. Help me monitor.</span>
           </Button>
 
@@ -114,6 +132,7 @@ const Homepage = () => {
             onClick={() => navigate("/during")}
             className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
           >
+            <Zap className="h-6 w-6 flex-shrink-0" />
             <span className="text-base">A disaster is coming. Time to act.</span>
           </Button>
 
@@ -121,6 +140,7 @@ const Homepage = () => {
             onClick={() => navigate("/after")}
             className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
           >
+            <HeartHandshake className="h-6 w-6 flex-shrink-0" />
             <span className="text-base">A disaster came. I need assistance and supplies.</span>
           </Button>
 
@@ -128,6 +148,7 @@ const Homepage = () => {
             onClick={handle911Click}
             className="w-full h-auto py-4 bg-red-600 hover:bg-red-700 text-white text-left flex items-center gap-3"
           >
+            <Phone className="h-6 w-6 flex-shrink-0" />
             <span className="text-base font-semibold">Help! I'm hurt, lost or stuck! Dial 911!</span>
           </Button>
         </div>
@@ -247,26 +268,7 @@ const Homepage = () => {
         >
           Go to Account Settings
         </a>
-
-       {/* Educational Disclaimer */}
-        {showEducationalDisclaimer && (
-          <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3 text-center">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
-              </p>
-              <Button 
-                onClick={() => setShowEducationalDisclaimer(false)}
-                variant="outline"
-                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
-              >
-                I understand! Dismiss!
-              </Button>
-            </CardContent>
-          </Card>
-        )}
       </div>
-
       <MobileNavigation />
     </div>
   );
