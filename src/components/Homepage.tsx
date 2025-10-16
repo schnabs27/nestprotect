@@ -75,24 +75,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
-        {/* Educational Disclaimer */}
-        {showEducationalDisclaimer && (
-          <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3 text-center">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
-              </p>
-              <Button 
-                onClick={() => setShowEducationalDisclaimer(false)}
-                variant="outline"
-                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
-              >
-                I understand! Dismiss!
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
+       
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
@@ -268,7 +251,26 @@ const Homepage = () => {
         >
           Go to Account Settings
         </a>
+
+       {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+              <Button 
+                onClick={() => setShowEducationalDisclaimer(false)}
+                variant="outline"
+                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
+              >
+                I understand! Dismiss!
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
+      
       <MobileNavigation />
     </div>
   );
