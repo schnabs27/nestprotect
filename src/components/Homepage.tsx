@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CalendarIcon, Home, Calendar, Info, AlertCircle, Shield, Eye, Zap, HeartHandshake, Phone } from "lucide-react";
+import { CalendarIcon, Home, Calendar, Info } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,15 +16,77 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import MobileNavigation from "@/components/MobileNavigation";
 
 const Homepage = () => {
+  const [completionDate, setCompletionDate] = useState<Date>();
+  const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
+  const [assessmentScore, setAssessmentScore] = useState(0);
   const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
   const [searchZipCode, setSearchZipCode] = useState("");
   const [riskData, setRiskData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [show911Confirm, setShow911Confirm] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
+
+  // Fetch preparedness progress for authenticated users
+  useEffect(() => {
+    const fetchPrepProgress = async () => {
+      if (!user) {
+        setPrepProgress({ completed: 0, total: 10 });
+        return;
+      }
+
+      try {
+        const allNowToplineItems = ['know-risk', 'household-plan', 'emergency-kit', 'go-bags', 'important-documents', 'shelter-plan', 'communication-plan', 'financial-prep', 'special-needs', 'practice-plan'];
+        
+        const { data: progressData } = await supabase
+          .from('user_preparedness_progress')
+          .select('task_id, completed')
+          .eq('user_id', user.id)
+          .in('task_id', allNowToplineItems);
+
+        const completedTasks = progressData?.filter(item => item.completed).length || 0;
+        setPrepProgress({ completed: completedTasks, total: allNowToplineItems.length });
+      } catch (error) {
+        console.error('Error fetching prep progress:', error);
+        setPrepProgress({ completed: 0, total: 10 });
+      }
+    };
+
+    fetchPrepProgress();
+  }, [user]);
+
+  // Fetch assessment score for authenticated users
+  useEffect(() => {
+    const fetchAssessmentScore = async () => {
+      if (!user) {
+        const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+        setAssessmentScore(score);
+        return;
+      }
+
+      try {
+        const { data: assessmentData } = await supabase
+          .from('user_assessments')
+          .select('score')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (assessmentData) {
+          setAssessmentScore(assessmentData.score);
+        } else {
+          const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+          setAssessmentScore(score);
+        }
+      } catch (error) {
+        console.error('Error fetching assessment score:', error);
+        const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
+        setAssessmentScore(score);
+      }
+    };
+
+    fetchAssessmentScore();
+  }, [user]);
 
   // Build FEMA URL when zip code is available and auto-fetch risk data
   useEffect(() => {
@@ -64,13 +126,15 @@ const Homepage = () => {
     fetchRiskData(searchZipCode);
   };
 
-  const handle911Click = () => {
-    setShow911Confirm(true);
+  const assessmentTotalItems = 8;
+
+  const getDaysUntilDate = () => {
+    if (!completionDate) return null;
+    const days = differenceInDays(completionDate, new Date());
+    return Math.max(0, days);
   };
 
-  const confirmDial911 = () => {
-    window.location.href = 'tel:911';
-  };
+  const daysRemaining = getDaysUntilDate();
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -105,78 +169,166 @@ const Homepage = () => {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Hi, glad to see you!</h1>
             <p className="text-muted-foreground">
-              I'm Nestor, your personal natural disaster guide. How can I help you protect your nest today?
+              I'm here to guide you through basic natural disaster prep. Let's see how you're doing.
             </p>
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="space-y-3">
-          <Button 
-            onClick={() => navigate("/preparedness")}
-            className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
-          >
-            <Shield className="h-6 w-6 flex-shrink-0" />
-            <span className="text-base">A disaster is possible. Let's prepare.</span>
-          </Button>
-
-          <Button 
-            onClick={() => navigate("/during")}
-            className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
-          >
-            <Eye className="h-6 w-6 flex-shrink-0" />
-            <span className="text-base">A disaster might come. Help me monitor.</span>
-          </Button>
-
-          <Button 
-            onClick={() => navigate("/during")}
-            className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
-          >
-            <Zap className="h-6 w-6 flex-shrink-0" />
-            <span className="text-base">A disaster is coming. Time to act.</span>
-          </Button>
-
-          <Button 
-            onClick={() => navigate("/after")}
-            className="w-full h-auto py-4 bg-gradient-primary hover:opacity-90 text-left flex items-center gap-3"
-          >
-            <HeartHandshake className="h-6 w-6 flex-shrink-0" />
-            <span className="text-base">A disaster came. I need assistance and supplies.</span>
-          </Button>
-
-          <Button 
-            onClick={handle911Click}
-            className="w-full h-auto py-4 bg-red-600 hover:bg-red-700 text-white text-left flex items-center gap-3"
-          >
-            <Phone className="h-6 w-6 flex-shrink-0" />
-            <span className="text-base font-semibold">Help! I'm hurt, lost or stuck! Dial 911!</span>
-          </Button>
-        </div>
-
-        {/* 911 Confirmation Dialog */}
-        {show911Confirm && (
-          <Card className="bg-red-50 border-red-300 shadow-lg">
-            <CardContent className="p-4 space-y-3 text-center">
-              <AlertCircle className="h-12 w-12 text-red-600 mx-auto" />
-              <p className="text-lg font-semibold text-red-900">Do you want to dial 911?</p>
-              <div className="flex gap-3">
-                <Button 
-                  onClick={confirmDial911}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Yes, Dial 911
-                </Button>
-                <Button 
-                  onClick={() => setShow911Confirm(false)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
+        {/* Scoreboards */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Self-Assessment Scoreboard */}
+          <Card className="shadow-soft bg-gradient-purple border-purple-600">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-white text-center">Self-Assessment</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">
+                  {assessmentScore}/{assessmentTotalItems}
+                </div>
+                <p className="text-sm text-purple-100">Keep prepping until you get 8 out of 8!</p>
               </div>
+              <Button 
+                onClick={() => navigate("/self-assessment")}
+                className="w-full bg-white hover:bg-gray-100 text-black"
+              >
+                Take Self-Assessment
+              </Button>
             </CardContent>
           </Card>
-        )}
+
+          {/* Prep Scoreboard */}
+          <Card className="shadow-soft">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-title text-center">Emergency Prep Progress</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary">
+                  {prepProgress.completed}/{prepProgress.total}
+                </div>
+                <div className="flex items-center justify-center gap-1">
+                  <p className="text-sm text-muted-foreground">Do you have the 10 basics done?</p>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Tasks listed in the "do these now" stage for all types of disaster.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate("/preparedness")}
+                className="w-full bg-gradient-primary hover:opacity-90"
+              >
+                Continue Emergency Prep
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Completion Date Goal */}
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-title text-center">
+              Prep and Practice!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Make a plan. Don't wait for an emergency!
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-center text-center font-normal",
+                        !completionDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {completionDate ? format(completionDate, "PPP") : "My deadline to be prepared"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={completionDate}
+                      onSelect={setCompletionDate}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                <div className="mt-2 text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!completionDate) {
+                        toast({
+                          title: "Please select a date first",
+                          description: "Choose your emergency prep completion date above",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
+                      const startDate = new Date(completionDate);
+                      startDate.setHours(10, 0, 0);
+                      const endDate = new Date(startDate);
+                      endDate.setHours(11, 0, 0);
+                      
+                      const formatGoogleDate = (date: Date) => {
+                        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                      };
+                      
+                      const details = encodeURIComponent(
+                        "You can't schedule your emergencies. But you can prepare for them. Protect your home, loved ones, and valuables before a disaster. Use NestProtect to help: https://nestprotect.app/."
+                      );
+                      
+                      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Complete Disaster Prep')}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}`;
+                      
+                      window.open(googleCalendarUrl, '_blank');
+                    }}
+                    className="w-full bg-black text-white hover:bg-gray-700"
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Add to Google Calendar
+                  </Button>
+                </div>
+              </div>
+              
+              {daysRemaining !== null && (
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {daysRemaining}
+                  </div>
+                  <p className="text-sm text-muted-foreground">days remaining</p>
+                </div>
+              )}
+            </div>
+
+            {daysRemaining !== null && (
+              <div className="flex justify-center pt-4">
+                <img 
+                  src="/images/giffy-countdown.gif" 
+                  alt="Countdown timer animation"
+                  className="object-contain"
+                  style={{ width: '400px', height: '181px' }}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Risk Assessment Card */}
         <Card className="border-0 shadow-lg overflow-hidden" style={{
@@ -260,15 +412,15 @@ const Homepage = () => {
         </Card>
       </div>
 
-      {/* Settings Link */}
-      <div className="text-center pb-4">
-        <a
-          href="/settings"
-          className="text-primary hover:text-primary/80 underline text-sm"
-        >
-          Go to Account Settings
-        </a>
-      </div>
+{/* Settings Link */}
+        <div className="text-center pb-4">
+          <a
+           href="/settings"
+            className="text-primary hover:text-primary/80 underline text-sm"
+          >
+            Go to Account Settings
+          </a>
+        </div>
       <MobileNavigation />
     </div>
   );
