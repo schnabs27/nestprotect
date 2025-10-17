@@ -19,7 +19,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, isGuest, signOut, setGuestMode } = useAuth();
   const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
-  
+  const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
 
   const [userInfo, setUserInfo] = useState({
     zipCode: "",
@@ -316,6 +316,17 @@ const ProfilePage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Links */}
         <div className="space-y-3">

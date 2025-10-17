@@ -14,7 +14,6 @@ import MobileNavigation from "@/components/MobileNavigation";
 const Homepage = () => {
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
-  const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
   const [searchZipCode, setSearchZipCode] = useState("");
   const [riskData, setRiskData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -144,53 +143,11 @@ const Homepage = () => {
           </div>
         </div>
 
-        {/* Scoreboards */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Prep Scoreboard */}
-          <Card className="shadow-soft">
-            <CardHeader className="pb-1">
-              <CardTitle className="text-lg text-title text-center">Your Readiness Score</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-title">
-                  {assessmentScore}/{assessmentTotalItems}
-                </div>
-                <div className="flex items-center justify-center gap-1 pt-2 pb-2">
-                  <p className="text-sm text-muted-foreground">According to my crystal ball, you could use more prep.</p>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>The score is based on your own answers to Nestor's assessment. Test yourself again!</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-              <Button 
-                onClick={() => navigate("/self-assessment")}
-                className="w-full bg-gradient-primary hover:opacity-90"
-              >
-                Take Nestor's Readiness Test
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Risk Assessment Card */}
-        <Card className="border-0 shadow-lg overflow-hidden" style={{
-          background: 'white',
-          border: '2px solid transparent',
-          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box'
-        }}>
+{/* Risk Assessment Card */}
+        <Card className="shadow-soft">
           <CardContent className="p-6 text-center">
             <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
-              Prepare for Your Risks
+              Your Risks
             </h3>
             <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
               FEMA has tracked these risks in your area.
@@ -235,24 +192,41 @@ const Homepage = () => {
                       </span>
                     </div>
                   )}
-                  <Button 
-                    onClick={() => navigate("/preparedness")}
-                    disabled={loading || searchZipCode.length !== 5}
-                    className="w-full"
-                    style={{
-                      background: 'linear-gradient(135deg, #b416ff 0%, #000be0ff 100%)',
-                      color: 'white'
-                    }}
-                  >
-                    Let's Get Prepped!
-                  </Button>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Settings Link */}
+        {/* Scoreboards */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Prep Scoreboard */}
+          <Card className="shadow-soft">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-lg text-title text-center">Your Readiness Score</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-title">
+                  {assessmentScore}/{assessmentTotalItems}
+                </div>
+                <div className="flex items-center justify-center gap-1 pt-2 pb-2">
+                  <p className="text-sm text-muted-foreground">According to my crystal ball, you could use more prep.</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate("/self-assessment")}
+                className="w-full bg-gradient-primary hover:opacity-90"
+              >
+                Take Nestor's Readiness Test
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+      </div>
+
+              {/* Settings Link */}
         <div className="text-center pb-4">
           <a
             href="/settings"
@@ -261,25 +235,6 @@ const Homepage = () => {
             Go to Account Settings
           </a>
         </div>
-
-        {/* Educational Disclaimer */}
-        {showEducationalDisclaimer && (
-          <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3 text-center">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
-              </p>
-              <Button 
-                onClick={() => setShowEducationalDisclaimer(false)}
-                variant="outline"
-                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
-              >
-                I understand! Dismiss!
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
 
       <MobileNavigation />
     </div>
