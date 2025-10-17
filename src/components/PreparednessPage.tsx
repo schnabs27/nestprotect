@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown } from "lucide-react";
+import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown, CalendarIcon, Calendar } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
 import nestorPreparedness from '@/assets/nestor-preparedness.png';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import MobileNavigation from "@/components/MobileNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 /**
  * PREPAREDNESS PAGE - Disaster Prep Checklists
@@ -42,11 +47,21 @@ import { toast } from "sonner";
 const PreparednessPage = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { toast: toastHook } = useToast();
   const [activeHazard, setActiveHazard] = useState("all");
   const [activeTab, setActiveTab] = useState("now");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [completionDate, setCompletionDate] = useState<Date>();
+
+  const getDaysUntilDate = () => {
+    if (!completionDate) return null;
+    const days = differenceInDays(completionDate, new Date());
+    return Math.max(0, days);
+  };
+
+  const daysRemaining = getDaysUntilDate();
 
   // Load user progress from database or localStorage
   useEffect(() => {
@@ -304,6 +319,105 @@ const PreparednessPage = () => {
             <h1 className="text-2xl font-bold text-title">Prepare for an emergency.</h1>
           </div>
         </div>
+
+        {/* Completion Date Goal */}
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-title text-center">
+              Prep and Practice!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Make a plan. Don't wait for an emergency!
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-center text-center font-normal",
+                        !completionDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {completionDate ? format(completionDate, "PPP") : "My deadline to be prepared"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={completionDate}
+                      onSelect={setCompletionDate}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                <div className="mt-2 text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!completionDate) {
+                        toastHook({
+                          title: "Please select a date first",
+                          description: "Choose your emergency prep completion date above",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      
+                      const startDate = new Date(completionDate);
+                      startDate.setHours(10, 0, 0);
+                      const endDate = new Date(startDate);
+                      endDate.setHours(11, 0, 0);
+                      
+                      const formatGoogleDate = (date: Date) => {
+                        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                      };
+                      
+                      const details = encodeURIComponent(
+                        "You can't schedule your emergencies. But you can prepare for them. Protect your home, loved ones, and valuables before a disaster. Use NestProtect to help: https://nestprotect.app/."
+                      );
+                      
+                      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Complete Disaster Prep')}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}`;
+                      
+                      window.open(googleCalendarUrl, '_blank');
+                    }}
+                    className="w-full bg-black text-white hover:bg-gray-700"
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Add to Google Calendar
+                  </Button>
+                </div>
+              </div>
+              
+              {daysRemaining !== null && (
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">
+                    {daysRemaining}
+                  </div>
+                  <p className="text-sm text-muted-foreground">days remaining</p>
+                </div>
+              )}
+            </div>
+
+            {daysRemaining !== null && (
+              <div className="flex justify-center pt-4">
+                <img 
+                  src="/images/giffy-countdown.gif" 
+                  alt="Countdown timer animation"
+                  className="object-contain"
+                  style={{ width: '400px', height: '181px' }}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Hazard Selection */}
         <div className="mb-6">

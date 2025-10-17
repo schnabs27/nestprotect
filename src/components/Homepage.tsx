@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
-import { CalendarIcon, Home, Calendar, Info } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +12,6 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import MobileNavigation from "@/components/MobileNavigation";
 
 const Homepage = () => {
-  const [completionDate, setCompletionDate] = useState<Date>();
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
   const [showEducationalDisclaimer, setShowEducationalDisclaimer] = useState(true);
@@ -128,14 +123,6 @@ const Homepage = () => {
 
   const assessmentTotalItems = 8;
 
-  const getDaysUntilDate = () => {
-    if (!completionDate) return null;
-    const days = differenceInDays(completionDate, new Date());
-    return Math.max(0, days);
-  };
-
-  const daysRemaining = getDaysUntilDate();
-
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
@@ -159,7 +146,6 @@ const Homepage = () => {
 
         {/* Scoreboards */}
         <div className="grid gap-4 md:grid-cols-2">
-
           {/* Prep Scoreboard */}
           <Card className="shadow-soft">
             <CardHeader className="pb-1">
@@ -167,7 +153,7 @@ const Homepage = () => {
             </CardHeader>
             <CardContent className="space-y-1">
               <div className="text-center">
-                                <div className="text-3xl font-bold text-title">
+                <div className="text-3xl font-bold text-title">
                   {assessmentScore}/{assessmentTotalItems}
                 </div>
                 <div className="flex items-center justify-center gap-1 pt-2 pb-2">
@@ -250,153 +236,33 @@ const Homepage = () => {
                     </div>
                   )}
                   <Button 
-                  onClick={() => navigate("/preparedness")}
-                  disabled={loading || searchZipCode.length !== 5}
-                  className="w-full"
-                  style={{
-                    background: 'linear-gradient(135deg, #b416ff 0%, #000be0ff 100%)',
-                    color: 'white'
-                  }}
-                >
-                  Let's Get Prepped!
-                </Button>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-       {/* Completion Date Goal */}
-        <Card className="shadow-soft">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-title text-center">
-              Prep and Practice!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  Make a plan. Don't wait for an emergency!
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-center text-center font-normal",
-                        !completionDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {completionDate ? format(completionDate, "PPP") : "My deadline to be prepared"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={completionDate}
-                      onSelect={setCompletionDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <div className="mt-2 text-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (!completionDate) {
-                        toast({
-                          title: "Please select a date first",
-                          description: "Choose your emergency prep completion date above",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      
-                      const startDate = new Date(completionDate);
-                      startDate.setHours(10, 0, 0);
-                      const endDate = new Date(startDate);
-                      endDate.setHours(11, 0, 0);
-                      
-                      const formatGoogleDate = (date: Date) => {
-                        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-                      };
-                      
-                      const details = encodeURIComponent(
-                        "You can't schedule your emergencies. But you can prepare for them. Protect your home, loved ones, and valuables before a disaster. Use NestProtect to help: https://nestprotect.app/."
-                      );
-                      
-                      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Complete Disaster Prep')}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}`;
-                      
-                      window.open(googleCalendarUrl, '_blank');
+                    onClick={() => navigate("/preparedness")}
+                    disabled={loading || searchZipCode.length !== 5}
+                    className="w-full"
+                    style={{
+                      background: 'linear-gradient(135deg, #b416ff 0%, #000be0ff 100%)',
+                      color: 'white'
                     }}
-                    className="w-full bg-black text-white hover:bg-gray-700"
                   >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Add to Google Calendar
+                    Let's Get Prepped!
                   </Button>
                 </div>
-              </div>
-              
-              {daysRemaining !== null && (
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
-                    {daysRemaining}
-                  </div>
-                  <p className="text-sm text-muted-foreground">days remaining</p>
-                </div>
               )}
             </div>
-
-            {daysRemaining !== null && (
-              <div className="flex justify-center pt-4">
-                <img 
-                  src="/images/giffy-countdown.gif" 
-                  alt="Countdown timer animation"
-                  className="object-contain"
-                  style={{ width: '400px', height: '181px' }}
-                />
-              </div>
-            )}
           </CardContent>
         </Card>
 
-        {/* Add to Phone Card */}
-        <Card className="shadow-soft bg-gradient-phone">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex justify-center">
-              <img 
-                src="/images/nestprotect-add-to-phone.png" 
-                alt="Add to Phone image"
-                className="object-contain"
-                style={{ width: '150px', height: '150px' }}
-              />
-            </div>
-            <Button 
-              onClick={() => navigate("/shortcut")}
-              className="w-full bg-white text-black hover:bg-gray-100"
-            >
-              Add NestProtect to Your Phone
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-{/* Settings Link */}
+        {/* Settings Link */}
         <div className="text-center pb-4">
           <a
-           href="/settings"
+            href="/settings"
             className="text-primary hover:text-primary/80 underline text-sm"
           >
             Go to Account Settings
           </a>
         </div>
 
-               {/* Educational Disclaimer */}
+        {/* Educational Disclaimer */}
         {showEducationalDisclaimer && (
           <Card className="bg-white shadow-soft">
             <CardContent className="p-4 space-y-3 text-center">
@@ -413,6 +279,7 @@ const Homepage = () => {
             </CardContent>
           </Card>
         )}
+      </div>
 
       <MobileNavigation />
     </div>
