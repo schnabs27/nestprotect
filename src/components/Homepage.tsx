@@ -139,99 +139,133 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="container mx-auto px-4 py-6 space-y-4">
-        {/* Educational Disclaimer */}
-        {showEducationalDisclaimer && (
-          <Card className="bg-white shadow-soft">
-            <CardContent className="p-4 space-y-3 text-center">
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
-              </p>
-              <Button 
-                onClick={() => setShowEducationalDisclaimer(false)}
-                variant="outline"
-                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
-              >
-                I understand! Dismiss!
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
+ 
         {/* Nestor Introduction */}
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src="/images/564fda98-1db0-44eb-97de-a693f9254dea.png" 
-              alt="Nestor - Your disaster preparedness guide"
+              src="/images/nestprotect-crystal-ball.gif" 
+              alt="Nestor sees disaster in the future through a crystal ball"
               className="w-32 h-32 object-contain"
             />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-title">Hi, glad to see you!</h1>
+            <h1 className="text-2xl font-bold text-title">A disaster may be in your future.</h1>
             <p className="text-muted-foreground">
-              I'm here to guide you through basic natural disaster prep. Let's see how you're doing.
+              How you prepare now can make all the difference.
             </p>
           </div>
         </div>
 
         {/* Scoreboards */}
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Self-Assessment Scoreboard */}
-          <Card className="shadow-soft bg-gradient-purple border-purple-600">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-white text-center">Self-Assessment</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">
-                  {assessmentScore}/{assessmentTotalItems}
-                </div>
-                <p className="text-sm text-purple-100">Keep prepping until you get 8 out of 8!</p>
-              </div>
-              <Button 
-                onClick={() => navigate("/self-assessment")}
-                className="w-full bg-white hover:bg-gray-100 text-black"
-              >
-                Take Self-Assessment
-              </Button>
-            </CardContent>
-          </Card>
 
           {/* Prep Scoreboard */}
           <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg text-title text-center">Emergency Prep Progress</CardTitle>
+            <CardHeader className="pb-1">
+              <CardTitle className="text-lg text-title text-center">Your Readiness Score</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-1">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">
-                  {prepProgress.completed}/{prepProgress.total}
+                                <div className="text-3xl font-bold text-title">
+                  {assessmentScore}/{assessmentTotalItems}
                 </div>
-                <div className="flex items-center justify-center gap-1">
-                  <p className="text-sm text-muted-foreground">Do you have the 10 basics done?</p>
+                <div className="flex items-center justify-center gap-1 pt-2 pb-2">
+                  <p className="text-sm text-muted-foreground">According to my crystal ball, you could use more prep.</p>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
                         <Info className="h-3 w-3 text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Tasks listed in the "do these now" stage for all types of disaster.</p>
+                        <p>The score is based on your own answers to Nestor's assessment. Test yourself again!</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
               </div>
               <Button 
-                onClick={() => navigate("/preparedness")}
+                onClick={() => navigate("/SelfAssessmentPage.tsx")}
                 className="w-full bg-gradient-primary hover:opacity-90"
               >
-                Continue Emergency Prep
+                Take Nestor's Readiness Test
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Completion Date Goal */}
+        {/* Risk Assessment Card */}
+        <Card className="border-0 shadow-lg overflow-hidden" style={{
+          background: 'white',
+          border: '2px solid transparent',
+          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box'
+        }}>
+          <CardContent className="p-6 text-center">
+            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
+              Prepare for Your Risks
+            </h3>
+            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
+              FEMA has tracked these risks in your area.
+            </p>
+            
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Zipcode"
+                  value={searchZipCode}
+                  onChange={(e) => setSearchZipCode(e.target.value)}
+                  maxLength={5}
+                  pattern="[0-9]{5}"
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleRiskCheck}
+                  disabled={loading || searchZipCode.length !== 5}
+                  style={{
+                    background: 'linear-gradient(135deg, #efefef 0%, #efefef 100%)',
+                    color: 'black'
+                  }}
+                >
+                  Search Risks by Zipcode
+                </Button>
+              </div>
+              
+              {riskData && (
+                <div className="mt-4 space-y-2">
+                  <div>
+                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      {riskData.risk_rating || 'Not available'}
+                    </span>
+                  </div>
+                  {riskData.high_risks && (
+                    <div>
+                      <span style={{ color: '#4b5563' }}>High Risks: </span>
+                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                        {riskData.high_risks}
+                      </span>
+                    </div>
+                  )}
+                  <Button 
+                  onClick={() => navigate("/PreparednessPage.tsx")}
+                  disabled={loading || searchZipCode.length !== 5}
+                  style={{
+                    background: 'linear-gradient(135deg, #b416ff 0%, #000be0ff 100%)',
+                    color: 'white'
+                  }}
+                >
+                  Let's Get Prepped!
+                </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+       {/* Completion Date Goal */}
         <Card className="shadow-soft">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg text-title text-center">
@@ -330,67 +364,6 @@ const Homepage = () => {
           </CardContent>
         </Card>
 
-        {/* Risk Assessment Card */}
-        <Card className="border-0 shadow-lg overflow-hidden" style={{
-          background: 'white',
-          border: '2px solid transparent',
-          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box'
-        }}>
-          <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
-              Prepare for Your Risks
-            </h3>
-            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
-              FEMA has tracked these risks in your area.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Zipcode"
-                  value={searchZipCode}
-                  onChange={(e) => setSearchZipCode(e.target.value)}
-                  maxLength={5}
-                  pattern="[0-9]{5}"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleRiskCheck}
-                  disabled={loading || searchZipCode.length !== 5}
-                  style={{
-                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-                    color: 'white'
-                  }}
-                >
-                  Search Risks by Zipcode
-                </Button>
-              </div>
-              
-              {riskData && (
-                <div className="mt-4 space-y-2">
-                  <div>
-                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
-                    <span style={{ color: '#7f1baf' }} className="font-semibold">
-                      {riskData.risk_rating || 'Not available'}
-                    </span>
-                  </div>
-                  {riskData.high_risks && (
-                    <div>
-                      <span style={{ color: '#4b5563' }}>High Risks: </span>
-                      <span style={{ color: '#7f1baf' }} className="font-semibold">
-                        {riskData.high_risks}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Add to Phone Card */}
         <Card className="shadow-soft bg-gradient-phone">
           <CardContent className="p-4 space-y-3">
@@ -421,6 +394,25 @@ const Homepage = () => {
             Go to Account Settings
           </a>
         </div>
+
+               {/* Educational Disclaimer */}
+        {showEducationalDisclaimer && (
+          <Card className="bg-white shadow-soft">
+            <CardContent className="p-4 space-y-3 text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The NestProtect app is for education only. Emergencies are serious. Contact 911 if you think you might be in danger.
+              </p>
+              <Button 
+                onClick={() => setShowEducationalDisclaimer(false)}
+                variant="outline"
+                className="w-full bg-yellow-100 text-black hover:bg-yellow-200"
+              >
+                I understand! Dismiss!
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
       <MobileNavigation />
     </div>
   );
