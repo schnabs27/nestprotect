@@ -146,11 +146,9 @@ const Homepage = () => {
 {/* Risk Assessment Card */}
         <Card className="shadow-soft">
           <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
-              Your Risks
-            </h3>
+            <CardTitle className="text-lg text-title text-center">Your Risks</CardTitle>
             <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
-              FEMA has tracked these risks in your area.
+              Your area has had these risks in the past, according to FEMA.
             </p>
             
             <div className="space-y-4">
@@ -180,14 +178,14 @@ const Homepage = () => {
                 <div className="mt-4 space-y-2">
                   <div>
                     <span style={{ color: '#4b5563' }}>Risk Rating: </span>
-                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                    <span style={{ color: '#0162e8' }} className="font-semibold">
                       {riskData.risk_rating || 'Not available'}
                     </span>
                   </div>
                   {riskData.high_risks && (
                     <div>
                       <span style={{ color: '#4b5563' }}>High Risks: </span>
-                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      <span style={{ color: '#0162e8' }} className="font-semibold">
                         {riskData.high_risks}
                       </span>
                     </div>
