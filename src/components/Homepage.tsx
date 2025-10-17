@@ -185,7 +185,7 @@ const Homepage = () => {
                 </div>
               </div>
               <Button 
-                onClick={() => navigate("/SelfAssessmentPage.tsx")}
+                onClick={() => navigate("/self-assessment")}
                 className="w-full bg-gradient-primary hover:opacity-90"
               >
                 Take Nestor's Readiness Test
@@ -250,8 +250,9 @@ const Homepage = () => {
                     </div>
                   )}
                   <Button 
-                  onClick={() => navigate("/PreparednessPage.tsx")}
+                  onClick={() => navigate("/preparedness")}
                   disabled={loading || searchZipCode.length !== 5}
+                  className="w-full"
                   style={{
                     background: 'linear-gradient(135deg, #b416ff 0%, #000be0ff 100%)',
                     color: 'white'

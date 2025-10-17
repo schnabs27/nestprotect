@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown } from "lucide-react";
 import nestorPreparedness from '@/assets/nestor-preparedness.png';
 import { Button } from "@/components/ui/button";
@@ -48,9 +47,6 @@ const PreparednessPage = () => {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
-const navigate = useNavigate();
-const [assessmentScore, setAssessmentScore] = useState(0);
-const assessmentTotalItems = 8;
 
   // Load user progress from database or localStorage
   useEffect(() => {
@@ -88,38 +84,6 @@ const assessmentTotalItems = 8;
     loadProgress();
   }, [user]);
 
-  // Fetch assessment score for authenticated users
-useEffect(() => {
-  const fetchAssessmentScore = async () => {
-    if (!user) {
-      const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
-      setAssessmentScore(score);
-      return;
-    }
-
-    try {
-      const { data: assessmentData } = await supabase
-        .from('user_assessments')
-        .select('score')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (assessmentData) {
-        setAssessmentScore(assessmentData.score);
-      } else {
-        const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
-        setAssessmentScore(score);
-      }
-    } catch (error) {
-      console.error('Error fetching assessment score:', error);
-      const score = parseInt(localStorage.getItem('selfAssessmentScore') || '0');
-      setAssessmentScore(score);
-    }
-  };
-
-  fetchAssessmentScore();
-}, [user]);
-
   // Handle navigation state to set initial tab and hazard
   useEffect(() => {
     if (location.state?.activeTab && location.state?.activeHazard) {
@@ -151,7 +115,7 @@ useEffect(() => {
     });
   };
 
-    const checklists = {
+  const checklists = {
     all: {
       now: [
         {
@@ -339,135 +303,113 @@ useEffect(() => {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Prepare for an emergency.</h1>
           </div>
-</div>
+        </div>
+
         {/* Hazard Selection */}
         <div className="mb-6">
           <p className="text-body mb-4 text-center">
             Check off these tasks. When an emergency alerts, you'll be ready!
           </p>
-
-{/* Self-Assessment Card */}
-<Card className="shadow-soft bg-gradient-purple border-purple-600 mb-4">
-  <CardHeader className="pb-1  pt-2">
-    <CardTitle className="text-lg text-white text-center">How ready are you?</CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-1 pt-1 pb-3">
-    <div className="text-center">
-      <Button 
-        onClick={() => navigate("/self-assessment")}
-        className="bg-white hover:bg-gray-100 text-black px-8"
-        size="lg"
-      >
-        Take Nestor's Readiness Test
-      </Button>
-    </div>
-    <div className="text-center">
-      <div className="text-sm text-white">
-        Your current score: <span className="font-bold">{assessmentScore}/{assessmentTotalItems}</span>
-      </div>
-    </div>
-  </CardContent>
-</Card>
         </div>
-{/* Now Checklist */}
+
+        {/* Now Checklist */}
         <Card className="shadow-soft">
           <CardContent className="space-y-1 pt-3 mb-1">
-              <CardHeader className="pt-1">
-    <CardTitle className="text-lg text-center">The Basics</CardTitle>
-    <p className="text-body text-center">
-            This basic prep applies to all disaster scenarios.
-          </p>
-  </CardHeader>
-                  {(activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood" || activeHazard === "storm") ? (
-                    // Interactive checklist for hazards with detailed structure
-                    currentChecklist.now.map((section: any) => (
-                      <Collapsible 
-                        key={section.id} 
-                        open={openItems.has(section.id)}
-                        onOpenChange={() => toggleOpen(section.id)}
-                      >
-                        <div className="border border-border rounded-lg">
-                          <CollapsibleTrigger className="w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-smooth">
-                            <Checkbox
-                              checked={checkedItems.has(section.id)}
-                              onCheckedChange={() => toggleCheck(section.id)}
-                              className="mt-0.5"
-                            />
-                            <div className="flex-1 text-left">
-                              <h4 className={`font-medium ${checkedItems.has(section.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                {section.title}
-                              </h4>
-                            </div>
-                            <ChevronDown 
-                              size={16} 
-                              className={`text-muted-foreground transition-transform ${openItems.has(section.id) ? 'rotate-180' : ''}`} 
-                            />
-                          </CollapsibleTrigger>
-                          
-                          <CollapsibleContent className="px-4 pb-4">
-                            <div className="space-y-4 ml-7">
-                              {/* Critical Tasks */}
-                              <div>
-                                <h5 className="font-medium text-sm text-foreground mb-2">Critical items</h5>
-                                <div className="space-y-2">
-                                  {section.criticalTasks.map((task: any) => (
-                                    <div key={task.id} className="flex items-start gap-2">
-                                      <Checkbox
-                                        checked={checkedItems.has(task.id)}
-                                        onCheckedChange={() => toggleCheck(task.id)}
-                                        className="mt-0.5"
-                                      />
-                                       <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                         {renderTextWithLinks(task.text)}
-                                       </span>
-                                    </div>
-                                  ))}
-                                </div>
+            <CardHeader className="pt-1">
+              <CardTitle className="text-lg text-center">The Basics</CardTitle>
+              <p className="text-body text-center">
+                This basic prep applies to all disaster scenarios.
+              </p>
+            </CardHeader>
+            {(activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood" || activeHazard === "storm") ? (
+              // Interactive checklist for hazards with detailed structure
+              currentChecklist.now.map((section: any) => (
+                <Collapsible 
+                  key={section.id} 
+                  open={openItems.has(section.id)}
+                  onOpenChange={() => toggleOpen(section.id)}
+                >
+                  <div className="border border-border rounded-lg">
+                    <CollapsibleTrigger className="w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-smooth">
+                      <Checkbox
+                        checked={checkedItems.has(section.id)}
+                        onCheckedChange={() => toggleCheck(section.id)}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 text-left">
+                        <h4 className={`font-medium ${checkedItems.has(section.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                          {section.title}
+                        </h4>
+                      </div>
+                      <ChevronDown 
+                        size={16} 
+                        className={`text-muted-foreground transition-transform ${openItems.has(section.id) ? 'rotate-180' : ''}`} 
+                      />
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent className="px-4 pb-4">
+                      <div className="space-y-4 ml-7">
+                        {/* Critical Tasks */}
+                        <div>
+                          <h5 className="font-medium text-sm text-foreground mb-2">Critical items</h5>
+                          <div className="space-y-2">
+                            {section.criticalTasks.map((task: any) => (
+                              <div key={task.id} className="flex items-start gap-2">
+                                <Checkbox
+                                  checked={checkedItems.has(task.id)}
+                                  onCheckedChange={() => toggleCheck(task.id)}
+                                  className="mt-0.5"
+                                />
+                                <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                  {renderTextWithLinks(task.text)}
+                                </span>
                               </div>
-
-                              {/* Additional Tasks */}
-                              <div>
-                                <h5 className="font-medium text-sm text-foreground mb-2">Additional items</h5>
-                                <div className="space-y-2">
-                                  {section.additionalTasks.map((task: any) => (
-                                    <div key={task.id} className="flex items-start gap-2">
-                                      <Checkbox
-                                        checked={checkedItems.has(task.id)}
-                                        onCheckedChange={() => toggleCheck(task.id)}
-                                        className="mt-0.5"
-                                      />
-                                       <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                         {renderTextWithLinks(task.text)}
-                                       </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {/* Learn More */}
-                              {section.learnMore && (
-                                <div className="pt-2 border-t border-border">
-                                   <p className="text-xs text-muted-foreground">
-                                     Learn More: <a 
-                                       href={section.learnMore} 
-                                       target="_blank" 
-                                       rel="noopener noreferrer" 
-                                       className="text-primary hover:underline"
-                                     >
-                                       {section.learnMore}
-                                     </a>
-                                   </p>
-                                </div>
-                              )}
-                            </div>
-                          </CollapsibleContent>
+                            ))}
+                          </div>
                         </div>
-                      </Collapsible>
-                    ))
-                  ) : null}
-                </CardContent>
-              </Card>
 
+                        {/* Additional Tasks */}
+                        <div>
+                          <h5 className="font-medium text-sm text-foreground mb-2">Additional items</h5>
+                          <div className="space-y-2">
+                            {section.additionalTasks.map((task: any) => (
+                              <div key={task.id} className="flex items-start gap-2">
+                                <Checkbox
+                                  checked={checkedItems.has(task.id)}
+                                  onCheckedChange={() => toggleCheck(task.id)}
+                                  className="mt-0.5"
+                                />
+                                <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                                  {renderTextWithLinks(task.text)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Learn More */}
+                        {section.learnMore && (
+                          <div className="pt-2 border-t border-border">
+                            <p className="text-xs text-muted-foreground">
+                              Learn More: <a 
+                                href={section.learnMore} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-primary hover:underline"
+                              >
+                                {section.learnMore}
+                              </a>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              ))
+            ) : null}
+          </CardContent>
+        </Card>
       </div>
       <MobileNavigation />
     </div>
