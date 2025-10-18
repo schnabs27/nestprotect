@@ -1,0 +1,23 @@
+DESIGN
+- Canva
+- Google Gemini
+- UXPilot / Figma
+
+BUILD
+- Supabase Postgres database and Edge functions
+- Lovable
+- ChatGPT / Claude
+- Language??
+
+API DATA CONNECTIONS
+- Google Maps API (Places, Traffic)
+- Perplexity API
+- Govt Alerts
+- Weather
+- Wildfire Alerts
+
+OTHER DATA SOURCES
+- US Govt: FEMA, HUD
+
+DATA FORMATTING
+- Python

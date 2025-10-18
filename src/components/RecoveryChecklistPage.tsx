@@ -1,30 +1,98 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, AlertTriangle, Flame, Waves } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import nestorPreparedness from '@/assets/nestor-preparedness.png';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import MobileNavigation from "@/components/MobileNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
-const RecoveryChecklistPage = () => {
+interface Task {
+  id: string;
+  task: string;
+  stage: string;
+  basic: boolean;
+  avalanche: boolean;
+  cold: boolean;
+  earthquake: boolean;
+  flood: boolean;
+  hail: boolean;
+  heat: boolean;
+  hurricane: boolean;
+  ice: boolean;
+  landslide: boolean;
+  lightning: boolean;
+  tornado: boolean;
+  tsunami: boolean;
+  volcanic: boolean;
+  wildfire: boolean;
+  wind: boolean;
+  winter: boolean;
+}
+
+const RecoveryPage = () => {
   const { user } = useAuth();
-  const [activeHazard, setActiveHazard] = useState("all");
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(["basic"]));
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const categories = [
+    { id: "basic", label: "Basic", color: "bg-primary" },
+    { id: "avalanche", label: "Avalanche", color: "bg-blue-300" },
+    { id: "cold", label: "Cold", color: "bg-blue-500" },
+    { id: "earthquake", label: "Earthquake", color: "bg-orange-600" },
+    { id: "flood", label: "Flood", color: "bg-blue-600" },
+    { id: "hail", label: "Hail", color: "bg-gray-400" },
+    { id: "heat", label: "Heat", color: "bg-coral" },
+    { id: "hurricane", label: "Hurricane", color: "bg-raspberry" },
+    { id: "ice", label: "Ice", color: "bg-cyan-300" },
+    { id: "landslide", label: "Landslide", color: "bg-orange-500" },
+    { id: "lightning", label: "Lightning", color: "bg-yellow" },
+    { id: "tornado", label: "Tornado", color: "bg-accent" },
+    { id: "tsunami", label: "Tsunami", color: "bg-blue-700" },
+    { id: "volcanic", label: "Volcanic", color: "bg-red-600" },
+    { id: "wildfire", label: "Wildfire", color: "bg-orange-700" },
+    { id: "wind", label: "Wind", color: "bg-gray-500" },
+    { id: "winter", label: "Winter", color: "bg-blue-400" }
+  ];
+
+  // Load tasks from Supabase
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('recovery_tasks')
+          .select('*')
+          .order('task', { ascending: true });
+
+        if (error) throw error;
+
+        setTasks(data || []);
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+        toast.error('Failed to load tasks');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTasks();
+  }, []);
 
   // Load user progress from database or localStorage
   useEffect(() => {
     const loadProgress = async () => {
       if (user) {
         try {
-          setLoading(true);
           const { data, error } = await supabase
-            .from('user_preparedness_progress')
-            .select('task_id, completed')
+            .from('recovery_task_user_state')
+            .select('task_id, is_checked')
             .eq('user_id', user.id)
-            .eq('completed', true);
+            .eq('is_checked', true);
 
           if (error) throw error;
 
@@ -33,13 +101,11 @@ const RecoveryChecklistPage = () => {
         } catch (error) {
           console.error('Error loading progress:', error);
           toast.error('Failed to load your progress');
-          const saved = localStorage.getItem('prepCheckedItems');
+          const saved = localStorage.getItem('recoveryCheckedItems');
           setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
-        } finally {
-          setLoading(false);
         }
       } else {
-        const saved = localStorage.getItem('prepCheckedItems');
+        const saved = localStorage.getItem('recoveryCheckedItems');
         setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
       }
     };
@@ -47,76 +113,40 @@ const RecoveryChecklistPage = () => {
     loadProgress();
   }, [user]);
 
-  const hazards = [
-    { id: "all", label: "All Types", icon: AlertTriangle, color: "text-primary" },
-    { id: "wildfire", label: "Wildfire", icon: Flame, color: "text-coral" },
-    { id: "flood", label: "Flood", icon: Waves, color: "text-blue-600" },
-    { id: "storm", label: "Storm", icon: AlertTriangle, color: "text-accent" }
-  ];
-
-  const checklists = {
-    all: {
-      after: [
-        { id: "all-after-1", title: "Return home only when officials say it's safe", notes: "Wait for all-clear from authorities", links: [] },
-        { id: "all-after-1b", title: "Board up new openings to your home caused by the disaster", notes: "Easy access may tempt looters", links: [] },
-        { id: "all-after-2", title: "Wear protective gear when cleaning debris", notes: "boots, gloves, masks", links: [] },
-        { id: "all-after-3", title: "Document damage before cleanup or repairs", notes: "Take photos/videos for insurance", links: [] },
-        { id: "all-after-4", title: "Contact insurance promptly; apply for FEMA assistance if eligible", notes: "Start recovery process quickly", links: ["fema.gov/assistance"] },
-        { id: "all-after-5", title: "Watch for hazards", notes: "power lines, gas leaks, unstable structures", links: [] },
-        { id: "all-after-6", title: "Use generators outdoors only, at least 20 feet from homes", notes: "Prevent carbon monoxide poisoning", links: [] },
-        { id: "all-after-7", title: "Check on vulnerable neighbors", notes: "Community support during recovery", links: [] },
-        { id: "all-after-8", title: "Discard spoiled or contaminated food/water", notes: "Prevent foodborne illness", links: [] },
-        { id: "all-after-9", title: "Apply fencing and \"Do Not Enter\" signage", notes: "Discourage visitors who may hurt themselves or further damage your property", links: [] },
-        { id: "all-after-10", title: "Be confident, ask questions", notes: "Strangers may show up and insist you use their services - but they are not in charge. Remember you have the right to make researched, thoughtful decisions for your best interest.", links: [] }
-      ]
-    },
-    wildfire: {
-      after: [
-        { id: "wildfire-after-1", title: "Be alert for smoldering hot spots and weakened structures", notes: "Fire can reignite or structures can collapse", links: [] },
-        { id: "wildfire-after-2", title: "Check attic, roof, and yard for embers", notes: "Look for remaining fire hazards", links: [] },
-        { id: "wildfire-after-3", title: "Wear N95 masks to avoid breathing ash", notes: "Protect respiratory health", links: [] },
-        { id: "wildfire-after-4", title: "File insurance claim promptly", notes: "Document all fire damage", links: [] }
-      ]
-    },
-    flood: {
-      after: [
-        { id: "flood-after-1", title: "Avoid standing water", notes: "contamination/electricity risk", links: [] },
-        { id: "flood-after-2", title: "Check buildings for structural damage before entering", notes: "Ensure safety before re-entry", links: [] },
-        { id: "flood-after-3", title: "Discard any food, water, or medicine touched by floodwater", notes: "Prevent contamination illness", links: [] },
-        { id: "flood-after-4", title: "Dry home quickly to prevent mold", notes: "Use fans, dehumidifiers, open windows", links: [] }
-      ]
-    },
-    storm: {
-      after: [
-        { id: "storm-after-1", title: "Avoid downed power lines and flooded areas", notes: "Stay safe during initial assessment", links: [] },
-        { id: "storm-after-2", title: "Protect yourself from hazards", notes: "Shattered glass, broken wood, exposed nails, insulation, and large debris are frequent after strong winds", links: [] },
-        { id: "storm-after-3", title: "Cover belongings to minimize further damage", notes: "Post-storm secondary rain is common", links: [] },
-        { id: "storm-after-4", title: "If you smell gas, leave immediately", notes: "Contact the police or utilities company about a possible gas line rupture", links: [] }
-      ]
+  const toggleCategory = (categoryId: string) => {
+    const newCategories = new Set(selectedCategories);
+    if (newCategories.has(categoryId)) {
+      newCategories.delete(categoryId);
+    } else {
+      newCategories.add(categoryId);
     }
+    setSelectedCategories(newCategories);
   };
 
-  const toggleCheck = async (itemId: string) => {
+  const toggleCheck = async (taskUuid: string) => {
+    // Store the previous state for rollback
+    const previousChecked = new Set(checkedItems);
     const newChecked = new Set(checkedItems);
-    const isCompleted = !checkedItems.has(itemId);
+    const isCompleted = !checkedItems.has(taskUuid);
     
     if (isCompleted) {
-      newChecked.add(itemId);
+      newChecked.add(taskUuid);
     } else {
-      newChecked.delete(itemId);
+      newChecked.delete(taskUuid);
     }
     
+    // Optimistically update UI
     setCheckedItems(newChecked);
 
     if (user) {
       try {
         if (isCompleted) {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('recovery_task_user_state')
             .upsert({
               user_id: user.id,
-              task_id: itemId,
-              completed: true
+              task_id: taskUuid,
+              is_checked: true
             }, {
               onConflict: 'user_id,task_id'
             });
@@ -124,24 +154,34 @@ const RecoveryChecklistPage = () => {
           if (error) throw error;
         } else {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('recovery_task_user_state')
             .delete()
             .eq('user_id', user.id)
-            .eq('task_id', itemId);
+            .eq('task_id', taskUuid);
 
           if (error) throw error;
         }
       } catch (error) {
         console.error('Error saving progress:', error);
         toast.error('Failed to save progress');
-        setCheckedItems(checkedItems);
+        // Revert to previous state on error
+        setCheckedItems(previousChecked);
       }
     } else {
-      localStorage.setItem('prepCheckedItems', JSON.stringify(Array.from(newChecked)));
+      localStorage.setItem('recoveryCheckedItems', JSON.stringify(Array.from(newChecked)));
     }
   };
 
-  const currentChecklist = checklists[activeHazard as keyof typeof checklists];
+  // Filter tasks based on selected categories (all recovery tasks are stage "after")
+  const filteredTasks = tasks.filter(task => {
+    // If no categories selected, don't show any tasks
+    if (selectedCategories.size === 0) return false;
+
+    // Check if task matches any selected category
+    return Array.from(selectedCategories).some(category => {
+      return task[category as keyof Task] === true;
+    });
+  });
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
@@ -158,84 +198,91 @@ const RecoveryChecklistPage = () => {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Recover from a disaster.</h1>
             <p className="text-muted-foreground">
-              Hit by a severe weather event? I hope these basic steps help you bounce back faster.
+              Select disaster categories below to see recommended recovery actions.
             </p>
           </div>
         </div>
 
-        {/* Hazard Selection */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {hazards.map((hazard) => {
-            const Icon = hazard.icon;
-            return (
-              <Button
-                key={hazard.id}
-                variant={activeHazard === hazard.id ? "default" : "outline"}
-                className={`h-16 flex flex-col gap-1 ${
-                  activeHazard === hazard.id 
-                    ? "bg-gradient-primary border-0 text-primary-foreground" 
-                    : ""
-                }`}
-                onClick={() => setActiveHazard(hazard.id)}
-              >
-                <Icon size={20} className={activeHazard === hazard.id ? "" : hazard.color} />
-                <span className="text-xs">{hazard.label}</span>
-              </Button>
-            );
-          })}
+        {/* Category Selection */}
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-foreground mb-2">Disaster Categories</h3>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => {
+              const isSelected = selectedCategories.has(category.id);
+              
+              return (
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} text-white ring-2 ring-primary`
+                      : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Recovery Checklist */}
+        {/* Recovery Tasks */}
         <Card className="shadow-soft">
-          <CardContent className="space-y-4 pt-6">
-            {currentChecklist.after?.map((item: any) => (
-              <div 
-                key={item.id}
-                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
-              >
-                <button
-                  onClick={() => toggleCheck(item.id)}
-                  className="mt-1"
-                >
-                  {checkedItems.has(item.id) ? (
-                    <CheckCircle2 size={20} className="text-primary" />
-                  ) : (
-                    <Circle size={20} className="text-muted-foreground" />
-                  )}
-                </button>
-                
-                <div className="flex-1">
-                  <h4 className={`font-medium ${checkedItems.has(item.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                    {item.title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {item.notes}
-                  </p>
-                  {item.links && item.links.length > 0 && (
-                    <div className="mt-2">
-                      {item.links.map((link: string, index: number) => (
-                        <a
-                          key={index}
-                          href={`https://${link}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline mr-3"
-                        >
-                          {link}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          <CardHeader>
+            <CardTitle className="text-title">
+              Recovery Actions - After the disaster
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Loading tasks...</p>
               </div>
-            ))}
+            ) : selectedCategories.size === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Please select a disaster category to view recommended recovery actions
+                </p>
+              </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  No tasks found for the selected categories
+                </p>
+              </div>
+            ) : (
+              filteredTasks.map((task) => (
+                <div 
+                  key={task.id}
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                >
+                  <button
+                    onClick={() => toggleCheck(task.id)}
+                    className="mt-1"
+                  >
+                    {checkedItems.has(task.id) ? (
+                      <CheckCircle2 size={20} className="text-primary" />
+                    ) : (
+                      <Circle size={20} className="text-muted-foreground" />
+                    )}
+                  </button>
+                  
+                  <div className="flex-1">
+                    <h4 className={`font-medium ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                      {task.task}
+                    </h4>
+                  </div>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
-
       </div>
       <MobileNavigation />
     </div>
   );
 };
 
-export default RecoveryChecklistPage;
+export default RecoveryPage;

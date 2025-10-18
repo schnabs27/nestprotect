@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import MobileNavigation from "@/components/MobileNavigation";
+import { Link } from "react-router-dom";
 
 const Homepage = () => {
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
@@ -224,15 +225,14 @@ const Homepage = () => {
 
       </div>
 
-              {/* Settings Link */}
-        <div className="text-center pb-4">
-          <a
-            href="/settings"
-            className="text-primary hover:text-primary/80 underline text-sm"
-          >
-            Go to Account Settings
-          </a>
-        </div>
+ <div className="text-center pb-4">
+  <Link
+    to="/settings"
+    className="text-primary hover:text-primary/80 underline text-sm"
+  >
+    Go to Account Settings
+  </Link>
+</div>
 
       <MobileNavigation />
     </div>

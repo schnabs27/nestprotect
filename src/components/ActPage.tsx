@@ -14,6 +14,7 @@ interface Task {
   id: string;
   task: string;
   stage: string;
+  basic: boolean;
   avalanche: boolean;
   cold: boolean;
   earthquake: boolean;
@@ -35,12 +36,13 @@ interface Task {
 const ActPage = () => {
   const { user } = useAuth();
   const [activeStage, setActiveStage] = useState("coming");
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(["basic"]));
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
   const categories = [
+    { id: "basic", label: "Basic", color: "bg-primary" },
     { id: "avalanche", label: "Avalanche", color: "bg-blue-300" },
     { id: "cold", label: "Cold", color: "bg-blue-500" },
     { id: "earthquake", label: "Earthquake", color: "bg-orange-600" },

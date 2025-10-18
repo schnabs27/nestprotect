@@ -14,6 +14,190 @@ export type Database = {
   }
   public: {
     Tables: {
+      act_task_user_state: {
+        Row: {
+          is_checked: boolean | null
+          task_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          is_checked?: boolean | null
+          task_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          is_checked?: boolean | null
+          task_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "act_task_user_state_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "act_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      act_tasks: {
+        Row: {
+          avalanche: boolean | null
+          basic: boolean | null
+          cold: boolean | null
+          created_at: string | null
+          earthquake: boolean | null
+          flood: boolean | null
+          hail: boolean | null
+          heat: boolean | null
+          hurricane: boolean | null
+          ice: boolean | null
+          id: string
+          landslide: boolean | null
+          lightning: boolean | null
+          order_num: number
+          stage: Database["public"]["Enums"]["act_stage"]
+          task: string
+          tornado: boolean | null
+          tsunami: boolean | null
+          updated_at: string | null
+          volcanic: boolean | null
+          wildfire: boolean | null
+          wind: boolean | null
+          winter: boolean | null
+        }
+        Insert: {
+          avalanche?: boolean | null
+          basic?: boolean | null
+          cold?: boolean | null
+          created_at?: string | null
+          earthquake?: boolean | null
+          flood?: boolean | null
+          hail?: boolean | null
+          heat?: boolean | null
+          hurricane?: boolean | null
+          ice?: boolean | null
+          id?: string
+          landslide?: boolean | null
+          lightning?: boolean | null
+          order_num?: number
+          stage: Database["public"]["Enums"]["act_stage"]
+          task: string
+          tornado?: boolean | null
+          tsunami?: boolean | null
+          updated_at?: string | null
+          volcanic?: boolean | null
+          wildfire?: boolean | null
+          wind?: boolean | null
+          winter?: boolean | null
+        }
+        Update: {
+          avalanche?: boolean | null
+          basic?: boolean | null
+          cold?: boolean | null
+          created_at?: string | null
+          earthquake?: boolean | null
+          flood?: boolean | null
+          hail?: boolean | null
+          heat?: boolean | null
+          hurricane?: boolean | null
+          ice?: boolean | null
+          id?: string
+          landslide?: boolean | null
+          lightning?: boolean | null
+          order_num?: number
+          stage?: Database["public"]["Enums"]["act_stage"]
+          task?: string
+          tornado?: boolean | null
+          tsunami?: boolean | null
+          updated_at?: string | null
+          volcanic?: boolean | null
+          wildfire?: boolean | null
+          wind?: boolean | null
+          winter?: boolean | null
+        }
+        Relationships: []
+      }
+      checklist_sections: {
+        Row: {
+          created_at: string | null
+          hazard_type: string
+          id: string
+          learn_more_url: string | null
+          phase: string
+          section_key: string
+          sort_order: number
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hazard_type: string
+          id?: string
+          learn_more_url?: string | null
+          phase: string
+          section_key: string
+          sort_order: number
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hazard_type?: string
+          id?: string
+          learn_more_url?: string | null
+          phase?: string
+          section_key?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      checklist_tasks: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_critical: boolean
+          section_id: string
+          sort_order: number
+          task_description: string
+          task_key: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_critical?: boolean
+          section_id: string
+          sort_order: number
+          task_description: string
+          task_key: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_critical?: boolean
+          section_id?: string
+          sort_order?: number
+          task_description?: string
+          task_key?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_tasks_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_access_logs: {
         Row: {
           accessed_at: string | null
@@ -98,6 +282,35 @@ export type Database = {
         }
         Relationships: []
       }
+      prep_task_user_state: {
+        Row: {
+          is_checked: boolean | null
+          task_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          is_checked?: boolean | null
+          task_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          is_checked?: boolean | null
+          task_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prep_task_user_state_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -119,6 +332,110 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      recovery_task_user_state: {
+        Row: {
+          is_checked: boolean | null
+          task_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          is_checked?: boolean | null
+          task_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          is_checked?: boolean | null
+          task_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recovery_task_user_state_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "recovery_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recovery_tasks: {
+        Row: {
+          avalanche: boolean | null
+          basic: boolean | null
+          cold: boolean | null
+          created_at: string | null
+          earthquake: boolean | null
+          flood: boolean | null
+          hail: boolean | null
+          heat: boolean | null
+          hurricane: boolean | null
+          ice: boolean | null
+          id: string
+          landslide: boolean | null
+          lightning: boolean | null
+          stage: string
+          task: string
+          tornado: boolean | null
+          tsunami: boolean | null
+          updated_at: string | null
+          volcanic: boolean | null
+          wildfire: boolean | null
+          wind: boolean | null
+          winter: boolean | null
+        }
+        Insert: {
+          avalanche?: boolean | null
+          basic?: boolean | null
+          cold?: boolean | null
+          created_at?: string | null
+          earthquake?: boolean | null
+          flood?: boolean | null
+          hail?: boolean | null
+          heat?: boolean | null
+          hurricane?: boolean | null
+          ice?: boolean | null
+          id?: string
+          landslide?: boolean | null
+          lightning?: boolean | null
+          stage: string
+          task: string
+          tornado?: boolean | null
+          tsunami?: boolean | null
+          updated_at?: string | null
+          volcanic?: boolean | null
+          wildfire?: boolean | null
+          wind?: boolean | null
+          winter?: boolean | null
+        }
+        Update: {
+          avalanche?: boolean | null
+          basic?: boolean | null
+          cold?: boolean | null
+          created_at?: string | null
+          earthquake?: boolean | null
+          flood?: boolean | null
+          hail?: boolean | null
+          heat?: boolean | null
+          hurricane?: boolean | null
+          ice?: boolean | null
+          id?: string
+          landslide?: boolean | null
+          lightning?: boolean | null
+          stage?: string
+          task?: string
+          tornado?: boolean | null
+          tsunami?: boolean | null
+          updated_at?: string | null
+          volcanic?: boolean | null
+          wildfire?: boolean | null
+          wind?: boolean | null
+          winter?: boolean | null
         }
         Relationships: []
       }
@@ -400,6 +717,7 @@ export type Database = {
       }
     }
     Enums: {
+      act_stage: "Coming" | "Here"
       app_role: "admin" | "user"
     }
     CompositeTypes: {
@@ -528,6 +846,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      act_stage: ["Coming", "Here"],
       app_role: ["admin", "user"],
     },
   },

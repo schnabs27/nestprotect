@@ -1,307 +1,220 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { CheckCircle2, Circle, FileDown, Share, AlertTriangle, Flame, Waves, ChevronDown, CalendarIcon, Calendar } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+import { useState, useEffect } from 'react';
+import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react';
 import nestorPreparedness from '@/assets/nestor-preparedness.png';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import MobileNavigation from "@/components/MobileNavigation";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/components/AuthProvider";
-import { toast } from "sonner";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import MobileNavigation from '@/components/MobileNavigation';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/AuthProvider';
+import { toast } from 'sonner';
 
-/**
- * PREPAREDNESS PAGE - Disaster Prep Checklists
- * 
- * PURPOSE:
- * Displays interactive checklists for preparing for natural disasters.
- * Users can check off tasks, which are saved to their account or browser.
- * 
- * STRUCTURE:
- * - Hazard filter buttons (All, Wildfire, Flood, etc)
- * - Expandable checklist sections with critical and additional tasks
- * 
- * DATA ORGANIZATION:
- * The `checklists` object contains all tasks:
- *   checklists[hazardType] = array of checklist sections
- *   - hazardType: "all", "wildfire", "flood", "storm"
- * 
- * PROGRESS TRACKING:
- * - Authenticated users: saved to Supabase database
- * - Guest users: saved to browser localStorage
- * - State managed in checkedItems Set (task IDs)
- * 
- * KEY FEATURES:
- * - Auto-detects URLs in task text and makes them clickable
- * - Collapsible sections (openItems Set tracks expanded state)
- * - Real-time sync with database on checkbox changes
- */
+interface MainTask {
+  id: string;
+  main_task: string;
+  learn_more_url: string | null;
+  sort_order: number;
+  basic: boolean;
+  avalanche: boolean;
+  cold: boolean;
+  earthquake: boolean;
+  flood: boolean;
+  hail: boolean;
+  heat: boolean;
+  hurricane: boolean;
+  ice: boolean;
+  landslide: boolean;
+  lightning: boolean;
+  tornado: boolean;
+  tsunami: boolean;
+  volcanic: boolean;
+  wildfire: boolean;
+  wind: boolean;
+  winter: boolean;
+}
 
-const PreparednessPage = () => {
-  const location = useLocation();
+interface SubTask {
+  id: string;
+  section_id: string;
+  task_description: string;
+  is_critical: boolean;
+  sort_order: number;
+}
+
+export default function PreparePage() {
   const { user } = useAuth();
-  const { toast: toastHook } = useToast();
-  const [activeHazard, setActiveHazard] = useState("all");
-  const [activeTab, setActiveTab] = useState("now");
-  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
-  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
-  const [completionDate, setCompletionDate] = useState<Date>();
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(['basic']));
+  const [completedSubtasks, setCompletedSubtasks] = useState<Set<string>>(new Set());
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [mainTasks, setMainTasks] = useState<MainTask[]>([]);
+  const [subTasks, setSubTasks] = useState<SubTask[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const getDaysUntilDate = () => {
-    if (!completionDate) return null;
-    const days = differenceInDays(completionDate, new Date());
-    return Math.max(0, days);
-  };
+  const categories = [
+    { id: 'basic', label: 'Basic', color: 'bg-primary' },
+    { id: 'avalanche', label: 'Avalanche', color: 'bg-blue-300' },
+    { id: 'cold', label: 'Cold', color: 'bg-blue-500' },
+    { id: 'earthquake', label: 'Earthquake', color: 'bg-orange-600' },
+    { id: 'flood', label: 'Flood', color: 'bg-blue-600' },
+    { id: 'hail', label: 'Hail', color: 'bg-gray-400' },
+    { id: 'heat', label: 'Heat', color: 'bg-coral' },
+    { id: 'hurricane', label: 'Hurricane', color: 'bg-raspberry' },
+    { id: 'ice', label: 'Ice', color: 'bg-cyan-300' },
+    { id: 'landslide', label: 'Landslide', color: 'bg-orange-500' },
+    { id: 'lightning', label: 'Lightning', color: 'bg-yellow' },
+    { id: 'tornado', label: 'Tornado', color: 'bg-accent' },
+    { id: 'tsunami', label: 'Tsunami', color: 'bg-blue-700' },
+    { id: 'volcanic', label: 'Volcanic', color: 'bg-red-600' },
+    { id: 'wildfire', label: 'Wildfire', color: 'bg-orange-700' },
+    { id: 'wind', label: 'Wind', color: 'bg-gray-500' },
+    { id: 'winter', label: 'Winter', color: 'bg-blue-400' }
+  ];
 
-  const daysRemaining = getDaysUntilDate();
+  // Load tasks from Supabase
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        setLoading(true);
+        
+        // Load main tasks
+        const { data: mainData, error: mainError } = await supabase
+          .from('prep_maintasks')
+          .select('*')
+          .order('sort_order', { ascending: true });
 
-  // Load user progress from database or localStorage
+        if (mainError) throw mainError;
+
+        // Load subtasks
+        const { data: subData, error: subError } = await supabase
+          .from('prep_subtasks')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (subError) throw subError;
+
+        setMainTasks(mainData || []);
+        setSubTasks(subData || []);
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+        toast.error('Failed to load tasks');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTasks();
+  }, []);
+
+  // Load user progress
   useEffect(() => {
     const loadProgress = async () => {
       if (user) {
-        // Load from database for authenticated users
         try {
-          setLoading(true);
           const { data, error } = await supabase
-            .from('user_preparedness_progress')
-            .select('task_id, completed')
+            .from('prep_subtask_user_state')
+            .select('subtask_id, is_checked')
             .eq('user_id', user.id)
-            .eq('completed', true);
+            .eq('is_checked', true);
 
           if (error) throw error;
 
-          const completedTasks = new Set(data?.map(item => item.task_id) || []);
-          setCheckedItems(completedTasks);
+          const completed = new Set(data?.map(item => item.subtask_id) || []);
+          setCompletedSubtasks(completed);
         } catch (error) {
           console.error('Error loading progress:', error);
-          toast.error('Failed to load your progress');
-          // Fall back to localStorage
-          const saved = localStorage.getItem('prepCheckedItems');
-          setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
-        } finally {
-          setLoading(false);
+          const saved = localStorage.getItem('prepSubtaskCheckedItems');
+          setCompletedSubtasks(saved ? new Set(JSON.parse(saved)) : new Set());
         }
       } else {
-        // Load from localStorage for non-authenticated users
-        const saved = localStorage.getItem('prepCheckedItems');
-        setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
+        const saved = localStorage.getItem('prepSubtaskCheckedItems');
+        setCompletedSubtasks(saved ? new Set(JSON.parse(saved)) : new Set());
       }
     };
 
     loadProgress();
   }, [user]);
 
-  // Handle navigation state to set initial tab and hazard
-  useEffect(() => {
-    if (location.state?.activeTab && location.state?.activeHazard) {
-      setActiveHazard(location.state.activeHazard);
-      setActiveTab(location.state.activeTab === "recovery" ? "after" : location.state.activeTab);
+  const toggleCategory = (categoryId: string) => {
+    const newCategories = new Set(selectedCategories);
+    if (newCategories.has(categoryId)) {
+      newCategories.delete(categoryId);
+    } else {
+      newCategories.add(categoryId);
     }
-  }, [location.state]);
-
-  // Helper function to render text with clickable links
-  const renderTextWithLinks = (text: string) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const parts = text.split(urlRegex);
-    
-    return parts.map((part, index) => {
-      if (part.match(urlRegex)) {
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            {part}
-          </a>
-        );
-      }
-      return part;
-    });
+    setSelectedCategories(newCategories);
   };
 
-  const checklists = {
-    all: {
-      now: [
-        {
-          id: "know-risk",
-          title: "Know your risk for each type of disaster.",
-          criticalTasks: [
-            { id: "risk-1", text: "Search your address at https://hazards.fema.gov/nri/map to identify risks (flood, wildfire, storm, etc.)." },
-            { id: "risk-2", text: "Prepare for the risks with \"Very High\" ratings in your area." }
-          ],
-          additionalTasks: [
-            { id: "risk-3", text: "Share the FEMA map results with your household." },
-            { id: "risk-4", text: "Bookmark the FEMA National Risk Index for quick reference." }
-          ],
-          learnMore: "https://hazards.fema.gov/nri/map"
-        },
-        {
-          id: "household-plan",
-          title: "Make a household emergency plan.",
-          criticalTasks: [
-            { id: "plan-1", text: "Create a shared Google Doc titled \"Family Emergency Plan\" with household info and roles." },
-            { id: "plan-2", text: "In Google Contacts, add an out-of-area contact under a new label \"Emergency.\"" },
-            { id: "plan-3", text: "In Google Maps, make a list \"Emergency Meeting Places\" and save two locations (near home and outside neighborhood)." }
-          ],
-          additionalTasks: [
-            { id: "plan-4", text: "Save two evacuation routes in Google Maps and download offline maps." },
-            { id: "plan-5", text: "Assign roles in your Google Doc (who grabs kit, manages pets, helps elderly)." },
-            { id: "plan-6", text: "Set a Google Calendar reminder to practice twice a year." }
-          ],
-          learnMore: "https://www.ready.gov/plan"
-        },
-        {
-          id: "emergency-kit",
-          title: "Assemble an at-home emergency supply kit.",
-          criticalTasks: [
-            { id: "kit-1", text: "At least a 3-day supply of water (1 gallon per person per day)" },
-            { id: "kit-2", text: "At least a 3-day supply of non-perishable food" },
-            { id: "kit-3", text: "A first aid kit, basic medicines, and personal hygiene items" },
-            { id: "kit-4", text: "A flashlight and a battery-powered radio" },
-            { id: "kit-5", text: "Backup power: batteries, charged power bank, and/or generator" }
-          ],
-          additionalTasks: [
-            { id: "kit-6", text: "Extra clothing, blankets, and sturdy shoes" },
-            { id: "kit-7", text: "Cash in small bills and local maps" },
-            { id: "kit-8", text: "Tools such as a wrench or pliers for turning off utilities" },
-            { id: "kit-9", text: "Supplies as needed for infants, elderly and/or pets" }
-          ],
-          learnMore: "https://www.ready.gov/kit"
-        },
-        {
-          id: "go-bags",
-          title: "Maintain a go-bag for each person in case you need to evacuate.",
-          criticalTasks: [
-            { id: "gobag-1", text: "3 days of clothing and personal items" },
-            { id: "gobag-2", text: "Water bottles and lightweight, non-perishable snacks" },
-            { id: "gobag-3", text: "Copies of IDs, insurance information, critical phone numbers, and printed map in waterproof bag" },
-            { id: "gobag-4", text: "Necessary medications and a small first aid kit" },
-            { id: "gobag-5", text: "Lightweight poncho and flashlight" }
-          ],
-          additionalTasks: [
-            { id: "gobag-6", text: "Power chargers and charged portable power bank" },
-            { id: "gobag-7", text: "Some cash in small bills" },
-            { id: "gobag-8", text: "Items for children, elderly, or pets as needed" },
-            { id: "gobag-9", text: "Maintain a car kit with water, snacks, blankets, and a phone charger in case you become stranded or stuck in traffic." }
-          ],
-          learnMore: "https://www.ready.gov/kit"
-        },
-        {
-          id: "documents",
-          title: "Keep important documents safe.",
-          criticalTasks: [
-            { id: "docs-1", text: "Use the Google Drive app → Scan → upload IDs, insurance, and medical records." },
-            { id: "docs-2", text: "Organize into a folder \"Emergency Documents\" and share only with trusted family." }
-          ],
-          additionalTasks: [
-            { id: "docs-3", text: "Mark key files \"Available Offline\" in Drive." },
-            { id: "docs-4", text: "Place physical originals in a fireproof, waterproof container at home." },
-            { id: "docs-5", text: "Add a one-page Google Doc summary of where originals are stored." }
-          ],
-          learnMore: "https://www.ready.gov/protecting-documents"
-        },
-        {
-          id: "alerts",
-          title: "Sign up for local alerts and FEMA app.",
-          criticalTasks: [
-            { id: "alerts-1", text: "Download and enable alerts in the FEMA App (Android or iOS)." },
-            { id: "alerts-2", text: "Search Google for \"[Your City] emergency alerts\" and register with your local system." },
-            { id: "alerts-3", text: "Enable Wireless Emergency Alerts in phone settings." }
-          ],
-          additionalTasks: [
-            { id: "alerts-4", text: "In Google Contacts, create a label \"Emergency Services\" and add police, fire, utilities, and emergency management." },
-            { id: "alerts-5", text: "Test by sending a message to your \"Emergency\" label group." }
-          ],
-          learnMore: "https://www.fema.gov/mobile-app"
-        },
-        {
-          id: "inventory",
-          title: "Photograph property and review insurance.",
-          criticalTasks: [
-            { id: "inventory-1", text: "Take photos of every room and major item, then save in a Google Photos album \"Home Inventory.\"" },
-            { id: "inventory-2", text: "Upload receipts and warranties to a Google Drive folder \"Home Inventory.\"" }
-          ],
-          additionalTasks: [
-            { id: "inventory-3", text: "Use the Info field in Photos to add notes such as serial numbers and purchase year." },
-            { id: "inventory-4", text: "Search Drive or email for your insurance policy and confirm coverage for local hazards such as flood, wildfire, or storm." },
-            { id: "inventory-5", text: "Update photos after major purchases and share the album with a trusted family member." }
-          ],
-          learnMore: "https://www.ready.gov/financial-preparedness"
-        },
-      ],
-    }
-  };
-
-  const toggleCheck = async (itemId: string) => {
-    const newChecked = new Set(checkedItems);
-    const isCompleted = !checkedItems.has(itemId);
+  const toggleSubtask = async (subtaskId: string) => {
+    const previousCompleted = new Set(completedSubtasks);
+    const newCompleted = new Set(completedSubtasks);
+    const isCompleted = !completedSubtasks.has(subtaskId);
     
     if (isCompleted) {
-      newChecked.add(itemId);
+      newCompleted.add(subtaskId);
     } else {
-      newChecked.delete(itemId);
+      newCompleted.delete(subtaskId);
     }
     
-    setCheckedItems(newChecked);
+    setCompletedSubtasks(newCompleted);
 
     if (user) {
-      // Save to database for authenticated users
       try {
         if (isCompleted) {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('prep_subtask_user_state')
             .upsert({
               user_id: user.id,
-              task_id: itemId,
-              completed: true
+              subtask_id: subtaskId,
+              is_checked: true
             }, {
-              onConflict: 'user_id,task_id'
+              onConflict: 'user_id,subtask_id'
             });
 
           if (error) throw error;
         } else {
           const { error } = await supabase
-            .from('user_preparedness_progress')
+            .from('prep_subtask_user_state')
             .delete()
             .eq('user_id', user.id)
-            .eq('task_id', itemId);
+            .eq('subtask_id', subtaskId);
 
           if (error) throw error;
         }
       } catch (error) {
         console.error('Error saving progress:', error);
         toast.error('Failed to save progress');
-        // Revert the change on error
-        setCheckedItems(checkedItems);
+        setCompletedSubtasks(previousCompleted);
       }
     } else {
-      // Save to localStorage for non-authenticated users
-      localStorage.setItem('prepCheckedItems', JSON.stringify(Array.from(newChecked)));
+      localStorage.setItem('prepSubtaskCheckedItems', JSON.stringify(Array.from(newCompleted)));
     }
   };
 
-  const toggleOpen = (itemId: string) => {
-    const newOpen = new Set(openItems);
-    if (newOpen.has(itemId)) {
-      newOpen.delete(itemId);
+  const toggleMainTask = (mainTaskId: string) => {
+    const newExpanded = new Set(expandedTasks);
+    if (newExpanded.has(mainTaskId)) {
+      newExpanded.delete(mainTaskId);
     } else {
-      newOpen.add(itemId);
+      newExpanded.add(mainTaskId);
     }
-    setOpenItems(newOpen);
+    setExpandedTasks(newExpanded);
   };
 
-  const currentChecklist = checklists[activeHazard as keyof typeof checklists];
+  const filteredMainTasks = mainTasks.filter(task => {
+    if (selectedCategories.size === 0) return false;
+    return Array.from(selectedCategories).some(category => 
+      task[category as keyof MainTask] === true
+    );
+  });
+
+  const getSubtasksForMainTask = (mainTaskId: string) => {
+    return subTasks.filter(subtask => subtask.section_id === mainTaskId);
+  };
+
+  const getCompletionStats = (mainTaskId: string) => {
+    const subtasks = getSubtasksForMainTask(mainTaskId);
+    const completed = subtasks.filter(st => completedSubtasks.has(st.id)).length;
+    return { completed, total: subtasks.length };
+  };
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
@@ -311,216 +224,142 @@ const PreparednessPage = () => {
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
               src={nestorPreparedness}
-              alt="Nestor with checklist - Your preparedness guide"
+              alt="Nestor with checklist - Your preparation guide"
               className="w-32 h-32 object-contain"
             />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-title">Prepare for an emergency.</h1>
+            <h1 className="text-2xl font-bold text-title">Prepare for disasters.</h1>
+            <p className="text-muted-foreground">
+              Select disaster categories below to see preparation tasks to complete weeks or months ahead.
+            </p>
           </div>
         </div>
 
-        {/* Hazard Selection */}
-        <div className="mb-6">
-          <p className="text-body mb-4 text-center">
-            Check off these tasks. When an emergency alerts, you'll be ready!
-          </p>
+        {/* Category Selection */}
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-foreground mb-2">Disaster Categories</h3>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => {
+              const isSelected = selectedCategories.has(category.id);
+              
+              return (
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} text-white ring-2 ring-primary`
+                      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Now Checklist */}
+        {/* Main Tasks List */}
         <Card className="shadow-soft">
-          <CardContent className="space-y-1 pt-3 mb-1">
-            <CardHeader className="pt-1">
-              <CardTitle className="text-lg text-center">The Basics</CardTitle>
-              <p className="text-body text-center">
-                This basic prep applies to all disaster scenarios.
-              </p>
-            </CardHeader>
-            {(activeHazard === "all" || activeHazard === "wildfire" || activeHazard === "flood" || activeHazard === "storm") ? (
-              // Interactive checklist for hazards with detailed structure
-              currentChecklist.now.map((section: any) => (
-                <Collapsible 
-                  key={section.id} 
-                  open={openItems.has(section.id)}
-                  onOpenChange={() => toggleOpen(section.id)}
-                >
-                  <div className="border border-border rounded-lg">
-                    <CollapsibleTrigger className="w-full p-4 flex items-start gap-3 hover:bg-muted/50 transition-smooth">
-                      <Checkbox
-                        checked={checkedItems.has(section.id)}
-                        onCheckedChange={() => toggleCheck(section.id)}
-                        className="mt-0.5"
-                      />
+          <CardHeader>
+            <CardTitle className="text-title">
+              Preparation Tasks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Loading tasks...</p>
+              </div>
+            ) : selectedCategories.size === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Please select a disaster category to view preparation tasks
+                </p>
+              </div>
+            ) : filteredMainTasks.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  No tasks found for the selected categories
+                </p>
+              </div>
+            ) : (
+              filteredMainTasks.map(mainTask => {
+                const subtasks = getSubtasksForMainTask(mainTask.id);
+                const isExpanded = expandedTasks.has(mainTask.id);
+
+                return (
+                  <div key={mainTask.id}>
+                    {/* Main Task Header */}
+                    <button
+                      onClick={() => toggleMainTask(mainTask.id)}
+                      className="w-full p-3 flex items-start justify-between rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                    >
                       <div className="flex-1 text-left">
-                        <h4 className={`font-medium ${checkedItems.has(section.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                          {section.title}
-                        </h4>
+                        <h3 className="font-medium text-foreground">
+                          {mainTask.main_task}
+                        </h3>
                       </div>
-                      <ChevronDown 
-                        size={16} 
-                        className={`text-muted-foreground transition-transform ${openItems.has(section.id) ? 'rotate-180' : ''}`} 
-                      />
-                    </CollapsibleTrigger>
-                    
-                    <CollapsibleContent className="px-4 pb-4">
-                      <div className="space-y-4 ml-7">
-                        {/* Critical Tasks */}
-                        <div>
-                          <h5 className="font-medium text-sm text-foreground mb-2">Critical items</h5>
-                          <div className="space-y-2">
-                            {section.criticalTasks.map((task: any) => (
-                              <div key={task.id} className="flex items-start gap-2">
-                                <Checkbox
-                                  checked={checkedItems.has(task.id)}
-                                  onCheckedChange={() => toggleCheck(task.id)}
-                                  className="mt-0.5"
-                                />
-                                <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                  {renderTextWithLinks(task.text)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                      <div className="ml-4 flex-shrink-0">
+                        {isExpanded ? (
+                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </div>
+                    </button>
 
-                        {/* Additional Tasks */}
-                        <div>
-                          <h5 className="font-medium text-sm text-foreground mb-2">Additional items</h5>
-                          <div className="space-y-2">
-                            {section.additionalTasks.map((task: any) => (
-                              <div key={task.id} className="flex items-start gap-2">
-                                <Checkbox
-                                  checked={checkedItems.has(task.id)}
-                                  onCheckedChange={() => toggleCheck(task.id)}
-                                  className="mt-0.5"
-                                />
-                                <span className={`text-sm ${checkedItems.has(task.id) ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                                  {renderTextWithLinks(task.text)}
-                                </span>
-                              </div>
-                            ))}
+                    {/* Subtasks */}
+                    {isExpanded && subtasks.length > 0 && (
+                      <div className="mt-2 ml-4 space-y-2">
+                        {subtasks.map(subtask => (
+                          <div
+                            key={subtask.id}
+                            className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                          >
+                            <button
+                              onClick={() => toggleSubtask(subtask.id)}
+                              className="mt-1"
+                            >
+                              {completedSubtasks.has(subtask.id) ? (
+                                <CheckCircle2 size={20} className="text-primary" />
+                              ) : (
+                                <Circle size={20} className="text-muted-foreground" />
+                              )}
+                            </button>
+                            <div className="flex-1">
+                              <p className={`text-sm ${
+                                completedSubtasks.has(subtask.id)
+                                  ? 'text-muted-foreground line-through'
+                                  : 'text-foreground'
+                              }`}>
+                                {subtask.task_description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-
-                        {/* Learn More */}
-                        {section.learnMore && (
-                          <div className="pt-2 border-t border-border">
+                        ))}
+                        
+                        {mainTask.learn_more_url && (
+                          <div className="mt-2 ml-8">
                             <p className="text-xs text-muted-foreground">
                               Learn More: <a 
-                                href={section.learnMore} 
+                                href={mainTask.learn_more_url} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className="text-primary hover:underline"
                               >
-                                {section.learnMore}
+                                {mainTask.learn_more_url}
                               </a>
                             </p>
                           </div>
                         )}
                       </div>
-                    </CollapsibleContent>
+                    )}
                   </div>
-                </Collapsible>
-              ))
-            ) : null}
-          </CardContent>
-        </Card>
-
-      {/* Completion Date Goal */}
-        <Card className="shadow-soft">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-title text-center">
-              Prep and Practice!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <div className="flex-1">
-                <label className="text-sm font-medium text-foreground mb-2 block">
-                  Make a plan. Don't wait for an emergency!
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-center text-center font-normal",
-                        !completionDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {completionDate ? format(completionDate, "PPP") : "My deadline to be prepared"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={completionDate}
-                      onSelect={setCompletionDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <div className="mt-2 text-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (!completionDate) {
-                        toastHook({
-                          title: "Please select a date first",
-                          description: "Choose your emergency prep completion date above",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      
-                      const startDate = new Date(completionDate);
-                      startDate.setHours(10, 0, 0);
-                      const endDate = new Date(startDate);
-                      endDate.setHours(11, 0, 0);
-                      
-                      const formatGoogleDate = (date: Date) => {
-                        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-                      };
-                      
-                      const details = encodeURIComponent(
-                        "You can't schedule your emergencies. But you can prepare for them. Protect your home, loved ones, and valuables before a disaster. Use NestProtect to help: https://nestprotect.app/."
-                      );
-                      
-                      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Complete Disaster Prep')}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${details}`;
-                      
-                      window.open(googleCalendarUrl, '_blank');
-                    }}
-                    className="w-full bg-black text-white hover:bg-gray-700"
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Add to Google Calendar
-                  </Button>
-                </div>
-              </div>
-              
-              {daysRemaining !== null && (
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
-                    {daysRemaining}
-                  </div>
-                  <p className="text-sm text-muted-foreground">days remaining</p>
-                </div>
-              )}
-            </div>
-
-            {daysRemaining !== null && (
-              <div className="flex justify-center pt-4">
-                <img 
-                  src="/images/giffy-countdown.gif" 
-                  alt="Countdown timer animation"
-                  className="object-contain"
-                  style={{ width: '400px', height: '181px' }}
-                />
-              </div>
+                );
+              })
             )}
           </CardContent>
         </Card>
@@ -529,6 +368,4 @@ const PreparednessPage = () => {
       <MobileNavigation />
     </div>
   );
-};
-
-export default PreparednessPage;
+}
