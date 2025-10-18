@@ -212,17 +212,18 @@ const RecoveryPage = () => {
               
               return (
                 <Badge
-                  key={category.id}
-                  variant="secondary"
-                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
-                    isSelected 
-                      ? `${category.color} text-white ring-2 ring-primary`
-                      : "bg-background border border-input text-muted-foreground hover:bg-muted/50"
-                  }`}
-                  onClick={() => toggleCategory(category.id)}
-                >
-                  {category.label}
-                </Badge>
+  key={category.id}
+  variant="secondary"
+  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+    isSelected 
+      ? 'text-white ring-2 ring-primary'
+      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
+  }`}
+  style={isSelected ? { backgroundColor: '#0162e8' } : undefined}
+  onClick={() => toggleCategory(category.id)}
+>
+  {category.label}
+</Badge>
               );
             })}
           </div>
