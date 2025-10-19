@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react';
-import nestorPrep from '/images/nestor-prep.png';
+import nestorPreparedness from '@/assets/nestor-preparedness.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MobileNavigation from '@/components/MobileNavigation';
@@ -110,14 +110,14 @@ export default function PreparePage() {
       if (user) {
         try {
           const { data, error } = await supabase
-            .from('prep_subtask_user_state')
-            .select('subtask_id, is_checked')
+            .from('prep_task_user_state')
+            .select('task_id, is_checked')
             .eq('user_id', user.id)
             .eq('is_checked', true);
 
           if (error) throw error;
 
-          const completed = new Set(data?.map(item => item.subtask_id) || []);
+          const completed = new Set(data?.map(item => item.task_id) || []);
           setCompletedSubtasks(completed);
         } catch (error) {
           console.error('Error loading progress:', error);
@@ -143,15 +143,15 @@ export default function PreparePage() {
     setSelectedCategories(newCategories);
   };
 
-  const toggleSubtask = async (subtaskId: string) => {
+  const toggleSubtask = async (taskId: string) => {
     const previousCompleted = new Set(completedSubtasks);
     const newCompleted = new Set(completedSubtasks);
-    const isCompleted = !completedSubtasks.has(subtaskId);
+    const isCompleted = !completedSubtasks.has(taskId);
     
     if (isCompleted) {
-      newCompleted.add(subtaskId);
+      newCompleted.add(taskId);
     } else {
-      newCompleted.delete(subtaskId);
+      newCompleted.delete(taskId);
     }
     
     setCompletedSubtasks(newCompleted);
@@ -160,22 +160,22 @@ export default function PreparePage() {
       try {
         if (isCompleted) {
           const { error } = await supabase
-            .from('prep_subtask_user_state')
+            .from('prep_task_user_state')
             .upsert({
               user_id: user.id,
-              subtask_id: subtaskId,
+              task_id: taskId,
               is_checked: true
             }, {
-              onConflict: 'user_id,subtask_id'
+              onConflict: 'user_id,task_id'
             });
 
           if (error) throw error;
         } else {
           const { error } = await supabase
-            .from('prep_subtask_user_state')
+            .from('prep_task_user_state')
             .delete()
             .eq('user_id', user.id)
-            .eq('subtask_id', subtaskId);
+            .eq('task_id', taskId);
 
           if (error) throw error;
         }
@@ -223,7 +223,7 @@ export default function PreparePage() {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestorPrep}
+              src={nestorPreparedness}
               alt="Nestor with checklist - Your preparation guide"
               className="w-32 h-32 object-contain"
             />
@@ -231,7 +231,7 @@ export default function PreparePage() {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Prepare for disasters.</h1>
             <p className="text-muted-foreground">
-              Don't wait for disaster. Customize your prep list and start now!
+              Select disaster categories below to see preparation tasks to complete weeks or months ahead.
             </p>
           </div>
         </div>
@@ -244,19 +244,18 @@ export default function PreparePage() {
               const isSelected = selectedCategories.has(category.id);
               
               return (
-<Badge
-  key={category.id}
-  variant="secondary"
-  className={`cursor-pointer hover:opacity-80 transition-smooth ${
-    isSelected 
-      ? 'text-white ring-2 ring-primary'
-      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
-  }`}
-  style={isSelected ? { backgroundColor: '#0162e8' } : undefined}
-  onClick={() => toggleCategory(category.id)}
->
-  {category.label}
-</Badge>
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} text-white ring-2 ring-primary`
+                      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
               );
             })}
           </div>
