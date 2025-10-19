@@ -17,6 +17,7 @@ const PerplexitySearchPage = () => {
   const [user, setUser] = useState(null);
   const { zipCode: savedZipCode } = useUserProfile(user);
   const [zipCode, setZipCode] = useState("");
+  const [hasUserEdited, setHasUserEdited] = useState(false);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<string | null>(null);
 
@@ -29,12 +30,17 @@ const PerplexitySearchPage = () => {
     getCurrentUser();
   }, []);
 
-  // Auto-populate zip code when user profile loads
+  // Auto-populate zip code when user profile loads (only if user hasn't edited it)
   useEffect(() => {
-    if (savedZipCode && !zipCode) {
+    if (savedZipCode && !zipCode && !hasUserEdited) {
       setZipCode(savedZipCode);
     }
-  }, [savedZipCode, zipCode]);
+  }, [savedZipCode, zipCode, hasUserEdited]);
+
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setZipCode(e.target.value);
+    setHasUserEdited(true);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +49,9 @@ const PerplexitySearchPage = () => {
       toast.error("Please enter a ZIP code");
       return;
     }
+
+    // Show toast message immediately after submit
+    toast.info("Nestor is using AI to compile a fresh resource listing from news sources, press releases, and local organization websites.");
 
     setLoading(true);
     setResults(null);
@@ -81,7 +90,7 @@ const PerplexitySearchPage = () => {
         {/* Search Section */}
         <div className="bg-background shadow-soft p-4">
           <p className="text-muted-foreground mb-4">
-            Use Perplexity's AI engine to search the news for local disaster relief resources.
+            Use AI tools to search the news for local disaster relief resources.
           </p>
           <div className="flex gap-2 mb-4">
             <div className="flex-1">
@@ -89,7 +98,7 @@ const PerplexitySearchPage = () => {
                 type="text"
                 placeholder="Enter ZIP code (e.g., 12345)"
                 value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
+                onChange={handleZipCodeChange}
                 className="h-12"
                 maxLength={10}
               />

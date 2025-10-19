@@ -244,7 +244,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               Are you at risk?
             </h3>
             <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
-              FEMA predicts disaster by county. Are you ready?
+              FEMA tracks risks by county. Ready?
             </p>
             
             <div className="space-y-4">
