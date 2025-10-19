@@ -202,33 +202,29 @@ const ActPage = () => {
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Act when disaster strikes.</h1>
-            <p className="text-muted-foreground">
-              Select disaster categories below to see recommended actions.
-            </p>
           </div>
         </div>
 
         {/* Category Selection */}
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-foreground mb-2">Disaster Categories</h3>
+          <h3 className="text-sm font-medium text-foreground mb-2">Select Your Actions</h3>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => {
               const isSelected = selectedCategories.has(category.id);
               
-              return (
-<Badge
-  key={category.id}
-  variant="secondary"
-  className={`cursor-pointer hover:opacity-80 transition-smooth ${
-    isSelected 
-      ? 'text-white ring-2 ring-primary'
-      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
-  }`}
-  style={isSelected ? { backgroundColor: '#0162e8' } : undefined}
-  onClick={() => toggleCategory(category.id)}
->
-  {category.label}
-</Badge>
+               return (
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} text-white ring-2 ring-primary`
+                      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
               );
             })}
           </div>
@@ -244,12 +240,6 @@ const ActPage = () => {
           {["coming", "here"].map((stage) => (
             <TabsContent key={stage} value={stage} className="mt-4">
               <Card className="shadow-soft">
-                <CardHeader>
-                  <CardTitle className="text-title">
-                    {stage === "coming" && "It's Coming - Final preparations"}
-                    {stage === "here" && "It's Here - Stay safe"}
-                  </CardTitle>
-                </CardHeader>
                 <CardContent className="space-y-4">
                   {loading ? (
                     <div className="text-center py-8">

@@ -13,15 +13,15 @@ interface AssessmentState {
 }
 
 const statements = [
+  "I know ways to move or protect my property so it's less likely to be damaged.",
+  "I have 3 days of food, water, medication, and backup power.",
   "I'm receiving emergency alerts about the disaster.",
-  "I know my safest place to go right now.",
-  "If my safe place is no longer safe, I have a plan B.",
+  "I know if I should stay or leave.",
+  "If I need to leave, I have the supplies and gas to do it NOW.",
   "I know who to contact if I'm hurt, lost, or trapped.",
   "My family members know how to find each other even when internet and phone service is unavailable.",
-  "I have 3 days of food, water, medication, and power.",
-  "I can quickly access my insurance and property documents.",
-  "I know ways to move or protect my property so it's less likely to be damaged."
-];
+  "I can quickly access my ID, insurance, and property documents.",
+  ];
 
 const SelfAssessmentPage = () => {
   const navigate = useNavigate();
@@ -87,9 +87,9 @@ const SelfAssessmentPage = () => {
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <div className="bg-gradient-primary text-primary-foreground p-4 pt-8">
-        <h1 className="text-2xl font-bold mb-2">Self-Assessment</h1>
+        <h1 className="text-2xl font-bold mb-2">Nestor's Test</h1>
         <p className="text-primary-foreground/90 text-sm">
-          Check your emergency preparedness with Nestor
+          Are you really ready for a natural disaster?
         </p>
       </div>
 
@@ -232,7 +232,7 @@ const SelfAssessmentPage = () => {
                     {isAllTrue ? "Great job - basics are done!" : "Almost there - keep prepping!"}
                   </p>
                   <Button 
-                    onClick={() => navigate("/")} 
+                    onClick={() => navigate("/preparedness")} 
                     size="sm"
                     className="w-full"
                   >

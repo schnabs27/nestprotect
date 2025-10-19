@@ -230,15 +230,12 @@ export default function PreparePage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Prepare for disasters.</h1>
-            <p className="text-muted-foreground">
-              Select disaster categories below to see preparation tasks to complete weeks or months ahead.
-            </p>
           </div>
         </div>
 
         {/* Category Selection */}
         <div className="mb-4">
-          <h3 className="text-sm font-medium text-foreground mb-2">Disaster Categories</h3>
+          <h3 className="text-sm font-medium text-foreground mb-2">Select Your Tasks</h3>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => {
               const isSelected = selectedCategories.has(category.id);
@@ -263,11 +260,6 @@ export default function PreparePage() {
 
         {/* Main Tasks List */}
         <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-title">
-              Preparation Tasks
-            </CardTitle>
-          </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (
               <div className="text-center py-8">
