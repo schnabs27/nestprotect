@@ -4,7 +4,7 @@ import MobileNavigation from "@/components/MobileNavigation";
 import ContactForm from "@/components/ContactForm";
 import ReviewForm from "@/components/ReviewForm";
 import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
-import settingsBird from "@/assets/settings-bird.png";
+import NestorCap from "/images/nestor-cap.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -153,8 +153,8 @@ const ProfilePage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={settingsBird} 
-              alt="Settings bird mascot"
+              src={NestorCap} 
+              alt="Nestor selfie in his baseball cap"
               className="w-32 h-32 object-contain"
             />
           </div>

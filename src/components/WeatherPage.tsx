@@ -20,7 +20,7 @@ import WeatherMap from './WeatherMap';
 import GovernmentAlerts from './GovernmentAlerts';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import nestorDuring from '@/assets/nestprotect-during.png';
+import NestorTieHat from '/images/nestor-tie-hat.png';
 
 interface WeatherData {
   current: {
@@ -179,7 +179,7 @@ const WeatherPage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestorDuring}
+              src={NestorTieHat}
               alt="NestProtect during natural disaster - Emergency preparedness guide"
               className="w-32 h-32 object-contain"
             />

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import MobileNavigation from "@/components/MobileNavigation";
-import nestorSuperhero from "@/assets/nestor-superhero.png";
+import nestorSuperhero from "/images/nestor-superhero.png";
 import letterA from "@/assets/abc-letter-a.png";
 import letterB from "@/assets/abc-letter-b.png";
 import letterC from "@/assets/abc-letter-c.png";

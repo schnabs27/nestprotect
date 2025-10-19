@@ -9,7 +9,7 @@ import { AlertCircle, Shield, Users, Clock, Map, LifeBuoy, Sun, AlertTriangle, H
 import ContactForm from "@/components/ContactForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import nestprotectLogo from "@/assets/nestprotect-logo.png";
+import NestorDamagedNest from "/images/nestor-damaged-nest.png";
 
 interface AuthPageProps {
   onAuthSuccess: () => void;
@@ -221,8 +221,8 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         {/* Logo and Branding */}
         <div className="text-center space-y-0.5">
           <img 
-            src={nestprotectLogo} 
-            alt="NestProtect Logo" 
+            src={NestorDamagedNest} 
+            alt="Nestor in damaged nest" 
             className="w-90 h-90 object-contain mx-auto"
           />
           <div className="px-8">

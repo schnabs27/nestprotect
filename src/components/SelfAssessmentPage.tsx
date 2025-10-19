@@ -96,11 +96,12 @@ const SelfAssessmentPage = () => {
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Chat Container */}
         <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+
           {/* Initial Introduction Message */}
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
               <img 
-                src="/images/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                src="/images/nestor-logo.png" 
                 alt="Nestor" 
                 className="w-full h-full object-cover"
               />
@@ -109,7 +110,7 @@ const SelfAssessmentPage = () => {
               <span className="text-sm font-medium text-primary">Nestor</span>
               <div className="bg-white border-4 border-[#66dcb5] rounded-2xl rounded-tl-md px-4 py-3 max-w-xs">
                 <p className="text-sm text-foreground">
-                  Let's see how ready you are for a disaster coming your way. <strong>Are these statements true for you?</strong>
+                  Let's pretend a disaster is coming. Can you say these statement are true?
                 </p>
               </div>
             </div>
@@ -122,7 +123,7 @@ const SelfAssessmentPage = () => {
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
-                    src="/images/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                    src="/images/nestor-logo.png" 
                     alt="Nestor" 
                     className="w-full h-full object-cover"
                   />
@@ -169,7 +170,7 @@ const SelfAssessmentPage = () => {
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
-                    src="/images/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                    src="/images/nestor-logo.png" 
                     alt="Nestor" 
                     className="w-full h-full object-cover"
                   />
@@ -211,7 +212,7 @@ const SelfAssessmentPage = () => {
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                 <img 
-                  src="/images/5ecbaeee-0fb6-4b04-a635-a4092e7ac93d.png" 
+                  src="/images/nestor-logo.png" 
                   alt="Nestor" 
                   className="w-full h-full object-cover"
                 />
@@ -235,7 +236,7 @@ const SelfAssessmentPage = () => {
                     size="sm"
                     className="w-full"
                   >
-                    Go to Emergency Preparedness
+                    Go to Your Emergency Prep
                   </Button>
                 </div>
               </div>

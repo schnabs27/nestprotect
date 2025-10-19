@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, Circle } from "lucide-react";
-import nestorPreparedness from '@/assets/nestor-preparedness.png';
+import nestorDamagedNest from '/images/nestor-damaged-nest.png';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -190,8 +190,8 @@ const RecoveryPage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestorPreparedness}
-              alt="Nestor with checklist - Your recovery guide"
+              src={nestorDamagedNest}
+              alt="Nestor with a damaged nest"
               className="w-32 h-32 object-contain"
             />
           </div>

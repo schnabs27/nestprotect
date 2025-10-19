@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react';
-import nestorPreparedness from '@/assets/nestor-preparedness.png';
+import nestorPrep from '/images/nestor-prep.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MobileNavigation from '@/components/MobileNavigation';
@@ -223,7 +223,7 @@ export default function PreparePage() {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestorPreparedness}
+              src={nestorPrep}
               alt="Nestor with checklist - Your preparation guide"
               className="w-32 h-32 object-contain"
             />
@@ -231,7 +231,7 @@ export default function PreparePage() {
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Prepare for disasters.</h1>
             <p className="text-muted-foreground">
-              Select disaster categories below to see preparation tasks to complete weeks or months ahead.
+              Don't wait for disaster. Customize your prep list and start now!
             </p>
           </div>
         </div>

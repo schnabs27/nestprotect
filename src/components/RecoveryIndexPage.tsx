@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MobileNavigation from "@/components/MobileNavigation";
 import ZipCodeHeader from "@/components/ZipCodeHeader";
 import { ExternalLink, Heart, Users } from "lucide-react";
-import nestorRecovery from "@/assets/nestor-recovery.png";
+import nestorSearching from "/images/nestor-searching.png";
 
 const RecoveryIndexPage = () => {
   const { user, isGuest } = useAuth();
@@ -20,15 +20,15 @@ const RecoveryIndexPage = () => {
         <div className="text-center space-y-4">
           <div className="mx-auto w-32 h-32 flex items-center justify-center">
             <img 
-              src={nestorRecovery}
-              alt="Nestor with binoculars - Your disaster recovery guide"
+              src={nestorSearching}
+              alt="Nestor with binoculars - your disaster recovery guide"
               className="w-32 h-32 object-contain"
             />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-title">Disaster Recovery Resources</h1>
             <p className="text-muted-foreground">
-              Recovery after a natural disaster can be challenging. These resources can help you navigate the recovery process and find the support you need.
+              Checklists and search tools to help you recover faster.
             </p>
           </div>
 
@@ -39,13 +39,13 @@ const RecoveryIndexPage = () => {
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-purple-100 leading-none mb-4">
-                  Use your checklist to bounce back faster.
+                  Not sure where to start? Use this checklist.
                 </p>
                 <Button 
                   onClick={() => navigate("/recovery-checklist")} 
                   className="w-full bg-white hover:bg-gray-100 text-black"
                 >
-                  Go to Your Recovery Checklist
+                  Go to Your Recovery Task List
                 </Button>
               </div>
             </CardContent>
@@ -59,7 +59,7 @@ const RecoveryIndexPage = () => {
             <CardContent className="space-y-3">
               <div className="text-center">
                 <p className="text-sm text-muted-foreground leading-none mb-4">
-                  Organizations may offer help - but it can be hard to find. Nestor will use an AI tool called Perplexity to help track down announcements.             </p>
+                  Organizations may offer help - but it can be hard to find. Nestor uses AI tools to find announcements.             </p>
               
                 <Button 
                   onClick={() => navigate("/perplexitysearch")} 
