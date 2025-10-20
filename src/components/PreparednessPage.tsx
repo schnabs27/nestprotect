@@ -48,6 +48,7 @@ export default function PreparePage() {
   const [mainTasks, setMainTasks] = useState<MainTask[]>([]);
   const [subTasks, setSubTasks] = useState<SubTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedZipRisks, setHasLoadedZipRisks] = useState(false);
 
   const categories = [
     { id: 'basic', label: 'Basic', color: 'bg-primary' },
@@ -103,6 +104,74 @@ export default function PreparePage() {
 
     loadTasks();
   }, []);
+
+  // Auto-check filter chips based on user's zipcode risks (ONE TIME ONLY)
+  useEffect(() => {
+    const loadZipRisks = async () => {
+      // Only run once
+      if (hasLoadedZipRisks) return;
+      
+      // Only run for authenticated users
+      if (!user) {
+        setHasLoadedZipRisks(true);
+        return;
+      }
+
+      try {
+        // Get user's zipcode from profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('zip_code')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        const userZipCode = profileData?.zip_code;
+
+        // If no zipcode, just keep default (basic)
+        if (!userZipCode) {
+          setHasLoadedZipRisks(true);
+          return;
+        }
+
+        // Get risks for this zipcode
+        const { data: zipRiskData, error: zipRiskError } = await supabase
+          .from('zips_with_risks')
+          .select('high_risks_oneword')
+          .eq('zipcode', userZipCode)
+          .single();
+
+        if (zipRiskError) {
+          // No matching zipcode found, keep default
+          console.log('No risk data found for zipcode:', userZipCode);
+          setHasLoadedZipRisks(true);
+          return;
+        }
+
+        const risks = zipRiskData?.high_risks_oneword || [];
+
+        // Auto-check the relevant categories (including basic)
+        const autoCheckedCategories = new Set<string>(['basic']);
+        risks.forEach((risk: string) => {
+          // Make sure the risk matches one of our category IDs
+          if (categories.some(cat => cat.id === risk)) {
+            autoCheckedCategories.add(risk);
+          }
+        });
+
+        setSelectedCategories(autoCheckedCategories);
+        setHasLoadedZipRisks(true);
+
+      } catch (error) {
+        console.error('Error loading zip risks:', error);
+        // On error, just keep default behavior
+        setHasLoadedZipRisks(true);
+      }
+    };
+
+    loadZipRisks();
+  }, [user, hasLoadedZipRisks, categories]);
 
   // Load user progress
   useEffect(() => {
@@ -241,18 +310,18 @@ export default function PreparePage() {
               const isSelected = selectedCategories.has(category.id);
               
               return (
-<Badge
-  key={category.id}
-  variant="secondary"
-  className={`cursor-pointer hover:opacity-80 transition-smooth ${
-    isSelected 
-      ? `${category.color} text-white ring-2 ring-primary`
-      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
-  }`}
-  onClick={() => toggleCategory(category.id)}
->
-  {category.label}
-</Badge>
+                <Badge
+                  key={category.id}
+                  variant="secondary"
+                  className={`cursor-pointer hover:opacity-80 transition-smooth ${
+                    isSelected 
+                      ? `${category.color} text-white ring-2 ring-primary`
+                      : 'bg-background border border-input text-muted-foreground hover:bg-muted/50'
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  {category.label}
+                </Badge>
               );
             })}
           </div>
@@ -260,7 +329,7 @@ export default function PreparePage() {
 
         {/* Main Tasks List */}
         <Card className="shadow-soft">
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             {loading ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">Loading tasks...</p>

@@ -609,6 +609,7 @@ export type Database = {
           ERQK_RISKR: string | null
           HAIL_RISKR: string | null
           high_risks: string | null
+          high_risks_oneword: string[] | null
           HRCN_RISKR: string | null
           HWAV_RISKR: string | null
           ISTM_RISKR: string | null
@@ -627,7 +628,7 @@ export type Database = {
           VLCN_RISKR: string | null
           WFIR_RISKR: string | null
           WNTW_RISKR: string | null
-          zipcode: number
+          zipcode: string
         }
         Insert: {
           AVLN_RISKR?: string | null
@@ -642,6 +643,7 @@ export type Database = {
           ERQK_RISKR?: string | null
           HAIL_RISKR?: string | null
           high_risks?: string | null
+          high_risks_oneword?: string[] | null
           HRCN_RISKR?: string | null
           HWAV_RISKR?: string | null
           ISTM_RISKR?: string | null
@@ -660,7 +662,7 @@ export type Database = {
           VLCN_RISKR?: string | null
           WFIR_RISKR?: string | null
           WNTW_RISKR?: string | null
-          zipcode: number
+          zipcode: string
         }
         Update: {
           AVLN_RISKR?: string | null
@@ -675,6 +677,7 @@ export type Database = {
           ERQK_RISKR?: string | null
           HAIL_RISKR?: string | null
           high_risks?: string | null
+          high_risks_oneword?: string[] | null
           HRCN_RISKR?: string | null
           HWAV_RISKR?: string | null
           ISTM_RISKR?: string | null
@@ -693,7 +696,7 @@ export type Database = {
           VLCN_RISKR?: string | null
           WFIR_RISKR?: string | null
           WNTW_RISKR?: string | null
-          zipcode?: number
+          zipcode?: string
         }
         Relationships: []
       }
