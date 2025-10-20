@@ -143,7 +143,9 @@ const Homepage = () => {
             </p>
           </div>
         </div>
-
+        
+        {/* Scoreboards */}
+        <div className="grid gap-4 md:grid-cols-2">
 {/* Risk Assessment Card */}
         <Card className="shadow-soft">
           <CardContent className="p-6 text-center">
@@ -197,8 +199,6 @@ const Homepage = () => {
           </CardContent>
         </Card>
 
-        {/* Scoreboards */}
-        <div className="grid gap-4 md:grid-cols-2">
           {/* Prep Scoreboard */}
           <Card className="shadow-soft">
             <CardHeader className="pb-1">

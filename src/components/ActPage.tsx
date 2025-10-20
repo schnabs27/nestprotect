@@ -42,23 +42,23 @@ const ActPage = () => {
   const [loading, setLoading] = useState(true);
 
   const categories = [
-    { id: "basic", label: "Basic", color: "bg-primary" },
-    { id: "avalanche", label: "Avalanche", color: "bg-blue-300" },
-    { id: "cold", label: "Cold", color: "bg-blue-500" },
-    { id: "earthquake", label: "Earthquake", color: "bg-orange-600" },
-    { id: "flood", label: "Flood", color: "bg-blue-600" },
-    { id: "hail", label: "Hail", color: "bg-gray-400" },
-    { id: "heat", label: "Heat", color: "bg-coral" },
-    { id: "hurricane", label: "Hurricane", color: "bg-raspberry" },
-    { id: "ice", label: "Ice", color: "bg-cyan-300" },
-    { id: "landslide", label: "Landslide", color: "bg-orange-500" },
-    { id: "lightning", label: "Lightning", color: "bg-yellow" },
-    { id: "tornado", label: "Tornado", color: "bg-accent" },
-    { id: "tsunami", label: "Tsunami", color: "bg-blue-700" },
-    { id: "volcanic", label: "Volcanic", color: "bg-red-600" },
-    { id: "wildfire", label: "Wildfire", color: "bg-orange-700" },
-    { id: "wind", label: "Wind", color: "bg-gray-500" },
-    { id: "winter", label: "Winter", color: "bg-blue-400" }
+    { id: 'basic', label: 'Basic', color: 'bg-primary' },
+    { id: 'avalanche', label: 'Avalanche', color: 'bg-primary' },
+    { id: 'cold', label: 'Cold Wave', color: 'bg-primary' },
+    { id: 'earthquake', label: 'Earthquake', color: 'bg-primary' },
+    { id: 'flood', label: 'Flood', color: 'bg-primary' },
+    { id: 'hail', label: 'Hail', color: 'bg-primary' },
+    { id: 'heat', label: 'Heat Wave', color: 'bg-primary' },
+    { id: 'hurricane', label: 'Hurricane', color: 'bg-primary' },
+    { id: 'ice', label: 'Ice', color: 'bg-primary' },
+    { id: 'landslide', label: 'Landslide', color: 'bg-primary' },
+    { id: 'lightning', label: 'Lightning', color: 'bg-primary' },
+    { id: 'tornado', label: 'Tornado', color: 'bg-primary' },
+    { id: 'tsunami', label: 'Tsunami', color: 'bg-primary' },
+    { id: 'volcanic', label: 'Volcanic Activity', color: 'bg-primary' },
+    { id: 'wildfire', label: 'Wildfire', color: 'bg-primary' },
+    { id: 'wind', label: 'Windstorm', color: 'bg-primary' },
+    { id: 'winter', label: 'Winter Weather', color: 'bg-primary' },
   ];
 
   // Load tasks from Supabase
@@ -240,7 +240,7 @@ const ActPage = () => {
           {["coming", "here"].map((stage) => (
             <TabsContent key={stage} value={stage} className="mt-4">
               <Card className="shadow-soft">
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
                   {loading ? (
                     <div className="text-center py-8">
                       <p className="text-muted-foreground">Loading tasks...</p>
