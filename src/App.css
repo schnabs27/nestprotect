@@ -1,0 +1,5 @@
+/* App-specific styles (supplementing index.css design system) */
+
+#root {
+  min-height: 100vh;
+}

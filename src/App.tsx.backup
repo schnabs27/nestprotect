@@ -1,0 +1,61 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/components/AuthProvider";
+import AppRouter from "@/components/AppRouter";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+import PreparednessPage from "./components/PreparednessPage";
+import WeatherPage from "./components/WeatherPage";
+import ResourcesPage from "./components/ResourcesPage";
+import RecoveryResourcesPage from "./components/RecoveryResourcesPage";
+import AISearchPage from "./components/AISearchPage";
+import PerplexitySearchPage from "./components/PerplexitySearchPage";
+import RecoveryIndexPage from "./components/RecoveryIndexPage";
+import ProfilePage from "./components/ProfilePage";
+import NotFound from "./pages/NotFound";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import About from "./pages/About";
+import SelfAssessmentPage from "./components/SelfAssessmentPage";
+import ShortcutPage from "./components/ShortcutPage";
+import Auth from "./pages/Auth";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<AppRouter />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            <Route path="/preparedness" element={<ProtectedRoute><PreparednessPage /></ProtectedRoute>} />
+            <Route path="/during" element={<ProtectedRoute><WeatherPage /></ProtectedRoute>} />
+            <Route path="/after" element={<ProtectedRoute><RecoveryIndexPage /></ProtectedRoute>} />
+            <Route path="/googlesearch" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
+            <Route path="/googlerecovery" element={<ProtectedRoute><RecoveryResourcesPage /></ProtectedRoute>} />
+            <Route path="/aisearch" element={<ProtectedRoute><AISearchPage /></ProtectedRoute>} />
+            <Route path="/perplexitysearch" element={<ProtectedRoute><PerplexitySearchPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/self-assessment" element={<ProtectedRoute><SelfAssessmentPage /></ProtectedRoute>} />
+            <Route path="/shortcut" element={<ProtectedRoute><ShortcutPage /></ProtectedRoute>} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/about" element={<About />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
