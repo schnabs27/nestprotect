@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react';
 import nestorPreparedness from '@/assets/nestor-preparedness.png';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MobileNavigation from '@/components/MobileNavigation';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,6 +38,10 @@ interface SubTask {
   task_description: string;
   is_critical: boolean;
   sort_order: number;
+}
+
+interface GroupedTasks {
+  [category: string]: MainTask[];
 }
 
 export default function PreparePage() {
@@ -108,17 +112,14 @@ export default function PreparePage() {
   // Auto-check filter chips based on user's zipcode risks (ONE TIME ONLY)
   useEffect(() => {
     const loadZipRisks = async () => {
-      // Only run once
       if (hasLoadedZipRisks) return;
       
-      // Only run for authenticated users
       if (!user) {
         setHasLoadedZipRisks(true);
         return;
       }
 
       try {
-        // Get user's zipcode from profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('zip_code')
@@ -129,13 +130,11 @@ export default function PreparePage() {
 
         const userZipCode = profileData?.zip_code;
 
-        // If no zipcode, just keep default (basic)
         if (!userZipCode) {
           setHasLoadedZipRisks(true);
           return;
         }
 
-        // Get risks for this zipcode
         const { data: zipRiskData, error: zipRiskError } = await supabase
           .from('zips_with_risks')
           .select('high_risks_oneword')
@@ -143,7 +142,6 @@ export default function PreparePage() {
           .single();
 
         if (zipRiskError) {
-          // No matching zipcode found, keep default
           console.log('No risk data found for zipcode:', userZipCode);
           setHasLoadedZipRisks(true);
           return;
@@ -151,10 +149,8 @@ export default function PreparePage() {
 
         const risks = zipRiskData?.high_risks_oneword || [];
 
-        // Auto-check the relevant categories (including basic)
         const autoCheckedCategories = new Set<string>(['basic']);
         risks.forEach((risk: string) => {
-          // Make sure the risk matches one of our category IDs
           if (categories.some(cat => cat.id === risk)) {
             autoCheckedCategories.add(risk);
           }
@@ -165,7 +161,6 @@ export default function PreparePage() {
 
       } catch (error) {
         console.error('Error loading zip risks:', error);
-        // On error, just keep default behavior
         setHasLoadedZipRisks(true);
       }
     };
@@ -268,22 +263,45 @@ export default function PreparePage() {
     setExpandedTasks(newExpanded);
   };
 
-  const filteredMainTasks = mainTasks.filter(task => {
-    if (selectedCategories.size === 0) return false;
-    return Array.from(selectedCategories).some(category => 
-      task[category as keyof MainTask] === true
-    );
-  });
+  // Get primary category for a task (highest priority category where task is tagged)
+  const getPrimaryCategory = (task: MainTask): string | null => {
+    // Priority order: basic first, then alphabetically
+    const priorityOrder = ['basic', ...categories.filter(c => c.id !== 'basic').map(c => c.id).sort()];
+    
+    for (const categoryId of priorityOrder) {
+      if (selectedCategories.has(categoryId) && task[categoryId as keyof MainTask] === true) {
+        return categoryId;
+      }
+    }
+    return null;
+  };
+
+  // Group tasks by their primary category
+  const getGroupedTasks = (): GroupedTasks => {
+    const grouped: GroupedTasks = {};
+    
+    mainTasks.forEach(task => {
+      const primaryCategory = getPrimaryCategory(task);
+      if (primaryCategory) {
+        if (!grouped[primaryCategory]) {
+          grouped[primaryCategory] = [];
+        }
+        grouped[primaryCategory].push(task);
+      }
+    });
+    
+    return grouped;
+  };
 
   const getSubtasksForMainTask = (mainTaskId: string) => {
     return subTasks.filter(subtask => subtask.section_id === mainTaskId);
   };
 
-  const getCompletionStats = (mainTaskId: string) => {
-    const subtasks = getSubtasksForMainTask(mainTaskId);
-    const completed = subtasks.filter(st => completedSubtasks.has(st.id)).length;
-    return { completed, total: subtasks.length };
-  };
+  const groupedTasks = getGroupedTasks();
+  const orderedCategories = ['basic', ...categories.filter(c => c.id !== 'basic').map(c => c.id).sort()];
+  const categoriesToDisplay = orderedCategories.filter(catId => 
+    selectedCategories.has(catId) && groupedTasks[catId]?.length > 0
+  );
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-subtle">
@@ -327,9 +345,9 @@ export default function PreparePage() {
           </div>
         </div>
 
-        {/* Main Tasks List */}
+        {/* Main Tasks List with Category Headers */}
         <Card className="shadow-soft">
-          <CardContent className="space-y-4 pt-6">
+          <CardContent className="space-y-6 pt-6">
             {loading ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">Loading tasks...</p>
@@ -340,84 +358,101 @@ export default function PreparePage() {
                   Please select a disaster category to view preparation tasks
                 </p>
               </div>
-            ) : filteredMainTasks.length === 0 ? (
+            ) : categoriesToDisplay.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">
                   No tasks found for the selected categories
                 </p>
               </div>
             ) : (
-              filteredMainTasks.map(mainTask => {
-                const subtasks = getSubtasksForMainTask(mainTask.id);
-                const isExpanded = expandedTasks.has(mainTask.id);
-
+              categoriesToDisplay.map(categoryId => {
+                const category = categories.find(c => c.id === categoryId);
+                const tasksInCategory = groupedTasks[categoryId] || [];
+                
                 return (
-                  <div key={mainTask.id}>
-                    {/* Main Task Header */}
-                    <button
-                      onClick={() => toggleMainTask(mainTask.id)}
-                      className="w-full p-3 flex items-start justify-between rounded-lg border border-border hover:bg-muted/30 transition-smooth"
-                    >
-                      <div className="flex-1 text-left">
-                        <h3 className="font-medium text-foreground">
-                          {mainTask.main_task}
-                        </h3>
-                      </div>
-                      <div className="ml-4 flex-shrink-0">
-                        {isExpanded ? (
-                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                        )}
-                      </div>
-                    </button>
+                  <div key={categoryId} className="space-y-4">
+                    {/* Category Header */}
+                    <div className="border-b border-border pb-2">
+                      <h2 className="text-lg font-semibold text-primary">
+                        {category?.label}
+                      </h2>
+                    </div>
 
-                    {/* Subtasks */}
-                    {isExpanded && subtasks.length > 0 && (
-                      <div className="mt-2 ml-4 space-y-2">
-                        {subtasks.map(subtask => (
-                          <div
-                            key={subtask.id}
-                            className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                    {/* Tasks in this category */}
+                    {tasksInCategory.map(mainTask => {
+                      const subtasks = getSubtasksForMainTask(mainTask.id);
+                      const isExpanded = expandedTasks.has(mainTask.id);
+
+                      return (
+                        <div key={mainTask.id}>
+                          {/* Main Task Header */}
+                          <button
+                            onClick={() => toggleMainTask(mainTask.id)}
+                            className="w-full p-3 flex items-start justify-between rounded-lg border border-border hover:bg-muted/30 transition-smooth"
                           >
-                            <button
-                              onClick={() => toggleSubtask(subtask.id)}
-                              className="mt-1"
-                            >
-                              {completedSubtasks.has(subtask.id) ? (
-                                <CheckCircle2 size={20} className="text-primary" />
-                              ) : (
-                                <Circle size={20} className="text-muted-foreground" />
-                              )}
-                            </button>
-                            <div className="flex-1">
-                              <p className={`text-sm ${
-                                completedSubtasks.has(subtask.id)
-                                  ? 'text-muted-foreground line-through'
-                                  : 'text-foreground'
-                              }`}>
-                                {subtask.task_description}
-                              </p>
+                            <div className="flex-1 text-left">
+                              <h3 className="font-medium text-foreground">
+                                {mainTask.main_task}
+                              </h3>
                             </div>
-                          </div>
-                        ))}
-                        
-                        {mainTask.learn_more_url && (
-                          <div className="mt-2 ml-8">
-                            <p className="text-xs text-muted-foreground">
-                              Learn More: <a 
-                                href={mainTask.learn_more_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-primary hover:underline"
-                              >
-                                {mainTask.learn_more_url}
-                              </a>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                            <div className="ml-4 flex-shrink-0">
+                              {isExpanded ? (
+                                <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                              )}
+                            </div>
+                          </button>
+
+                          {/* Subtasks */}
+                          {isExpanded && subtasks.length > 0 && (
+                            <div className="mt-2 ml-4 space-y-2">
+                              {subtasks.map(subtask => (
+                                <div
+                                  key={subtask.id}
+                                  className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-smooth"
+                                >
+                                  <button
+                                    onClick={() => toggleSubtask(subtask.id)}
+                                    className="mt-1"
+                                  >
+                                    {completedSubtasks.has(subtask.id) ? (
+                                      <CheckCircle2 size={20} className="text-primary" />
+                                    ) : (
+                                      <Circle size={20} className="text-muted-foreground" />
+                                    )}
+                                  </button>
+                                  <div className="flex-1">
+                                    <p className={`text-sm ${
+                                      completedSubtasks.has(subtask.id)
+                                        ? 'text-muted-foreground line-through'
+                                        : 'text-foreground'
+                                    }`}>
+                                      {subtask.task_description}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                              
+                              {mainTask.learn_more_url && (
+                                <div className="mt-2 ml-8">
+                                  <p className="text-xs text-muted-foreground">
+                                    Learn More: <a 
+                                      href={mainTask.learn_more_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="text-primary hover:underline"
+                                    >
+                                      {mainTask.learn_more_url}
+                                    </a>
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })
