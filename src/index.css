@@ -64,8 +64,8 @@
     --destructive-foreground: 0 0% 100%;
 
     /* === Form & Borders === */
-    --border: 210 14% 92%;                /* Soft gray border / card stroke */
-    --input: 0 0% 100%;
+    --border: 220 13% 86%;                /* Soft gray border (#D5D8DD) — visible against white surfaces */
+    --input: 220 13% 86%;                 /* Match --border so shadcn inputs (which use border-input) show their stroke */
     --ring: 215 99% 46%;
 
     /* === Links === */
