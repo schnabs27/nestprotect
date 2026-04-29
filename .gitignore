@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Claude Code local session data
+.claude/
+
+# Backup/archive files
+*.zip
+
+# Video files (use external storage instead)
+*.mp4
+*.mov
