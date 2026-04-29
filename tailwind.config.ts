@@ -111,12 +111,15 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			},
-			backgroundImage: {
-        'gradient-primary': 'var(--gradient-primary)',
-        'gradient-phone': 'var(--gradient-phone)',
-        'gradient-purple': 'var(--gradient-purple)',
-				'gradient-subtle': 'var(--gradient-subtle)'
-			},
+backgroundImage: {
+  'gradient-primary': 'var(--gradient-primary)',
+  'gradient-cool': 'var(--gradient-cool)',
+  'gradient-special': 'var(--gradient-special)',
+  'gradient-sunset': 'var(--gradient-sunset)',
+  'gradient-phone': 'var(--gradient-phone)',
+  'gradient-purple': 'var(--gradient-purple)',
+  'gradient-subtle': 'var(--gradient-subtle)',
+},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
 				'medium': 'var(--shadow-medium)',
