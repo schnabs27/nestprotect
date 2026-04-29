@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { sanitizeZipCode, rateLimiter } from "@/utils/security";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -15,13 +14,15 @@ import { Link } from "react-router-dom";
 const Homepage = () => {
   const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
-  const [searchZipCode, setSearchZipCode] = useState("");
   const [riskData, setRiskData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [isEditingZip, setIsEditingZip] = useState(false);
+  const [zipInput, setZipInput] = useState("");
+  const [zipError, setZipError] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { zipCode: userZipCode, loading: locationLoading } = useUserLocation();
+  const { zipCode: userZipCode, loading: locationLoading, updateZipCode } = useUserLocation();
 
   // Fetch preparedness progress for authenticated users
   useEffect(() => {
@@ -83,11 +84,9 @@ const Homepage = () => {
     fetchAssessmentScore();
   }, [user]);
 
-  // Build FEMA URL when zip code is available and auto-fetch risk data
+  // Auto-fetch risk data when zip code changes
   useEffect(() => {
     if (userZipCode) {
-      setSearchZipCode(userZipCode);
-      // Auto-fetch risk data for user's zip code
       fetchRiskData(userZipCode);
     }
   }, [userZipCode]);
@@ -115,10 +114,24 @@ const Homepage = () => {
     }
   };
 
-  // Handle risk check
-  const handleRiskCheck = async () => {
-    if (searchZipCode.length !== 5) return;
-    fetchRiskData(searchZipCode);
+  const handleZipUpdate = async () => {
+    const clientId = 'zip_update_' + (navigator.userAgent?.slice(0, 50) || 'unknown');
+    if (!rateLimiter.isAllowed(clientId, 10, 60000)) {
+      setZipError("Too many attempts. Please wait before updating your ZIP code again.");
+      return;
+    }
+    const sanitized = sanitizeZipCode(zipInput);
+    if (!/^[0-9]{5}$/.test(sanitized)) {
+      setZipError("Please enter a 5-digit US zip code.");
+      return;
+    }
+    try {
+      await updateZipCode(sanitized);
+      setIsEditingZip(false);
+      setZipError("");
+    } catch {
+      setZipError("Failed to update ZIP code. Please try again.");
+    }
   };
 
   const assessmentTotalItems = 8;
@@ -144,6 +157,51 @@ const Homepage = () => {
           </div>
         </div>
         
+        {/* Zip Code Card */}
+        <div
+          className="rounded-lg shadow-soft p-6 text-center space-y-3"
+          style={{ background: 'linear-gradient(to bottom, #0162e8, #770bda)' }}
+        >
+          <p className="text-white text-sm">Tailor risks and resources to your zip code:</p>
+          {isEditingZip ? (
+            <>
+              <div>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={zipInput}
+                  onChange={(e) => setZipInput(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  className="w-36 text-center text-4xl rounded-xl px-4 py-2 bg-white outline-none border-none"
+                  style={{ fontWeight: 800 }}
+                  autoFocus
+                />
+              </div>
+              {zipError && <p className="text-white text-xs">{zipError}</p>}
+              <button onClick={handleZipUpdate} className="text-white underline text-sm">
+                Update
+              </button>
+            </>
+          ) : (
+            <>
+              <div
+                className="inline-block bg-white rounded-xl px-6 py-2 cursor-pointer"
+                onClick={() => { setZipInput(userZipCode || '78028'); setIsEditingZip(true); setZipError(''); }}
+              >
+                <span className="text-4xl" style={{ fontWeight: 800 }}>
+                  {userZipCode || '78028'}
+                </span>
+              </div>
+              <br />
+              <button
+                onClick={() => { setZipInput(userZipCode || '78028'); setIsEditingZip(true); setZipError(''); }}
+                className="text-white underline text-sm"
+              >
+                Update
+              </button>
+            </>
+          )}
+        </div>
+
         {/* Scoreboards */}
         <div className="grid gap-4 md:grid-cols-2">
 {/* Risk Assessment Card */}
@@ -154,48 +212,24 @@ const Homepage = () => {
               Your area has had these risks in the past, according to FEMA.
             </p>
             
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Zipcode"
-                  value={searchZipCode}
-                  onChange={(e) => setSearchZipCode(e.target.value)}
-                  maxLength={5}
-                  pattern="[0-9]{5}"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleRiskCheck}
-                  disabled={loading || searchZipCode.length !== 5}
-                  style={{
-                    background: 'linear-gradient(135deg, #efefef 0%, #efefef 100%)',
-                    color: 'black'
-                  }}
-                >
-                  Search Risks by Zipcode
-                </Button>
-              </div>
-              
-              {riskData && (
-                <div className="mt-4 space-y-2">
+            {riskData && (
+              <div className="mt-4 space-y-2">
+                <div>
+                  <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                  <span style={{ color: '#0162e8' }} className="font-semibold">
+                    {riskData.risk_rating || 'Not available'}
+                  </span>
+                </div>
+                {riskData.high_risks && (
                   <div>
-                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
+                    <span style={{ color: '#4b5563' }}>High Risks: </span>
                     <span style={{ color: '#0162e8' }} className="font-semibold">
-                      {riskData.risk_rating || 'Not available'}
+                      {riskData.high_risks}
                     </span>
                   </div>
-                  {riskData.high_risks && (
-                    <div>
-                      <span style={{ color: '#4b5563' }}>High Risks: </span>
-                      <span style={{ color: '#0162e8' }} className="font-semibold">
-                        {riskData.high_risks}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

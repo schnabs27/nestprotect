@@ -216,7 +216,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(to bottom, #0080e0, #00d2bc)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-primary">
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Branding */}
         <div className="text-center space-y-0.5">
@@ -235,15 +235,15 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
         <Card className="border-0 shadow-lg overflow-hidden" style={{
           background: 'white',
           border: '2px solid transparent',
-          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
+          backgroundImage: 'linear-gradient(white, white), linear-gradient(180deg, hsl(215 99% 46%), hsl(271 90% 45%))',
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box'
          }}>
           <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-3" style={{ color: '#7f1baf' }}>
+            <h3 className="text-xl font-bold mb-3 text-primary">
               Are you at risk?
             </h3>
-            <p className="mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
+            <p className="mb-4 leading-relaxed text-muted-foreground">
               FEMA tracks risks by county. Ready?
             </p>
             
@@ -261,10 +261,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                 <Button 
                   onClick={handleRiskCheck}
                   disabled={loading || zipCode.length !== 5}
-                  style={{
-                    background: 'linear-gradient(135deg, #b416ff 0%, #0080e0 100%)',
-                    color: 'white'
-                  }}
+                  className="bg-gradient-special text-white"
                 >
                   What's my risk?
                 </Button>
@@ -273,15 +270,15 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
               {riskData && (
                 <div className="mt-4 space-y-2">
                   <div>
-                    <span style={{ color: '#4b5563' }}>Risk Rating: </span>
-                    <span style={{ color: '#7f1baf' }} className="font-semibold">
+                    <span className="text-muted-foreground">Risk Rating: </span>
+                    <span className="text-primary font-semibold">
                       {riskData.risk_rating || 'Not available'}
                     </span>
                   </div>
                   {riskData.high_risks && (
                     <div>
-                      <span style={{ color: '#4b5563' }}>High Risks: </span>
-                      <span style={{ color: '#7f1baf' }} className="font-semibold">
+                      <span className="text-muted-foreground">High Risks: </span>
+                      <span className="text-primary font-semibold">
                         {riskData.high_risks}
                       </span>
                     </div>
@@ -307,7 +304,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
                     </td>
                     <td className="text-left pl-4 py-3">
                       <span className="text-gray-700">
-                        <span className="font-bold" style={{ color: '#0080e0' }}>Are you prepared? Take Nestor's quiz.</span> Then prep more with checklists.
+                        <span className="font-bold text-primary">Are you prepared? Take Nestor's quiz.</span> Then prep more with checklists.
                       </span>
                     </td>
                   </tr>
@@ -500,10 +497,7 @@ const AuthPage = ({ onAuthSuccess, onGuestAccess }: AuthPageProps) => {
             <div className="mt-4">
               <Button 
                 onClick={() => navigate("/about")}
-                className="w-full text-white font-medium"
-                style={{
-                  background: 'linear-gradient(135deg, #0080e0 0%, #00d2bc 100%)'
-                }}
+                className="w-full text-white font-medium bg-gradient-primary"
               >
                 View Details and Screenshots
               </Button>

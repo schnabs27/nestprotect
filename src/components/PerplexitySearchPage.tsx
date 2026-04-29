@@ -121,7 +121,7 @@ const PerplexitySearchPage = () => {
 
         {results && (
           <div className="mt-6">
-            <h2 className="text-xl font-bold px-4 mb-4" style={{ color: '#0080e0' }}>Search Results</h2>
+            <h2 className="text-xl font-bold px-4 mb-4 text-primary">Search Results</h2>
             
             {(() => {
               const sections = results.split(/(?=Category:)/).filter(record => record.trim());
@@ -181,7 +181,7 @@ const PerplexitySearchPage = () => {
                           <Card key={index} className="shadow-soft">
                             <CardContent className="p-4">
                               {nameValue && (
-                                <h3 className="font-bold mb-2" style={{ color: '#0080e0' }}>
+                                <h3 className="font-bold mb-2 text-primary">
                                   {nameValue}
                                 </h3>
                               )}

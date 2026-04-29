@@ -2,130 +2,175 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/*
+  NestProtect Design System
+  =========================
+  All colors, gradients, fonts, etc. are defined here.
+  Aligned to the official Canva brand kit (April 2026).
+  All colors MUST be HSL.
+
+  Key decisions:
+  - White page background for emergency readability
+  - All cards use white/gradient surface + soft gray stroke + soft gray glow
+  - Royal blue for all titles (purple reserved for special-callout gradients)
+  - Iconography limited to footer navigation only
+  - Gradients flow top-to-bottom (180deg)
+  - Cool gradient (blue→teal) is the primary brand gradient
 */
 
 @layer base {
   :root {
-    /* NestProtect Color System */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-
+    /* === Surfaces === */
+    --background: 0 0% 100%;              /* Pure white #FFFFFF */
+    --foreground: 215 14% 34%;            /* Slate #4b5563 */
+    --card: 0 0% 100%;                    /* White — cards float on white page */
+    --card-foreground: 215 14% 34%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 215 14% 34%;
 
-    /* Primary gradient colors */
-    --primary: 214 89% 45%; /* #0162e8 */
-    --primary-end: 167 92% 45%; /* #07deb4 */
+    /* === Primary (Royal Blue) === */
+    --primary: 215 99% 46%;               /* #0162e8 */
+    --primary-end: 174 100% 41%;          /* #00d2bc — teal, gradient endpoint */
     --primary-foreground: 0 0% 100%;
 
-    /* Title color */
-    --title: 214 89% 45%; /* #0162e8 */
+    /* === Title (matches Primary — single hero color) === */
+    --title: 215 99% 46%;                 /* #0162e8 — used for all titles & subheads */
     --title-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 95.3%; /* #F2F2F2 */
-    --secondary-foreground: 217 10% 44%; /* #6B7280 */
-
-    --muted: 0 0% 95.3%; /* #F2F2F2 */
-    --muted-foreground: 217 10% 44%; /* #6B7280 */
-
-    --accent: 269 87% 45%; /* #770bda purple */
+    /* === Accent (special-callout gradient use only — not for solid text/buttons) === */
+    --accent: 271 90% 45%;                /* #770bda — purple, callout gradient endpoint */
     --accent-foreground: 0 0% 100%;
 
-    /* Additional accent colors */
-    --coral: 16 100% 66%; /* #FF7F50 */
-    --coral-foreground: 0 0% 100%;
-    
-    --yellow: 51 100% 50%; /* #FFD400 */
-    --yellow-foreground: 0 0% 0%;
-    
-    --raspberry: 345 84% 56%; /* #e13363 */
-    --raspberry-foreground: 0 0% 100%;
-    
-    --success: 170 95% 43%; /* #05d8b5 */
-    --success-foreground: 0 0% 0%;
+    /* === Secondary / Muted === */
+    --secondary: 210 17% 95%;
+    --secondary-foreground: 215 14% 34%;
+    --muted: 210 17% 98%;
+    --muted-foreground: 215 14% 34%;      /* Slate #4b5563 */
 
-    --destructive: 0 84.2% 60.2%;
+    /* === Brand Accent Colors === */
+    --raspberry: 344 90% 49%;             /* #ee0c49 — official Canva pink/red */
+    --raspberry-foreground: 0 0% 100%;
+
+    --yellow: 43 100% 73%;                /* #ffd875 — gradient endpoint */
+    --yellow-foreground: 215 14% 34%;
+
+    --coral: 16 100% 66%;                 /* #FF7F50 — kept for legacy use */
+    --coral-foreground: 0 0% 100%;
+
+    /* === Semantic === */
+    --success: 174 100% 41%;              /* Aligned to teal #00d2bc */
+    --success-foreground: 0 0% 100%;
+    --destructive: 344 90% 49%;           /* Aligned to raspberry */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 95.3%;
-    --ring: 214 89% 45%;
+    /* === Form & Borders === */
+    --border: 210 14% 92%;                /* Soft gray border / card stroke */
+    --input: 0 0% 100%;
+    --ring: 215 99% 46%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(214 89% 45%), hsl(167 92% 45%));
-    --gradient-phone: linear-gradient(90deg, #b416ff 0%, #1e40af 100%);
-    --gradient-purple: linear-gradient(135deg, #b416ff 0%, #0080e0 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
-    
-    /* Shadows */
-    --shadow-soft: 0 2px 8px hsl(214 89% 45% / 0.08);
-    --shadow-medium: 0 4px 16px hsl(214 89% 45% / 0.12);
-    --shadow-strong: 0 8px 32px hsl(214 89% 45% / 0.16);
-    
-    /* Animations */
+    /* === Links === */
+    --link: 215 99% 46%;                  /* Royal blue on white */
+    --link-hover: 215 99% 36%;            /* Slightly darker on hover */
+    --link-on-dark: 0 0% 100%;            /* White on dark/gradient bg */
+
+    /*
+      === Gradients (top-to-bottom, 180deg) ===
+      Listed in order of usage frequency:
+
+      1. PRIMARY (Cool): Blue → Teal — sky on top, grass on bottom.
+         Used for primary CTAs, default brand surfaces, data viz.
+      2. SPECIAL (Brand): Blue → Purple — for premium/callout moments only.
+      3. SUNSET: Yellow → Pink/Red — rare, high-energy emergency CTAs only.
+    */
+
+    /* PRIMARY — Cool: #0162e8 → #00d2bc (sky to grass) */
+    --gradient-primary: linear-gradient(180deg, hsl(215 99% 46%), hsl(174 100% 41%));
+    /* Alias kept for backward compatibility */
+    --gradient-cool: linear-gradient(180deg, hsl(215 99% 46%), hsl(174 100% 41%));
+
+    /* SPECIAL — Brand: #0162e8 → #770bda (premium / callouts) */
+    --gradient-special: linear-gradient(180deg, hsl(215 99% 46%), hsl(271 90% 45%));
+    /* Aliases kept for backward compatibility */
+    --gradient-purple: linear-gradient(180deg, hsl(215 99% 46%), hsl(271 90% 45%));
+    --gradient-phone: linear-gradient(180deg, hsl(215 99% 46%), hsl(271 90% 45%));
+
+    /* SUNSET — Energy: #ffd875 → #ee0c49 (rare, emergency CTAs only) */
+    --gradient-sunset: linear-gradient(180deg, hsl(43 100% 73%), hsl(344 90% 49%));
+
+    /* Subtle background gradient */
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 17% 98%));
+
+    /* === Card Shadows (soft gray glow — floating effect) === */
+    --shadow-card: 0 1px 3px hsl(210 14% 75% / 0.18), 0 4px 16px hsl(210 14% 75% / 0.18);
+    --shadow-card-hover: 0 2px 6px hsl(210 14% 70% / 0.22), 0 8px 24px hsl(210 14% 70% / 0.22);
+
+    /* === Brand-Tinted Shadows (used sparingly) === */
+    --shadow-soft: 0 2px 8px hsl(215 99% 46% / 0.08);
+    --shadow-medium: 0 4px 16px hsl(215 99% 46% / 0.12);
+    --shadow-strong: 0 8px 32px hsl(215 99% 46% / 0.16);
+
+    /* === Motion === */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s ease-out;
 
+    /* === Layout === */
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* === Sidebar === */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 14% 34%;
+    --sidebar-primary: 215 99% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 17% 95%;
+    --sidebar-accent-foreground: 215 14% 34%;
+    --sidebar-border: 210 14% 92%;
+    --sidebar-ring: 215 99% 46%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 84% 5%;
     --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
+    --card: 217 33% 12%;
     --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 84% 5%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 215 99% 46%;
+    --primary-end: 174 100% 41%;
+    --primary-foreground: 0 0% 100%;
+    --title: 215 99% 46%;
+    --title-foreground: 0 0% 100%;
+    --secondary: 217 33% 18%;
     --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 271 90% 45%;
+    --accent-foreground: 0 0% 100%;
+    --raspberry: 344 90% 49%;
+    --raspberry-foreground: 0 0% 100%;
+    --yellow: 43 100% 73%;
+    --yellow-foreground: 215 14% 34%;
+    --coral: 16 100% 66%;
+    --coral-foreground: 0 0% 100%;
+    --success: 174 100% 41%;
+    --success-foreground: 0 0% 100%;
+    --destructive: 344 90% 49%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 215 99% 46%;
+    --link: 215 99% 56%;
+    --link-hover: 215 99% 66%;
+    --link-on-dark: 0 0% 100%;
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.3), 0 4px 16px hsl(0 0% 0% / 0.25);
+    --shadow-card-hover: 0 2px 6px hsl(0 0% 0% / 0.35), 0 8px 24px hsl(0 0% 0% / 0.3);
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 215 99% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 215 99% 46%;
   }
 }
 
@@ -133,17 +178,64 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Default link styles — royal blue on white, underline on hover */
+  a {
+    color: hsl(var(--link));
+    text-decoration: none;
+    transition: var(--transition-fast);
+  }
+  a:hover {
+    color: hsl(var(--link-hover));
+    text-decoration: underline;
+  }
+  /* Links on dark or gradient backgrounds */
+  .on-dark a,
+  a.on-dark {
+    color: hsl(var(--link-on-dark));
+  }
+  .on-dark a:hover,
+  a.on-dark:hover {
+    color: hsl(var(--link-on-dark));
+    text-decoration: underline;
   }
 }
 
 @layer components {
+  /*
+    Floating card — universal treatment for ALL cards.
+    Apply to white cards AND gradient/colored cards equally so they
+    sit at the same visual elevation in a grid.
+  */
+  .card-floating {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+  }
+  .card-floating:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Variant: gradient card — same stroke + glow, gradient fill */
+  .card-floating--gradient {
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius);
+    transition: var(--transition-smooth);
+  }
+  .card-floating--gradient:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
   .card-content-text {
     @apply text-sm text-muted-foreground leading-none;
   }
-  
+
   .text-body {
     @apply text-muted-foreground text-sm leading-relaxed;
   }
