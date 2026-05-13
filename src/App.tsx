@@ -24,6 +24,7 @@ import SelfAssessmentPage from "./components/SelfAssessmentPage";
 import ShortcutPage from "./components/ShortcutPage";
 import KidsPage from "./components/KidsPage";
 import Auth from "./pages/Auth";
+import { PwaUpdateBanner } from "@/components/PwaUpdateBanner";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <PwaUpdateBanner />
       <BrowserRouter>
         <AuthProvider>
           <Routes>
