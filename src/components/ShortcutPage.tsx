@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import MobileNavigation from "@/components/MobileNavigation";
-import nestorImage from "@/assets/nestor-smartphone.png";
+import nestorImage from "@/assets/nestor-smartphone.webp";
 
 const ShortcutPage = () => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({});

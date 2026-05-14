@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, Circle } from "lucide-react";
-import nestorDamagedNest from '/images/nestor-damaged-nest.png';
+import nestorDamagedNest from '/images/nestor-damaged-nest.webp';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

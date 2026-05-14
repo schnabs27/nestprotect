@@ -20,7 +20,7 @@ import WeatherMap from './WeatherMap';
 import GovernmentAlerts from './GovernmentAlerts';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import NestorTieHat from '/images/nestor-tie-hat.png';
+import NestorTieHat from '/images/nestor-tie-hat.webp';
 
 interface WeatherData {
   current: {

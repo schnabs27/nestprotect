@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MobileNavigation from "@/components/MobileNavigation";
 import ZipCodeHeader from "@/components/ZipCodeHeader";
 import { ExternalLink, Heart, Users } from "lucide-react";
-import nestorSearching from "/images/nestor-searching.png";
+import nestorSearching from "/images/nestor-searching.webp";
 
 const RecoveryIndexPage = () => {
   const { user, isGuest } = useAuth();

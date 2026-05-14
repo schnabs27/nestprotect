@@ -4,7 +4,7 @@ import MobileNavigation from "@/components/MobileNavigation";
 import ContactForm from "@/components/ContactForm";
 import ReviewForm from "@/components/ReviewForm";
 import { User, Heart, MapPin, Shield, ExternalLink, Info, LogOut } from "lucide-react";
-import NestorCap from "/images/nestor-cap.png";
+import NestorCap from "/images/nestor-cap.webp";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";

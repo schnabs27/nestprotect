@@ -101,7 +101,7 @@ const SelfAssessmentPage = () => {
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
               <img 
-                src="/images/nestor-logo.png" 
+                src="/images/nestor-logo.webp"
                 alt="Nestor" 
                 className="w-full h-full object-cover"
               />
@@ -123,7 +123,7 @@ const SelfAssessmentPage = () => {
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
-                    src="/images/nestor-logo.png" 
+                    src="/images/nestor-logo.webp"
                     alt="Nestor" 
                     className="w-full h-full object-cover"
                   />
@@ -170,7 +170,7 @@ const SelfAssessmentPage = () => {
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   <img 
-                    src="/images/nestor-logo.png" 
+                    src="/images/nestor-logo.webp"
                     alt="Nestor" 
                     className="w-full h-full object-cover"
                   />
@@ -212,7 +212,7 @@ const SelfAssessmentPage = () => {
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                 <img 
-                  src="/images/nestor-logo.png" 
+                  src="/images/nestor-logo.webp"
                   alt="Nestor" 
                   className="w-full h-full object-cover"
                 />
