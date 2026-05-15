@@ -13,7 +13,6 @@ import MobileNavigation from "@/components/MobileNavigation";
 import { Link } from "react-router-dom";
 
 const Homepage = () => {
-  const [prepProgress, setPrepProgress] = useState({ completed: 0, total: 10 });
   const [assessmentScore, setAssessmentScore] = useState(0);
   const [riskData, setRiskData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -24,34 +23,6 @@ const Homepage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { zipCode: userZipCode, loading: locationLoading, updateZipCode } = useUserLocation();
-
-  // Fetch preparedness progress for authenticated users
-  useEffect(() => {
-    const fetchPrepProgress = async () => {
-      if (!user) {
-        setPrepProgress({ completed: 0, total: 10 });
-        return;
-      }
-
-      try {
-        const allNowToplineItems = ['know-risk', 'household-plan', 'emergency-kit', 'go-bags', 'important-documents', 'shelter-plan', 'communication-plan', 'financial-prep', 'special-needs', 'practice-plan'];
-        
-        const { data: progressData } = await supabase
-          .from('user_preparedness_progress')
-          .select('task_id, completed')
-          .eq('user_id', user.id)
-          .in('task_id', allNowToplineItems);
-
-        const completedTasks = progressData?.filter(item => item.completed).length || 0;
-        setPrepProgress({ completed: completedTasks, total: allNowToplineItems.length });
-      } catch (error) {
-        console.error('Error fetching prep progress:', error);
-        setPrepProgress({ completed: 0, total: 10 });
-      }
-    };
-
-    fetchPrepProgress();
-  }, [user]);
 
   // Fetch assessment score for authenticated users
   useEffect(() => {

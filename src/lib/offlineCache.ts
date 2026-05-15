@@ -1,6 +1,7 @@
 import { get, set } from 'idb-keyval';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { prewarmChecklistMirrors } from './checklistSync';
 
 // Row type aliases drawn from the generated Database type
 type PrepMaintask     = Database['public']['Tables']['prep_maintasks']['Row'];
@@ -154,6 +155,7 @@ export async function prewarmForUser(userId: string): Promise<void> {
     await Promise.allSettled([
       data?.zip_code ? fetchZipRisk(data.zip_code) : Promise.resolve(),
       prewarmPlaybook(),
+      prewarmChecklistMirrors(userId),
     ]);
   } catch {
     // Pre-warming is best-effort; never throw.
