@@ -20,7 +20,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /\.png$/i,
+            urlPattern: /\.(png|webp)$/i,
             handler: "CacheFirst",
             options: {
               cacheName: "nestprotect-images",

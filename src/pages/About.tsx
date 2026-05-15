@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import nestorHelloCircle from "@/assets/nestor-hello-circle.png";
+import nestorHelloCircle from "@/assets/nestor-hello-circle.webp";
 
 const About = () => {
   const navigate = useNavigate();

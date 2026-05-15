@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchZipRisk } from '@/lib/offlineCache';
 import { useToast } from "@/hooks/use-toast";
 import { useUserLocation } from "@/hooks/useUserLocation";
 import MobileNavigation from "@/components/MobileNavigation";
@@ -97,14 +98,10 @@ const Homepage = () => {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('zips_with_risks')
-        .select('risk_rating, high_risks')
-        .eq('zipcode', parseInt(zip))
-        .single();
+      const { data, error } = await fetchZipRisk(zip);
 
       if (error) throw error;
-      
+
       setRiskData(data);
     } catch (error) {
       console.error('Error fetching risk data:', error);

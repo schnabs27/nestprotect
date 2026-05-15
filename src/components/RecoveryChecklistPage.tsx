@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, Circle } from "lucide-react";
-import nestorDamagedNest from '/images/nestor-damaged-nest.png';
+import nestorDamagedNest from '/images/nestor-damaged-nest.webp';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import MobileNavigation from "@/components/MobileNavigation";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchRecoveryTasks } from '@/lib/offlineCache';
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
@@ -64,14 +65,11 @@ const RecoveryPage = () => {
     const loadTasks = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('recovery_tasks')
-          .select('*')
-          .order('task', { ascending: true });
-
+        const { data, error } = await fetchRecoveryTasks();
         if (error) throw error;
 
-        setTasks(data || []);
+        const sorted = (data || []).sort((a, b) => a.task.localeCompare(b.task));
+        setTasks(sorted as Task[]);
       } catch (error) {
         console.error('Error loading tasks:', error);
         toast.error('Failed to load tasks');

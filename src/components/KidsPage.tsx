@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import MobileNavigation from "@/components/MobileNavigation";
-import nestorSuperhero from "/images/nestor-superhero.png";
-import letterA from "@/assets/abc-letter-a.png";
-import letterB from "@/assets/abc-letter-b.png";
-import letterC from "@/assets/abc-letter-c.png";
+import nestorSuperhero from "/images/nestor-superhero.webp";
+import letterA from "@/assets/abc-letter-a.webp";
+import letterB from "@/assets/abc-letter-b.webp";
+import letterC from "@/assets/abc-letter-c.webp";
 
 const KidsPage = () => {
   return (
