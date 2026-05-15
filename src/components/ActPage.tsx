@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileNavigation from "@/components/MobileNavigation";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActTasks } from '@/lib/offlineCache';
+import { getChecklistMirror, setChecklistMirror, writeChecklist } from '@/lib/checklistSync';
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
@@ -87,22 +88,19 @@ const ActPage = () => {
   useEffect(() => {
     const loadProgress = async () => {
       if (user) {
-        try {
-          const { data, error } = await supabase
+        const ids = await getChecklistMirror('act', user.id);
+        if (ids !== undefined) {
+          setCheckedItems(new Set(ids));
+        } else {
+          // Mirror not seeded yet (first-login race). Fall back to Supabase and seed.
+          const { data } = await supabase
             .from('act_task_user_state')
-            .select('task_id, is_checked')
+            .select('task_id')
             .eq('user_id', user.id)
             .eq('is_checked', true);
-
-          if (error) throw error;
-
-          const completedTasks = new Set(data?.map(item => item.task_id) || []);
-          setCheckedItems(completedTasks);
-        } catch (error) {
-          console.error('Error loading progress:', error);
-          toast.error('Failed to load your progress');
-          const saved = localStorage.getItem('actCheckedItems');
-          setCheckedItems(saved ? new Set(JSON.parse(saved)) : new Set());
+          const taskIds = data?.map(r => r.task_id) ?? [];
+          await setChecklistMirror('act', user.id, taskIds);
+          setCheckedItems(new Set(taskIds));
         }
       } else {
         const saved = localStorage.getItem('actCheckedItems');
@@ -140,31 +138,9 @@ const ActPage = () => {
 
     if (user) {
       try {
-        if (isCompleted) {
-          const { error } = await supabase
-            .from('act_task_user_state')
-            .upsert({
-              user_id: user.id,
-              task_id: taskUuid,
-              is_checked: true
-            }, {
-              onConflict: 'user_id,task_id'
-            });
-
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from('act_task_user_state')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('task_id', taskUuid);
-
-          if (error) throw error;
-        }
-      } catch (error) {
-        console.error('Error saving progress:', error);
+        await writeChecklist({ type: 'act', userId: user.id, taskId: taskUuid, action: isCompleted ? 'check' : 'uncheck' });
+      } catch {
         toast.error('Failed to save progress');
-        // Revert to previous state on error
         setCheckedItems(previousChecked);
       }
     } else {

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prewarmForUser } from '@/lib/offlineCache';
+import { startSyncEngine } from '@/lib/checklistSync';
 
 interface AuthContextType {
   user: User | null;
@@ -44,16 +45,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setIsGuest(false);
           if (event === 'SIGNED_IN') {
             void prewarmForUser(session.user.id);
+            startSyncEngine();
           }
         }
       }
     );
 
-    // Check for existing session
+    // Check for existing session (page reload with active session)
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        startSyncEngine();
+      }
     });
 
     return () => subscription.unsubscribe();
