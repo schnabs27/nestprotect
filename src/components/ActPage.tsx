@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileNavigation from "@/components/MobileNavigation";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchActTasks } from '@/lib/offlineCache';
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
 
@@ -66,14 +67,11 @@ const ActPage = () => {
     const loadTasks = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('act_tasks')
-          .select('*')
-          .order('task', { ascending: true });
-
+        const { data, error } = await fetchActTasks();
         if (error) throw error;
 
-        setTasks(data || []);
+        const sorted = (data || []).sort((a, b) => a.task.localeCompare(b.task));
+        setTasks(sorted as Task[]);
       } catch (error) {
         console.error('Error loading tasks:', error);
         toast.error('Failed to load tasks');

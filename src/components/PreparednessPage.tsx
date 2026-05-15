@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MobileNavigation from '@/components/MobileNavigation';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchPrepMaintasks, fetchPrepSubtasks, fetchZipRisk } from '@/lib/offlineCache';
 import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 
@@ -80,24 +81,16 @@ export default function PreparePage() {
       try {
         setLoading(true);
         
-        // Load main tasks
-        const { data: mainData, error: mainError } = await supabase
-          .from('prep_maintasks')
-          .select('*')
-          .order('sort_order', { ascending: true });
-
+        const { data: mainData, error: mainError } = await fetchPrepMaintasks();
         if (mainError) throw mainError;
 
-        // Load subtasks
-        const { data: subData, error: subError } = await supabase
-          .from('prep_subtasks')
-          .select('*')
-          .order('sort_order', { ascending: true });
-
+        const { data: subData, error: subError } = await fetchPrepSubtasks();
         if (subError) throw subError;
 
-        setMainTasks(mainData || []);
-        setSubTasks(subData || []);
+        const sortedMain = (mainData || []).sort((a, b) => a.sort_order - b.sort_order);
+        const sortedSub  = (subData  || []).sort((a, b) => a.sort_order - b.sort_order);
+        setMainTasks(sortedMain as MainTask[]);
+        setSubTasks(sortedSub   as SubTask[]);
       } catch (error) {
         console.error('Error loading tasks:', error);
         toast.error('Failed to load tasks');
@@ -135,11 +128,7 @@ export default function PreparePage() {
           return;
         }
 
-        const { data: zipRiskData, error: zipRiskError } = await supabase
-          .from('zips_with_risks')
-          .select('high_risks_oneword')
-          .eq('zipcode', userZipCode)
-          .single();
+        const { data: zipRiskData, error: zipRiskError } = await fetchZipRisk(userZipCode);
 
         if (zipRiskError) {
           console.log('No risk data found for zipcode:', userZipCode);
